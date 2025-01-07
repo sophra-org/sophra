@@ -34,14 +34,16 @@ jobs:
     - name: Run tests with coverage
       id: tests
       continue-on-error: true
-      run: pnpm test --reporter=junit
+      run: |
+        pnpm test
+        ls ./coverage  # Debug: verify coverage files exist after tests
 
     - name: Upload coverage reports to Codecov
       if: always()
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: './coverage'
+        slug: sophra-org/sophra
 
     - name: Upload test results to Codecov
       if: always()
