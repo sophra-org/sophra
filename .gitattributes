@@ -3,4 +3,6 @@
 *.{bat,[bB][aA][tT]} text eol=crlf
 *.xml text eol=lf
 coverage/**/*.xml text eol=lf
-test-report.junit.xml text eol=lf 
+test-report.junit.xml text eol=lf
+coverage/**/*.json text eol=lf
+*.lcov text eol=lf 

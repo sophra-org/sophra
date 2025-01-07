@@ -36,7 +36,19 @@ jobs:
       continue-on-error: true
       run: |
         pnpm test
-        ls ./coverage  # Debug: verify coverage files exist after tests
+        dir coverage
+        type coverage/coverage-final.json
+
+    - name: Debug coverage files
+      if: always()
+      shell: bash
+      run: |
+        echo "Checking file formats..."
+        file coverage/coverage-final.json
+        file coverage/lcov.info
+        echo "Line ending check..."
+        cat -A coverage/coverage-final.json | head -n 1
+        cat -A coverage/lcov.info | head -n 1
 
     - name: Upload coverage reports to Codecov
       if: always()
@@ -44,6 +56,9 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: sophra-org/sophra
+        files: ./coverage/coverage-final.json,./coverage/lcov.info
+        fail_ci_if_error: true
+        verbose: true
 
     - name: Upload test results to Codecov
       if: always()
