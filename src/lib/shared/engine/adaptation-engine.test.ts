@@ -72,8 +72,14 @@ describe('AdaptationEngine', () => {
     } as unknown as RuleRegistry;
 
     mockNotifyAction = {
-      execute: vi.fn()
-    };
+      execute: vi.fn(),
+      config: {
+        title: '',
+        message: '',
+        severity: 'error'
+      },
+      logger: mockLogger
+    } as unknown as NotifyAction;
 
     vi.mocked(NotifyAction).mockReturnValue(mockNotifyAction);
 

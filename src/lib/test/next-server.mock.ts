@@ -1,5 +1,7 @@
 import { vi } from 'vitest';
 import { NextRequest } from 'next/server';
+import { RequestCookies } from 'next/dist/server/web/spec-extension/cookies';
+import { NextURL } from 'next/dist/server/web/next-url';
 
 class MockResponse {
     constructor(data: any, init?: ResponseInit) {
@@ -29,31 +31,59 @@ class MockResponse {
 
 class MockRequest implements Partial<NextRequest> {
     readonly url: string;
-    readonly nextUrl: URL;
+    readonly nextUrl: NextURL;
     readonly headers: Headers;
-    readonly cookies: Map<string, string>;
-    readonly geo: { country?: string; city?: string; region?: string } | null;
-    readonly ip: string | null;
-    readonly body: string | null;
+    readonly cookies: RequestCookies;
+    readonly geo?: {
+        city?: string;
+        country?: string;
+        region?: string;
+        latitude?: string;
+        longitude?: string;
+    };
+    readonly ip?: string;
+    readonly body: ReadableStream<Uint8Array> | null;
     readonly searchParams: URLSearchParams;
 
     constructor(url: string, init?: RequestInit) {
         this.url = url;
-        this.nextUrl = new URL(url);
+        this.nextUrl = new NextURL(url);
         this.headers = new Headers(init?.headers);
-        this.cookies = new Map();
-        this.geo = null;
-        this.ip = null;
-        this.body = init?.body?.toString() || null;
+        this.cookies = new RequestCookies(this.headers);
+        this.geo = undefined;
+        this.ip = undefined;
+        this.body = init?.body ? new ReadableStream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode(init.body?.toString() || ''));
+                controller.close();
+            }
+        }) : null;
         this.searchParams = this.nextUrl.searchParams;
     }
-
     async json() {
-        return this.body ? JSON.parse(this.body) : {};
+        const text = await this.text();
+        return text ? JSON.parse(text) : {};
     }
 
     async text() {
-        return this.body || '';
+        if (!this.body) return '';
+        const reader = this.body.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            chunks.push(value);
+        }
+
+        const concatenated = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+        let offset = 0;
+        for (const chunk of chunks) {
+            concatenated.set(chunk, offset);
+            offset += chunk.length;
+        }
+
+        return new TextDecoder().decode(concatenated);
     }
 }
 

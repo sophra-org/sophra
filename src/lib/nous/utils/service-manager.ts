@@ -3,6 +3,7 @@ import { SignalCoordinator } from "@/lib/nous/observe/coordinator";
 import logger from "@/lib/shared/logger";
 import { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";
+import { prisma } from "@/lib/shared/database/client";
 
 interface ServiceConfig {
   redis?: {

@@ -43,7 +43,7 @@ vi.mock('@/lib/shared/database/client', () => ({
 }));
 
 // Regular imports after mocks
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { EngineService } from "./service";
 import type { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";

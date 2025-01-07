@@ -48,7 +48,7 @@ export class MetricsService {
             type: data.type,
             value: data.value,
             confidence: data.confidence,
-            metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+            metadata: data.metadata ? JSON.stringify(data.metadata) : undefined,
             operationId: data.operationId,
             timestamp: new Date(),
           },
@@ -91,11 +91,11 @@ export class MetricsService {
             interval: data.interval,
             sessionId: data.sessionId,
             modelId: data.modelId,
-            metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+            metadata: data.metadata ? JSON.stringify(data.metadata) : undefined,
             timestamp: new Date(),
             timeframe: "1h",
             aggregated: false,
-          },
+          }
         });
       });
 
@@ -123,7 +123,8 @@ export class MetricsService {
       const metrics = await prisma.engineMetric.findMany({
         where: {
           metadata: {
-            contains: variant,
+            path: ['variant'],
+            equals: variant,
           },
           timestamp: {
             gte: new Date(startTime),

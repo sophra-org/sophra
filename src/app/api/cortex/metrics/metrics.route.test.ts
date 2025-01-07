@@ -40,7 +40,7 @@ describe('GET /api/cortex/metrics', () => {
         mockServices.metrics.getMetrics.mockResolvedValue(mockMetricsData);
 
         const request = new MockNextRequest('http://localhost:3000/api/cortex/metrics');
-        const response = await GET(request);
+        const response = await GET(request as unknown as NextRequest);
         const content = await response.text();
         const headers = response.headers;
 
@@ -52,7 +52,7 @@ describe('GET /api/cortex/metrics', () => {
         mockServices.metrics.getMetrics.mockResolvedValue(null);
 
         const request = new MockNextRequest('http://localhost:3000/api/cortex/metrics');
-        const response = await GET(request);
+        const response = await GET(request as unknown as NextRequest);
         const data = await response.json();
 
         expect(data.success).toBe(false);
@@ -64,7 +64,7 @@ describe('GET /api/cortex/metrics', () => {
         mockServices.metrics.getMetrics.mockRejectedValue(serviceError);
 
         const request = new MockNextRequest('http://localhost:3000/api/cortex/metrics');
-        const response = await GET(request);
+        const response = await GET(request as unknown as NextRequest);
         const data = await response.json();
 
         expect(data.success).toBe(false);
@@ -82,7 +82,7 @@ describe('GET /api/cortex/metrics', () => {
         vi.mocked(serviceManager.getServices).mockResolvedValue({} as unknown as Services);
 
         const request = new MockNextRequest('http://localhost:3000/api/cortex/metrics');
-        const response = await GET(request);
+        const response = await GET(request as unknown as NextRequest);
         const data = await response.json();
 
         expect(data.success).toBe(false);
@@ -94,7 +94,7 @@ describe('GET /api/cortex/metrics', () => {
         mockServices.metrics.getMetrics.mockResolvedValue(mockMetricsData);
 
         const request = new MockNextRequest('http://localhost:3000/api/cortex/metrics');
-        await GET(request);
+        await GET(request as unknown as NextRequest);
 
         expect(vi.mocked(logger.debug)).toHaveBeenCalledWith(
             'Retrieved metrics',

@@ -53,19 +53,41 @@ describe('Health Check Route Handler', () => {
     it('should return healthy status when all services are connected', async () => {
         const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost:3000/api/health');
         const services = await serviceManager.getServices();
-        vi.mocked(services.elasticsearch.ping).mockResolvedValue({ 
-          status: 'green',
-          cluster_name: 'test-cluster',
-          number_of_nodes: 1,
-          active_shards: 5,
-          relocating_shards: 0,
-          initializing_shards: 0,
-          unassigned_shards: 0,
-          delayed_unassigned_shards: 0,
-          number_of_pending_tasks: 0,
-          number_of_in_flight_fetch: 0,
-          task_max_waiting_in_queue_millis: 0,
-          active_shards_percent_as_number: 100.0
+        vi.mocked(services.elasticsearch.ping).mockResolvedValue({
+            operational: true,
+            latency: 0,
+            errors: [],
+            metrics: {
+                cluster: {
+                    status: '',
+                    name: '',
+                    nodes: 0,
+                    dataNodes: 0,
+                    activePrimaryShards: 0,
+                    activeShards: 0,
+                    relocatingShards: 0,
+                    initializingShards: 0,
+                    unassignedShards: 0,
+                    pendingTasks: 0,
+                    maxTaskWaitTime: '0'
+                },
+                indices: {
+                    total: 0,
+                    healthy: 0,
+                    unhealthy: 0,
+                    size: '',
+                    documentCount: 0
+                },
+                performance: {
+                    queryLatency: 0,
+                    indexingLatency: 0,
+                    searchRate: 0,
+                    indexingRate: 0,
+                    cpuUsage: 0,
+                    memoryUsage: '0',
+                    diskUsage: '0'
+                }
+            }
         });
         vi.mocked(services.postgres.ping).mockResolvedValue(true);
         vi.mocked(services.redis.ping).mockResolvedValue(true);
@@ -84,7 +106,42 @@ describe('Health Check Route Handler', () => {
 
     it('should return unhealthy status when any service is disconnected', async () => {
         const services = await serviceManager.getServices();
-        vi.mocked(services.elasticsearch.ping).mockResolvedValue(true);
+        vi.mocked(services.elasticsearch.ping).mockResolvedValue({
+            operational: true,
+            latency: 0,
+            errors: [],
+            metrics: {
+                cluster: {
+                    status: '',
+                    name: '',
+                    nodes: 0,
+                    dataNodes: 0,
+                    activePrimaryShards: 0,
+                    activeShards: 0,
+                    relocatingShards: 0,
+                    initializingShards: 0,
+                    unassignedShards: 0,
+                    pendingTasks: 0,
+                    maxTaskWaitTime: '0'
+                },
+                indices: {
+                    total: 0,
+                    healthy: 0,
+                    unhealthy: 0,
+                    size: '',
+                    documentCount: 0
+                },
+                performance: {
+                    queryLatency: 0,
+                    indexingLatency: 0,
+                    searchRate: 0,
+                    indexingRate: 0,
+                    cpuUsage: 0,
+                    memoryUsage: '0',
+                    diskUsage: '0'
+                }
+            }
+        });
         vi.mocked(services.postgres.ping).mockResolvedValue(false);
         vi.mocked(services.redis.ping).mockResolvedValue(true);
 
@@ -114,7 +171,42 @@ describe('Health Check Route Handler', () => {
 
     it('should mask sensitive information in service URLs', async () => {
         const services = await serviceManager.getServices();
-        vi.mocked(services.elasticsearch.ping).mockResolvedValue(true);
+        vi.mocked(services.elasticsearch.ping).mockResolvedValue({
+            operational: true,
+            latency: 0,
+            errors: [],
+            metrics: {
+                cluster: {
+                    status: '',
+                    name: '',
+                    nodes: 0,
+                    dataNodes: 0,
+                    activePrimaryShards: 0,
+                    activeShards: 0,
+                    relocatingShards: 0,
+                    initializingShards: 0,
+                    unassignedShards: 0,
+                pendingTasks: 0,
+                maxTaskWaitTime: '0'
+            },
+            indices: {
+                total: 0,
+                healthy: 0,
+                unhealthy: 0,
+                size: '',
+                documentCount: 0
+            },
+            performance: {
+                queryLatency: 0,
+                indexingLatency: 0,
+                searchRate: 0,
+                indexingRate: 0,
+                cpuUsage: 0,
+                memoryUsage: '0',
+                diskUsage: '0'
+                }
+            }
+        });
         vi.mocked(services.postgres.ping).mockResolvedValue(true);
         vi.mocked(services.redis.ping).mockResolvedValue(true);
 

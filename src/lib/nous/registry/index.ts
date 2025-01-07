@@ -5,7 +5,8 @@ import {
 } from "@/lib/shared/database/validation/generated";
 import logger from "@/lib/shared/logger";
 import { MetadataManager } from "./metadata";
-import { RegistryEntry, RegistryStore } from "./store";
+import { RegistryEntry } from "@prisma/client";
+import { RegistryStore } from "@/lib/nous/registry/store";
 import { VersionManager } from "./version";
 import cuid from "cuid";
 
@@ -44,16 +45,22 @@ export class Registry {
       const validatedVersion = ModelVersionSchema.parse(modelVersion);
       console.log('Model version after validation:', validatedVersion);
 
-      const entry: RegistryEntry<ModelVersion> = {
+      const entry: RegistryEntry = {
         id: modelId,
         name: `model_${config.type}`,
         version: version.toString(),
         createdAt: modelVersion.createdAt,
         updatedAt: modelVersion.createdAt,
         metadata: { type: config.type },
-        data: validatedVersion,
+        config: {
+          ...validatedVersion,
+          createdAt: validatedVersion.createdAt.toISOString()
+        },
         tags: [config.type],
-        dependencies: [],
+        type: config.type,
+        status: 'ACTIVE',
+        description: null,
+        lastUsedAt: null
       };
 
       this.store.register(entry);
@@ -73,7 +80,13 @@ export class Registry {
   async getModel(modelId: string): Promise<ModelVersion | null> {
     try {
       const entry = this.store.get<ModelVersion>(modelId);
-      return entry?.data || null;
+      if (!entry?.config) return null;
+      
+      // Parse stored JSON back to ModelVersion
+      return {
+        ...entry.config as any,
+        createdAt: new Date(entry.config as string)
+      };
     } catch (error) {
       logger.error("Failed to retrieve model:", { error, modelId });
       return null;
@@ -83,19 +96,26 @@ export class Registry {
   async updateModel(modelId: string, updates: Partial<ModelVersion>): Promise<ModelVersion | null> {
     try {
       const entry = this.store.get<ModelVersion>(modelId);
-      if (!entry) {
-        return null;
-      }
+      if (!entry) return null;
 
-      const updated = { ...entry.data, ...updates };
+      const currentConfig = entry.config as any;
+      const updated = { 
+        ...currentConfig,
+        ...updates,
+        createdAt: currentConfig.createdAt // Preserve the original createdAt
+      };
+      
       ModelVersionSchema.parse(updated);
 
       const updatedEntry = this.store.update<ModelVersion>(modelId, {
-        data: updated,
+        config: {
+          ...updated,
+          createdAt: updated.createdAt.toISOString()
+        },
         updatedAt: new Date(),
       });
 
-      return updatedEntry?.data || null;
+      return this.getModel(modelId);
     } catch (error) {
       logger.error("Failed to update model:", { error, modelId, updates });
       return null;
@@ -125,7 +145,11 @@ export class Registry {
       const entries = type
         ? this.store.getByTag<ModelVersion>(type)
         : this.store.listEntries<ModelVersion>();
-      return entries.map(entry => entry.data);
+      
+      return entries.map(entry => ({
+        ...entry.config as any,
+        createdAt: new Date(entry.config as string)
+      }));
     } catch (error) {
       logger.error("Failed to list models:", { error, type });
       return [];

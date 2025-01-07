@@ -40,7 +40,7 @@ describe('Adaptation Rules API', () => {
                 { id: '1', name: 'Rule 1', description: 'Description 1', type: 'Type 1', conditions: {}, actions: {}, priority: RulePriority.HIGH, enabled: true, lastTriggered: null },
                 { id: '2', name: 'Rule 2', description: 'Description 2', type: 'Type 2', conditions: {}, actions: {}, priority: RulePriority.LOW, enabled: true, lastTriggered: null }
             ];
-            mockPrisma.adaptationRule.findMany.mockResolvedValue(mockRules);
+            vi.mocked(mockPrisma.adaptationRule.findMany).mockResolvedValue(mockRules);
 
             const response = await GET();
             const data = await response.json();
@@ -52,7 +52,7 @@ describe('Adaptation Rules API', () => {
         });
 
         it('should handle database errors during fetch', async () => {
-            mockPrisma.adaptationRule.findMany.mockRejectedValue(new Error('DB Error'));
+            vi.mocked(mockPrisma.adaptationRule.findMany).mockRejectedValue(new Error('DB Error'));
 
             const response = await GET();
             const data = await response.json();

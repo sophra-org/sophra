@@ -1,9 +1,13 @@
-import { RegistryEntry, RegistryMetadata } from "./metadata";
+import { RegistryEntry } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
 
-export type { RegistryEntry };
+// Create an interface that extends the Prisma-generated type
+interface RegistryEntryWithMetadata<T = JsonValue> extends Omit<RegistryEntry, 'metadata'> {
+  metadata: T;
+}
 
 export class RegistryStore {
-  private entries: Map<string, RegistryEntry<any>>;
+  private entries: Map<string, RegistryEntryWithMetadata>;
   private versionMap: Map<string, string[]>; // name -> [id1, id2, ...]
   private tagMap: Map<string, Set<string>>; // tag -> Set<id>
 
@@ -13,7 +17,7 @@ export class RegistryStore {
     this.tagMap = new Map();
   }
 
-  register<T>(entry: RegistryEntry<T>): void {
+  register(entry: RegistryEntryWithMetadata): void {
     if (this.entries.has(entry.id)) {
       throw new Error(`Entry with id ${entry.id} already exists`);
     }
@@ -27,17 +31,17 @@ export class RegistryStore {
     if (existingVersion) {
       throw new Error(`Entry with version ${entry.version} already exists for ${entry.name}`);
     }
-
     // Validate dependencies
-    if (entry.dependencies) {
+    const dependencies = (entry as any).dependencies;
+    if (dependencies) {
       // First check if all dependencies exist
-      for (const depId of entry.dependencies) {
+      for (const depId of dependencies) {
         if (!this.entries.has(depId)) {
           throw new Error(`Dependency ${depId} not found`);
         }
       }
       // Then check for circular dependencies
-      this.checkCircularDependencies(entry.id, entry.dependencies, new Set([entry.id]));
+      this.checkCircularDependencies(entry.id, dependencies, new Set([entry.id]));
     }
 
     // Ensure entry has required fields
@@ -46,7 +50,7 @@ export class RegistryStore {
       createdAt: entry.createdAt || new Date(),
       updatedAt: entry.updatedAt || new Date(),
       tags: entry.tags || [],
-      dependencies: entry.dependencies || [],
+      dependencies: (entry as any).dependencies || [],
     };
     
     this.entries.set(entry.id, registryEntry);
@@ -56,7 +60,7 @@ export class RegistryStore {
     this.versionMap.set(entry.name, versions);
 
     // Track tags
-    registryEntry.tags.forEach(tag => {
+    registryEntry.tags.forEach((tag: string) => {
       const taggedIds = this.tagMap.get(tag) || new Set();
       taggedIds.add(entry.id);
       this.tagMap.set(tag, taggedIds);
@@ -75,32 +79,32 @@ export class RegistryStore {
 
       visited.add(depId);
       const entry = this.entries.get(depId);
-      if (entry?.dependencies && entry.dependencies.length > 0) {
-        this.checkCircularDependencies(depId, entry.dependencies, visited);
+      const dependencies = (entry as any).dependencies;
+      if (dependencies && dependencies.length > 0) {
+        this.checkCircularDependencies(depId, dependencies, visited);
       }
     }
   }
 
-  update<T>(id: string, updates: Partial<RegistryEntry<T>>): RegistryEntry<T> | undefined {
+  update<T>(id: string, updates: Partial<RegistryEntryWithMetadata<T>>): RegistryEntryWithMetadata<T> | undefined {
     const existing = this.entries.get(id);
     if (!existing) {
       return undefined;
     }
-
     // Validate dependencies if they're being updated
-    if (updates.dependencies) {
+    if ((updates as any).dependencies) {
       // First check if all dependencies exist
-      for (const depId of updates.dependencies) {
+      for (const depId of (updates as any).dependencies) {
         if (!this.entries.has(depId)) {
           throw new Error(`Dependency ${depId} not found`);
         }
       }
       // Then check for circular dependencies
-      this.checkCircularDependencies(id, updates.dependencies, new Set([id]));
+      this.checkCircularDependencies(id, (updates as any).dependencies, new Set([id]));
     }
 
     // Remove old tag mappings
-    existing.tags?.forEach(tag => {
+    existing.tags?.forEach((tag: string) => {
       const taggedIds = this.tagMap.get(tag);
       if (taggedIds) {
         taggedIds.delete(id);
@@ -116,16 +120,17 @@ export class RegistryStore {
       ...updates,
       updatedAt: new Date(),
       // Preserve these fields from existing entry if not in updates
-      tags: updates.tags || existing.tags,
-      dependencies: updates.dependencies || existing.dependencies,
-      version: updates.version || existing.version,
-      name: updates.name || existing.name,
-    };
+      tags: updates.tags ?? existing.tags,
+      dependencies: (updates as any).dependencies ?? (existing as any).dependencies,
+      version: updates.version ?? existing.version,
+      name: updates.name ?? existing.name,
+      metadata: updates.metadata ?? existing.metadata,
+    } as RegistryEntryWithMetadata<T>;
 
-    this.entries.set(id, updated);
+    this.entries.set(id, updated as RegistryEntryWithMetadata<JsonValue>);
 
     // Update tag mappings
-    updated.tags.forEach(tag => {
+    updated.tags.forEach((tag: string) => {
       const taggedIds = this.tagMap.get(tag) || new Set();
       taggedIds.add(id);
       this.tagMap.set(tag, taggedIds);
@@ -134,12 +139,12 @@ export class RegistryStore {
     return updated;
   }
 
-  get<T>(id: string): RegistryEntry<T> | undefined {
+  get<T>(id: string): RegistryEntryWithMetadata<T> | undefined {
     const entry = this.entries.get(id);
-    return entry ? entry as RegistryEntry<T> : undefined;
+    return entry ? entry as RegistryEntryWithMetadata<T> : undefined;
   }
 
-  getLatestVersion<T>(name: string): RegistryEntry<T> | undefined {
+  getLatestVersion<T>(name: string): RegistryEntryWithMetadata<T> | undefined {
     const versions = this.versionMap.get(name);
     if (!versions || versions.length === 0) {
       return undefined;
@@ -155,18 +160,18 @@ export class RegistryStore {
     return this.get<T>(sortedVersions[0]);
   }
 
-  getByTag<T>(tag: string): RegistryEntry<T>[] {
+  getByTag<T>(tag: string): RegistryEntryWithMetadata<T>[] {
     const taggedIds = this.tagMap.get(tag);
     if (!taggedIds) {
       return [];
     }
     return Array.from(taggedIds)
       .map(id => this.entries.get(id))
-      .filter((entry): entry is RegistryEntry<T> => entry !== undefined);
+      .filter((entry): entry is RegistryEntryWithMetadata<JsonValue> => entry !== undefined) as RegistryEntryWithMetadata<T>[];
   }
 
-  listEntries<T>(): RegistryEntry<T>[] {
-    return Array.from(this.entries.values()) as RegistryEntry<T>[];
+  listEntries<T>(): RegistryEntryWithMetadata<T>[] {
+    return Array.from(this.entries.values()) as RegistryEntryWithMetadata<T>[];
   }
 
   delete(id: string): boolean {
@@ -191,7 +196,7 @@ export class RegistryStore {
     }
 
     // Remove from tag tracking
-    entry.tags?.forEach(tag => {
+    entry.tags?.forEach((tag: string) => {
       const taggedIds = this.tagMap.get(tag);
       if (taggedIds) {
         taggedIds.delete(id);

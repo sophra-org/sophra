@@ -1,30 +1,10 @@
-import { mockPrisma } from '@/lib/shared/test/prisma.mock';
-
-// Mock Prisma before other imports
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn(() => mockPrisma),
-  Prisma: {
-    JsonValue: undefined,
-    JsonObject: undefined,
-  },
-  ExperimentStatus: {
-    PENDING: 'PENDING',
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE'
-  }
-}));
-
-vi.mock('@/lib/shared/database/client', () => ({
-  default: mockPrisma,
-  prisma: mockPrisma
-}));
-
 // Regular imports after mocking
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 import logger from "@/lib/shared/logger";
 import { ExperimentStatus } from "@prisma/client";
+import { mockPrisma } from '~/vitest.setup';
 
 vi.mock('@/lib/shared/logger', () => ({
   default: {
@@ -81,7 +61,7 @@ describe('Apply Adaptation Route Handler', () => {
       }
     });
 
-    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue(null);
+    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue(null);
 
     const response = await POST(request);
     const data = await response.json();
@@ -108,7 +88,7 @@ describe('Apply Adaptation Route Handler', () => {
       }
     });
 
-    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue({
+    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue({
       id: 'test-id',
       name: 'Test Experiment',
       status: ExperimentStatus.PENDING,
@@ -201,11 +181,11 @@ describe('Apply Adaptation Route Handler', () => {
       }
     ];
 
-    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue({
+    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue({
       ...mockExperiment,
       endDate: new Date()
     });
-    vi.mocked(prisma.adaptationRule.findMany).mockResolvedValue(mockRules.map(rule => ({
+    vi.mocked(mockPrisma.adaptationRule.findMany).mockResolvedValue(mockRules.map(rule => ({
       id: rule.id,
       name: rule.name,
       type: 'ADAPTATION_RULE',
@@ -216,7 +196,7 @@ describe('Apply Adaptation Route Handler', () => {
       enabled: true,
       lastTriggered: null
     })));
-    vi.mocked(prisma.aBTest.update).mockResolvedValue({
+    vi.mocked(mockPrisma.aBTest.update).mockResolvedValue({
       ...mockExperiment,
       endDate: new Date(),
       configuration: {
@@ -290,11 +270,11 @@ describe('Apply Adaptation Route Handler', () => {
       }
     ];
 
-    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue({
+    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue({
       ...mockExperiment,
       endDate: new Date()
     });
-    vi.mocked(prisma.adaptationRule.findMany).mockResolvedValue(mockRules.map(rule => ({
+    vi.mocked(mockPrisma.adaptationRule.findMany).mockResolvedValue(mockRules.map(rule => ({
       id: rule.id,
       name: rule.name,
       description: '',
@@ -336,7 +316,7 @@ describe('Apply Adaptation Route Handler', () => {
       }
     });
 
-    vi.mocked(prisma.aBTest.findUnique).mockRejectedValue(new Error('Database error'));
+    vi.mocked(mockPrisma.aBTest.findUnique).mockRejectedValue(new Error('Database error'));
 
     const response = await POST(request);
     const data = await response.json();

@@ -34,6 +34,23 @@ describe('ABTestingService', () => {
     vi.clearAllMocks()
     service = new ABTestingService({
       environment: 'test',
+      logger: {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+        service: 'ab-testing',
+        silent: false,
+        format: () => ({
+          transform: (msg: any) => msg
+        }),
+        levels: {
+          error: 0,
+          warn: 1,
+          info: 2,
+          debug: 3,
+        }
+      } as any
     })
   })
 

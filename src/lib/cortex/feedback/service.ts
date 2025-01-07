@@ -2,6 +2,7 @@ import type { ElasticsearchService } from "@/lib/cortex/elasticsearch/services";
 import { SearchABTestingService } from "@/lib/cortex/feedback/ab-testing";
 import { AutomatedFeedbackProcessor } from "@/lib/cortex/feedback/automated-processor";
 import { MetricsService } from "@/lib/cortex/monitoring/metrics";
+import { prisma } from "@/lib/shared/database/client";
 import type { Logger } from "@/lib/shared/types";
 import { JsonValue } from "@prisma/client/runtime/library";
 /**

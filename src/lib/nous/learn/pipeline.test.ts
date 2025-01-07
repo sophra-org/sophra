@@ -287,16 +287,13 @@ describe('LearningPipeline', () => {
       // Mock OpenAI responses
       vi.mocked(mockOpenAI.createFineTune).mockResolvedValueOnce({
         jobId: mockJobId,
-        status: 'pending',
-        error: undefined,
+        status: 'queued',
       })
 
       vi.mocked(mockOpenAI.getFineTuneStatus)
         .mockResolvedValueOnce({
-          jobId: mockJobId,
           status: 'succeeded',
-          steps_completed: 100,
-          total_steps: 100,
+          fineTunedModel: 'test-model-id',
           error: undefined,
         })
 
@@ -355,17 +352,14 @@ describe('LearningPipeline', () => {
       // Override the successful mock from beforeEach
       vi.mocked(mockOpenAI.createFineTune).mockResolvedValueOnce({
         jobId: mockJobId,
-        status: 'pending',
-        error: undefined,
+        status: 'queued',
       })
 
       vi.mocked(mockOpenAI.getFineTuneStatus).mockReset()
       vi.mocked(mockOpenAI.getFineTuneStatus).mockResolvedValueOnce({
-        jobId: mockJobId,
         status: 'failed',
+        fineTunedModel: null,
         error: 'Fine-tuning failed',
-        steps_completed: 50,
-        total_steps: 100,
       })
 
       await expect(

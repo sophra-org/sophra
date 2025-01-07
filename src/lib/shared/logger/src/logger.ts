@@ -109,7 +109,7 @@ const createBrowserLogger = (component: string): Logger => {
     set level(newLevel: string) {
       currentLevel = newLevel as LogLevel;
     },
-  } as Logger;
+  } as unknown as Logger;
   return browserLogger;
 };
 

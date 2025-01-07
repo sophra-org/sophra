@@ -77,7 +77,7 @@ export class RedisCacheService extends BaseService {
    */
   async set(key: string, value: unknown, ttl: number): Promise<void> {
     const serializedValue = JSON.stringify(value);
-    await this.client.set(key, serializedValue, { EX: ttl });
+    await this.client.setEx(key, ttl, serializedValue);
   }
 
   /**
@@ -318,7 +318,6 @@ export class RedisCacheService extends BaseService {
             await this.searchService.search({
               index,
               query: JSON.parse(pattern.queryHash),
-              forceFresh: true,
             });
 
             this.logger.info("Warmed cache for query", {

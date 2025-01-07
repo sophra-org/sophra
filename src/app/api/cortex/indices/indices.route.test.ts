@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET, POST, DELETE } from './route';
 import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import prisma from '@/lib/shared/database/client';
 import { Services } from '@/lib/cortex/types/services';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { MockNextRequest } from './__mocks__/next-server';
+import { mockPrisma } from '~/vitest.setup';
 
 // Mock setup with proper typing
 vi.mock('@/lib/cortex/utils/service-manager', () => ({
@@ -104,7 +104,15 @@ describe('Indices API Routes', () => {
                 }
             };
             vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
-            vi.mocked(prisma.index.create).mockResolvedValue({ id: 1, name: 'test-index', status: 'active', created_at: new Date(), updated_at: new Date() });
+            vi.mocked(mockPrisma.index.create).mockResolvedValue({
+                id: '1', name: 'test-index', status: 'active', created_at: new Date(), updated_at: new Date(),
+                settings: null,
+                mappings: null,
+                deleted_at: null,
+                doc_count: 0,
+                size_bytes: 0,
+                health: ''
+            });
 
             const request = new MockNextRequest('http://localhost', {
                 method: 'POST',
@@ -117,7 +125,7 @@ describe('Indices API Routes', () => {
                 })
             });
 
-            const response = await POST(request);
+            const response = await POST(request as unknown as NextRequest);
             const data = await response.json();
 
             expect(response.status).toBe(200);
@@ -147,7 +155,7 @@ describe('Indices API Routes', () => {
                 })
             });
 
-            const response = await POST(request);
+            const response = await POST(request as unknown as NextRequest);
             const data = await response.json();
 
             expect(response.status).toBe(400);
@@ -160,9 +168,9 @@ describe('Indices API Routes', () => {
 
     describe('DELETE /api/cortex/indices', () => {
         it('should return error when index parameter is missing', async () => {
-            const request = new NextRequest('http://localhost?index=');
+            const request = new MockNextRequest('http://localhost?index=');
 
-            const response = await DELETE(request);
+            const response = await DELETE(request as unknown as NextRequest);
             const data = await response.json();
 
             expect(response.status).toBe(400);
@@ -178,9 +186,9 @@ describe('Indices API Routes', () => {
             };
             vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
 
-            const request = new NextRequest('http://localhost?index=test-index');
+            const request = new MockNextRequest('http://localhost?index=test-index');
 
-            const response = await DELETE(request);
+            const response = await DELETE(request as unknown as NextRequest);
             const data = await response.json();
 
             expect(response.status).toBe(200);

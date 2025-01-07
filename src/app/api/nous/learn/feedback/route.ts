@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { EngagementType, SignalType } from "@prisma/client";
+import { EngagementType, Prisma, SignalType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime

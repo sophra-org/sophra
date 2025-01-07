@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { SignalType } from "@prisma/client";
+import { Prisma, SignalType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime
@@ -79,10 +79,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       where: { id: signalId },
       data: {
         type,
-        value: result as Prisma.InputJsonValue,
+        value: result as unknown as Prisma.InputJsonValue,
         processed: true,
         processedAt: new Date(),
-        metadata: metadata as Prisma.InputJsonValue,
+        metadata: metadata as unknown as Prisma.InputJsonValue,
         error: error || null,
       },
     });

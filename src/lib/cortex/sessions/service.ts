@@ -57,7 +57,7 @@ export class SessionService {
 
   async getSession(sessionId: string): Promise<Session | null> {
     try {
-      const data = await this.redis.get(`session:${sessionId}`);
+      const data = await this.redis.getEx(`session:${sessionId}`);
       if (!data) {
         return null;
       }

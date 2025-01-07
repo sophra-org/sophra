@@ -38,7 +38,9 @@ export const LearnConfigSchema = z.object({
 export const ConfigSchema = z.object({
   environment: z.nativeEnum(Environment),
   server: ServerConfigSchema.default({}),
-  registry: RegistryConfigSchema.default({}),
+  registry: RegistryConfigSchema.default({
+    storagePath: './storage'
+  }),
   observe: ObserveConfigSchema.default({}),
   learn: LearnConfigSchema.default({}),
   debug: z.boolean().default(false),

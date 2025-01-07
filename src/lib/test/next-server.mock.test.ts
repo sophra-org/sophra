@@ -1,12 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mockNextServer } from './next-server.mock';
+import { MockRequest, MockResponse } from './next-server.mock';
 
 describe('NextServer Mock', () => {
   let NextResponse: any;
   let NextRequest: any;
-
   beforeEach(() => {
-    const mocks = mockNextServer();
+    const mocks = { NextResponse: MockResponse, NextRequest: MockRequest };
     NextResponse = mocks.NextResponse;
     NextRequest = mocks.NextRequest;
     vi.clearAllMocks();

@@ -1,4 +1,4 @@
-import { mockPrisma } from '../test/prisma.mock';
+import { mockPrisma } from '~/vitest.setup';
 
 // Mock Prisma before other imports
 vi.mock('@prisma/client', () => ({
@@ -35,6 +35,7 @@ import { LearningEngine } from "./learning-engine";
 import { MetricsAdapter } from "./adapters/metrics-adapter";
 import { MetricsService } from "../../cortex/monitoring/metrics";
 import { EnhancedPrismaClient } from '../database/client';
+import { EngineOperation } from '@/lib/nous/engine/types';
 
 type JsonValue = Prisma.JsonValue;
 
@@ -102,7 +103,7 @@ describe("LearningEngine", () => {
         timeBased: mockTimeBasedProcessor,
         strategy: mockStrategyProcessor,
       },
-      mockPrisma
+      mockPrisma as unknown as EnhancedPrismaClient
     );
   });
 
@@ -112,27 +113,35 @@ describe("LearningEngine", () => {
 
   describe("detectPatterns", () => {
     it("should create an operation and analyze patterns", async () => {
-      const mockOperation: MockEngineOperation = {
+      const mockOperation = {
         id: "1",
-        type: EngineOperationType.PATTERN_DETECTION,
-        status: EngineOperationStatus.RUNNING,
+        type: "PATTERN_DETECTION",
+        status: "RUNNING",
         startTime: new Date(),
-        endTime: null,
+        endTime: undefined,
         error: null,
         metrics: {},
         metadata: {},
         createdAt: new Date(),
         updatedAt: new Date()
       };
-      
-      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(mockOperation);
-      vi.mocked(mockPrisma.engineOperation.update).mockResolvedValue({
+      const mockOperationWithEndTime = {
         ...mockOperation,
+        endTime: null
+      };
+      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(mockOperationWithEndTime);
+      vi.mocked(mockPrisma.engineOperation.update).mockResolvedValue({
+        id: mockOperation.id,
+        type: mockOperation.type,
         status: EngineOperationStatus.COMPLETED,
+        startTime: mockOperation.startTime,
         endTime: new Date(),
-        metrics: {},
-        metadata: {}
-      } as MockEngineOperation);
+        error: null,
+        metrics: {} as JsonValue,
+        metadata: {} as JsonValue,
+        createdAt: mockOperation.createdAt,
+        updatedAt: mockOperation.updatedAt
+      });
 
       const events: LearningEvent[] = [];
       const mockPatterns = [{
@@ -161,7 +170,7 @@ describe("LearningEngine", () => {
 
       const result = await engine.detectPatterns(events);
 
-      expect(result.operation.type).toBe(EngineOperationType.PATTERN_DETECTION);
+      expect(result.operation.type).toBe("PATTERN_DETECTION");
       expect(result.operation.status).toBe(EngineOperationStatus.COMPLETED);
       expect(result.patterns).toEqual(mockPatterns);
     });

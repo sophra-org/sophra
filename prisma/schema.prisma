@@ -941,3 +941,43 @@ enum EngineOperationStatus {
   COMPLETED
   FAILED
 }
+
+model RegistryEntry {
+  id           String    @id @default(cuid())
+  type         String
+  name         String    @unique
+  description  String?
+  status       String    @default("ACTIVE")  // ACTIVE, DISABLED, DEPRECATED
+  version      String?
+  metadata     Json
+  config       Json?
+  tags         String[]
+  dependencies String[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastUsedAt   DateTime?
+
+  @@index([type])
+  @@index([status])
+  @@index([name])
+  @@map("registry_entries")
+}
+
+model RegistryMetadata {
+  id            String   @id @default(cuid())
+  entryId       String?  // Optional reference to RegistryEntry
+  namespace     String   // For grouping related metadata
+  key           String
+  value         Json
+  description   String?
+  isEncrypted   Boolean  @default(false)
+  lastUpdatedBy String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([namespace, key])
+  @@index([entryId])
+  @@index([namespace])
+  @@index([key])
+  @@map("registry_metadata")
+}

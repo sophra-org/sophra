@@ -3,7 +3,7 @@ import { GET, PUT } from './route';
 import { serviceManager } from '@/lib/cortex/utils/service-manager';
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/lib/shared/logger';
-import prisma from '@/lib/shared/database/client';
+import { mockPrisma } from '~/vitest.setup';
 import { Services } from '@/lib/cortex/types/services';
 import { PrismaClient } from '@prisma/client';
 
@@ -22,24 +22,20 @@ vi.mock('next/server', () => ({
     NextRequest: class MockNextRequest {
         url: string;
         nextUrl: URL;
+        body: string | null;
 
         constructor(url: string, init?: RequestInit) {
             this.url = url;
             this.nextUrl = new URL(url);
-            if (init?.body) {
-                Object.defineProperty(this, 'body', {
-                    value: init.body,
-                    writable: false
-                });
-            }
+            this.body = init?.body as string || null;
         }
 
         async json() {
-            return JSON.parse(this.body as string);
+            return this.body ? JSON.parse(this.body) : null;
         }
 
         async text() {
-            return this.body as string;
+            return this.body || '';
         }
     },
     NextResponse: {
@@ -74,7 +70,7 @@ describe('Document vectorization endpoints', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(fetch).mockClear();
-        const prismaClient = prisma as unknown as PrismaClient;
+        const prismaClient = mockPrisma as unknown as PrismaClient;
         vi.mocked(prismaClient.index.findUnique).mockReset();
     });
 
@@ -92,7 +88,7 @@ describe('Document vectorization endpoints', () => {
         });
 
         it('should return 404 when index is not found', async () => {
-            const prismaClient = prisma as unknown as PrismaClient;
+            const prismaClient = mockPrisma as unknown as PrismaClient;
             vi.mocked(prismaClient.index.findUnique).mockResolvedValue(null);
             
             const req = new NextRequest('http://localhost/api/documents/123/vectorize?indexId=test-index');
@@ -107,7 +103,7 @@ describe('Document vectorization endpoints', () => {
         });
 
         it('should handle successful vectorization', async () => {
-            const prismaClient = prisma as unknown as PrismaClient;
+            const prismaClient = mockPrisma as unknown as PrismaClient;
             vi.mocked(prismaClient.index.findUnique).mockResolvedValue(mockIndex);
             
             const mockEmbeddings = new Array(3072).fill(0.1);
@@ -172,7 +168,7 @@ describe('Document vectorization endpoints', () => {
         });
 
         it('should handle successful document update', async () => {
-            const prismaClient = prisma as unknown as PrismaClient;
+            const prismaClient = mockPrisma as unknown as PrismaClient;
             vi.mocked(prismaClient.index.findUnique).mockResolvedValue(mockIndex);
             
             vi.mocked(fetch).mockImplementation(() => 
@@ -214,7 +210,7 @@ describe('Document vectorization endpoints', () => {
         });
 
         it('should handle invalid JSON input', async () => {
-            const prismaClient = prisma as unknown as PrismaClient;
+            const prismaClient = mockPrisma as unknown as PrismaClient;
             vi.mocked(prismaClient.index.findUnique).mockResolvedValue(mockIndex);
             
             const req = new NextRequest(

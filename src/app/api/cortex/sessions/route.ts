@@ -53,14 +53,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       userId: body.userId,
       metadata: body.metadata,
     });
-    const convertedSession = convertPrismaSession(session);
+    const convertedSession = {
+      id: session.id,
+      userId: session.userId,
+      startedAt: new Date(),
+      lastActiveAt: new Date(),
+      metadata: session.metadata || {},
+      createdAt: session.createdAt,
+      updatedAt: new Date()
+    };
     const jsonSafeSession = {
       ...convertedSession,
       metadata: convertedSession.metadata || null,
     };
-    await services.sessions.cacheSession(
-      convertedSession.id,
-      JSON.stringify(jsonSafeSession)
+    await services.redis.set(
+      `session:${convertedSession.id}`,
+      JSON.stringify(jsonSafeSession),
+      3600,
     );
 
     services.metrics.recordLatency(

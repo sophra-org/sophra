@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { NextRequest, NextResponse } from 'next/server';
 import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import prisma from '@/lib/shared/database/client';
+import { prisma } from '@/lib/shared/database/client';
 import logger from '@/lib/shared/logger';
 
 vi.mock('@/lib/cortex/utils/service-manager', () => ({

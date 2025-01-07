@@ -75,6 +75,8 @@ export interface EngineState {
 }
 
 export interface EngineOperation {
+  createdAt: Date;
+  updatedAt: Date;
   id: string;
   type: EngineOperationType;
   status: EngineOperationStatus;

@@ -154,7 +154,10 @@ export class ServiceManager {
   private async createBaseServices() {
     const metricsService = new MetricsService({ 
       logger,
-      environment: this.config.environment
+      environment: process.env.NODE_ENV as
+        | "development"
+        | "production"
+        | "test",
     });
 
     const elasticsearch = new ElasticsearchService({
@@ -220,7 +223,11 @@ export class ServiceManager {
       prisma,
     });
 
-    const sessions = new SessionService(this.redis!);
+    const sessions = new SessionService({
+      redis: redisClient,
+      logger: logger,
+      environment: process.env.NODE_ENV as "development" | "production" | "test",
+    });
 
     const baseServices = {
       elasticsearch,

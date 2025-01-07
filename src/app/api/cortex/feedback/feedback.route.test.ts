@@ -3,7 +3,7 @@ import { GET, POST } from './route';
 import { serviceManager } from '@/lib/cortex/utils/service-manager';
 import { Services } from '@/lib/cortex/types/services';
 import { PrismaClient } from '@prisma/client';
-import prisma from '@/lib/shared/database/client';
+import { prisma } from '@/lib/shared/database/client';
 import logger from '@/lib/shared/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { MockNextRequest } from './__mocks__/next-server';
@@ -69,7 +69,7 @@ describe('GET /api/cortex/feedback', () => {
         vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
 
         const req = mockRequest();
-        const res = await GET(req);
+        const res = await GET(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(true);
@@ -83,7 +83,7 @@ describe('GET /api/cortex/feedback', () => {
         vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
 
         const req = mockRequest({ timeframe: '7d', limit: '50' });
-        const res = await GET(req);
+        const res = await GET(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(true);
@@ -100,7 +100,7 @@ describe('GET /api/cortex/feedback', () => {
         vi.mocked(prisma.feedbackRequest.findMany).mockRejectedValue(new Error('Database error'));
 
         const req = mockRequest();
-        const res = await GET(req);
+        const res = await GET(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(false);
@@ -160,7 +160,11 @@ describe('POST /api/cortex/feedback', () => {
             searchType: 'FEEDBACK',
             totalHits: 0,
             took: 0,
-            sessionId: 'test-session'
+            sessionId: 'test-session',
+            facetsUsed: null,
+            resultIds: [],
+            page: 1,
+            pageSize: 10
         });
         vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
     });
@@ -176,7 +180,7 @@ describe('POST /api/cortex/feedback', () => {
             method: 'POST',
             body: JSON.stringify(validFeedbackBody)
         });
-        const res = await POST(req);
+        const res = await POST(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(false);
@@ -191,7 +195,7 @@ describe('POST /api/cortex/feedback', () => {
             method: 'POST',
             body: JSON.stringify(validFeedbackBody)
         });
-        const res = await POST(req);
+        const res = await POST(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(false);
@@ -206,7 +210,7 @@ describe('POST /api/cortex/feedback', () => {
             method: 'POST',
             body: JSON.stringify(validFeedbackBody)
         });
-        const res = await POST(req);
+        const res = await POST(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(false);
@@ -220,7 +224,7 @@ describe('POST /api/cortex/feedback', () => {
             method: 'POST',
             body: JSON.stringify(validFeedbackBody)
         });
-        const res = await POST(req);
+        const res = await POST(req as unknown as NextRequest);
         const data = await res.json();
 
         expect(data.success).toBe(true);

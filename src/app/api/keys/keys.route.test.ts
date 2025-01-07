@@ -16,6 +16,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST, GET, PUT, PATCH, DELETE } from './route';
 import { prisma } from "@/lib/shared/database/client";
 import * as adminMiddleware from './admin.middleware';
+import { INTERNALS } from 'next/dist/server/web/spec-extension/request';
+import { ResponseCookies } from 'next/dist/server/web/spec-extension/cookies';
+import { NextResponse } from 'next/server';
 
 vi.mock('./admin.middleware', () => ({
 	adminMiddleware: vi.fn()
@@ -51,8 +54,27 @@ describe('API Keys Route Handlers', () => {
 			status: 200,
 			ok: true,
 			headers: new Headers(),
-			json: async () => ({})
-		});
+			json: async () => ({}),
+			cookies: new ResponseCookies(new Headers()),
+			redirected: false,
+			statusText: '',
+			type: 'default',
+			url: '',
+			clone: function (): Response {
+				return structuredClone(this) as Response;
+			},
+			body: null,
+			bodyUsed: false,
+			arrayBuffer: async () => new ArrayBuffer(0),
+			blob: async () => new Blob(),
+			formData: async () => new FormData(),
+			text: async () => '',
+			[INTERNALS]: {
+				cookies: new Map(),
+				url: 'http://localhost:3000/api/keys',
+				body: null
+			}
+		} as unknown as NextResponse)
 	});
 
 	describe('POST /api/keys', () => {
@@ -128,7 +150,12 @@ describe('API Keys Route Handlers', () => {
 				usageCount: 0
 			}];
 
-			vi.mocked(prisma.apiKey.findMany).mockResolvedValue(mockApiKeys);
+			const mappedApiKeys = mockApiKeys.map(key => ({
+				...key,
+				key: 'test-key'
+			}));
+
+			vi.mocked(prisma.apiKey.findMany).mockResolvedValue(mappedApiKeys);
 
 			const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys');
 			const response = await GET(request);

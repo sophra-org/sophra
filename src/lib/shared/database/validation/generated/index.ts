@@ -158,6 +158,10 @@ export const AdminTokenScalarFieldEnumSchema = z.enum(['id','token','name','desc
 
 export const SessionToSignalScalarFieldEnumSchema = z.enum(['A','B']);
 
+export const RegistryEntryScalarFieldEnumSchema = z.enum(['id','type','name','description','status','version','metadata','config','tags','createdAt','updatedAt','lastUsedAt']);
+
+export const RegistryMetadataScalarFieldEnumSchema = z.enum(['id','entryId','namespace','key','value','description','isEncrypted','lastUpdatedBy','createdAt','updatedAt']);
+
 export const SortOrderSchema = z.enum(['asc','desc']);
 
 export const JsonNullValueInputSchema = z.enum(['JsonNull',]).transform((value) => (value === 'JsonNull' ? Prisma.JsonNull : value));
@@ -1113,6 +1117,46 @@ export const SessionToSignalSchema = z.object({
 })
 
 export type SessionToSignal = z.infer<typeof SessionToSignalSchema>
+
+/////////////////////////////////////////
+// REGISTRY ENTRY SCHEMA
+/////////////////////////////////////////
+
+export const RegistryEntrySchema = z.object({
+  id: z.string().cuid(),
+  type: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  status: z.string(),
+  version: z.string().nullable(),
+  metadata: JsonValueSchema,
+  config: JsonValueSchema.nullable(),
+  tags: z.string().array(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  lastUsedAt: z.coerce.date().nullable(),
+})
+
+export type RegistryEntry = z.infer<typeof RegistryEntrySchema>
+
+/////////////////////////////////////////
+// REGISTRY METADATA SCHEMA
+/////////////////////////////////////////
+
+export const RegistryMetadataSchema = z.object({
+  id: z.string().cuid(),
+  entryId: z.string().nullable(),
+  namespace: z.string(),
+  key: z.string(),
+  value: JsonValueSchema,
+  description: z.string().nullable(),
+  isEncrypted: z.boolean(),
+  lastUpdatedBy: z.string().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type RegistryMetadata = z.infer<typeof RegistryMetadataSchema>
 
 /////////////////////////////////////////
 // SELECT & INCLUDE
@@ -2318,6 +2362,40 @@ export const SessionToSignalSelectSchema: z.ZodType<Prisma.SessionToSignalSelect
   B: z.boolean().optional(),
   sessions: z.union([z.boolean(),z.lazy(() => SessionArgsSchema)]).optional(),
   Signal: z.union([z.boolean(),z.lazy(() => SignalArgsSchema)]).optional(),
+}).strict()
+
+// REGISTRY ENTRY
+//------------------------------------------------------
+
+export const RegistryEntrySelectSchema: z.ZodType<Prisma.RegistryEntrySelect> = z.object({
+  id: z.boolean().optional(),
+  type: z.boolean().optional(),
+  name: z.boolean().optional(),
+  description: z.boolean().optional(),
+  status: z.boolean().optional(),
+  version: z.boolean().optional(),
+  metadata: z.boolean().optional(),
+  config: z.boolean().optional(),
+  tags: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
+  lastUsedAt: z.boolean().optional(),
+}).strict()
+
+// REGISTRY METADATA
+//------------------------------------------------------
+
+export const RegistryMetadataSelectSchema: z.ZodType<Prisma.RegistryMetadataSelect> = z.object({
+  id: z.boolean().optional(),
+  entryId: z.boolean().optional(),
+  namespace: z.boolean().optional(),
+  key: z.boolean().optional(),
+  value: z.boolean().optional(),
+  description: z.boolean().optional(),
+  isEncrypted: z.boolean().optional(),
+  lastUpdatedBy: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
 }).strict()
 
 
@@ -6305,6 +6383,195 @@ export const SessionToSignalScalarWhereWithAggregatesInputSchema: z.ZodType<Pris
   NOT: z.union([ z.lazy(() => SessionToSignalScalarWhereWithAggregatesInputSchema),z.lazy(() => SessionToSignalScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   A: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   B: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+}).strict();
+
+export const RegistryEntryWhereInputSchema: z.ZodType<Prisma.RegistryEntryWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => RegistryEntryWhereInputSchema),z.lazy(() => RegistryEntryWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => RegistryEntryWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => RegistryEntryWhereInputSchema),z.lazy(() => RegistryEntryWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  type: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  status: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  version: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  metadata: z.lazy(() => JsonFilterSchema).optional(),
+  config: z.lazy(() => JsonNullableFilterSchema).optional(),
+  tags: z.lazy(() => StringNullableListFilterSchema).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  lastUsedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+}).strict();
+
+export const RegistryEntryOrderByWithRelationInputSchema: z.ZodType<Prisma.RegistryEntryOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  version: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  metadata: z.lazy(() => SortOrderSchema).optional(),
+  config: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  tags: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  lastUsedAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+}).strict();
+
+export const RegistryEntryWhereUniqueInputSchema: z.ZodType<Prisma.RegistryEntryWhereUniqueInput> = z.union([
+  z.object({
+    id: z.string().cuid(),
+    name: z.string()
+  }),
+  z.object({
+    id: z.string().cuid(),
+  }),
+  z.object({
+    name: z.string(),
+  }),
+])
+.and(z.object({
+  id: z.string().cuid().optional(),
+  name: z.string().optional(),
+  AND: z.union([ z.lazy(() => RegistryEntryWhereInputSchema),z.lazy(() => RegistryEntryWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => RegistryEntryWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => RegistryEntryWhereInputSchema),z.lazy(() => RegistryEntryWhereInputSchema).array() ]).optional(),
+  type: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  status: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  version: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  metadata: z.lazy(() => JsonFilterSchema).optional(),
+  config: z.lazy(() => JsonNullableFilterSchema).optional(),
+  tags: z.lazy(() => StringNullableListFilterSchema).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  lastUsedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+}).strict());
+
+export const RegistryEntryOrderByWithAggregationInputSchema: z.ZodType<Prisma.RegistryEntryOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  version: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  metadata: z.lazy(() => SortOrderSchema).optional(),
+  config: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  tags: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  lastUsedAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  _count: z.lazy(() => RegistryEntryCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => RegistryEntryMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => RegistryEntryMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const RegistryEntryScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.RegistryEntryScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => RegistryEntryScalarWhereWithAggregatesInputSchema),z.lazy(() => RegistryEntryScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => RegistryEntryScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => RegistryEntryScalarWhereWithAggregatesInputSchema),z.lazy(() => RegistryEntryScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  type: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  status: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  version: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  metadata: z.lazy(() => JsonWithAggregatesFilterSchema).optional(),
+  config: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional(),
+  tags: z.lazy(() => StringNullableListFilterSchema).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  lastUsedAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+}).strict();
+
+export const RegistryMetadataWhereInputSchema: z.ZodType<Prisma.RegistryMetadataWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => RegistryMetadataWhereInputSchema),z.lazy(() => RegistryMetadataWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => RegistryMetadataWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => RegistryMetadataWhereInputSchema),z.lazy(() => RegistryMetadataWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  entryId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  namespace: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  key: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  value: z.lazy(() => JsonFilterSchema).optional(),
+  description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  isEncrypted: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  lastUpdatedBy: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const RegistryMetadataOrderByWithRelationInputSchema: z.ZodType<Prisma.RegistryMetadataOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  entryId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  key: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional(),
+  description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  isEncrypted: z.lazy(() => SortOrderSchema).optional(),
+  lastUpdatedBy: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegistryMetadataWhereUniqueInputSchema: z.ZodType<Prisma.RegistryMetadataWhereUniqueInput> = z.union([
+  z.object({
+    id: z.string().cuid(),
+    namespace_key: z.lazy(() => RegistryMetadataNamespaceKeyCompoundUniqueInputSchema)
+  }),
+  z.object({
+    id: z.string().cuid(),
+  }),
+  z.object({
+    namespace_key: z.lazy(() => RegistryMetadataNamespaceKeyCompoundUniqueInputSchema),
+  }),
+])
+.and(z.object({
+  id: z.string().cuid().optional(),
+  namespace_key: z.lazy(() => RegistryMetadataNamespaceKeyCompoundUniqueInputSchema).optional(),
+  AND: z.union([ z.lazy(() => RegistryMetadataWhereInputSchema),z.lazy(() => RegistryMetadataWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => RegistryMetadataWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => RegistryMetadataWhereInputSchema),z.lazy(() => RegistryMetadataWhereInputSchema).array() ]).optional(),
+  entryId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  namespace: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  key: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  value: z.lazy(() => JsonFilterSchema).optional(),
+  description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  isEncrypted: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  lastUpdatedBy: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict());
+
+export const RegistryMetadataOrderByWithAggregationInputSchema: z.ZodType<Prisma.RegistryMetadataOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  entryId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  key: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional(),
+  description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  isEncrypted: z.lazy(() => SortOrderSchema).optional(),
+  lastUpdatedBy: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => RegistryMetadataCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => RegistryMetadataMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => RegistryMetadataMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const RegistryMetadataScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.RegistryMetadataScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => RegistryMetadataScalarWhereWithAggregatesInputSchema),z.lazy(() => RegistryMetadataScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => RegistryMetadataScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => RegistryMetadataScalarWhereWithAggregatesInputSchema),z.lazy(() => RegistryMetadataScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  entryId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  namespace: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  key: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  value: z.lazy(() => JsonWithAggregatesFilterSchema).optional(),
+  description: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  isEncrypted: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  lastUpdatedBy: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
 
 export const DocumentCreateInputSchema: z.ZodType<Prisma.DocumentCreateInput> = z.object({
@@ -10407,6 +10674,202 @@ export const SessionToSignalUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Ses
   B: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
+export const RegistryEntryCreateInputSchema: z.ZodType<Prisma.RegistryEntryCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  type: z.string(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  status: z.string().optional(),
+  version: z.string().optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryCreatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  lastUsedAt: z.coerce.date().optional().nullable()
+}).strict();
+
+export const RegistryEntryUncheckedCreateInputSchema: z.ZodType<Prisma.RegistryEntryUncheckedCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  type: z.string(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  status: z.string().optional(),
+  version: z.string().optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryCreatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  lastUsedAt: z.coerce.date().optional().nullable()
+}).strict();
+
+export const RegistryEntryUpdateInputSchema: z.ZodType<Prisma.RegistryEntryUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryUpdatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUsedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const RegistryEntryUncheckedUpdateInputSchema: z.ZodType<Prisma.RegistryEntryUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryUpdatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUsedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const RegistryEntryCreateManyInputSchema: z.ZodType<Prisma.RegistryEntryCreateManyInput> = z.object({
+  id: z.string().cuid().optional(),
+  type: z.string(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  status: z.string().optional(),
+  version: z.string().optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryCreatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  lastUsedAt: z.coerce.date().optional().nullable()
+}).strict();
+
+export const RegistryEntryUpdateManyMutationInputSchema: z.ZodType<Prisma.RegistryEntryUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryUpdatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUsedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const RegistryEntryUncheckedUpdateManyInputSchema: z.ZodType<Prisma.RegistryEntryUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  metadata: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  config: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  tags: z.union([ z.lazy(() => RegistryEntryUpdatetagsInputSchema),z.string().array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUsedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const RegistryMetadataCreateInputSchema: z.ZodType<Prisma.RegistryMetadataCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  entryId: z.string().optional().nullable(),
+  namespace: z.string(),
+  key: z.string(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]),
+  description: z.string().optional().nullable(),
+  isEncrypted: z.boolean().optional(),
+  lastUpdatedBy: z.string().optional().nullable(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional()
+}).strict();
+
+export const RegistryMetadataUncheckedCreateInputSchema: z.ZodType<Prisma.RegistryMetadataUncheckedCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  entryId: z.string().optional().nullable(),
+  namespace: z.string(),
+  key: z.string(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]),
+  description: z.string().optional().nullable(),
+  isEncrypted: z.boolean().optional(),
+  lastUpdatedBy: z.string().optional().nullable(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional()
+}).strict();
+
+export const RegistryMetadataUpdateInputSchema: z.ZodType<Prisma.RegistryMetadataUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  entryId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  namespace: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isEncrypted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUpdatedBy: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const RegistryMetadataUncheckedUpdateInputSchema: z.ZodType<Prisma.RegistryMetadataUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  entryId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  namespace: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isEncrypted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUpdatedBy: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const RegistryMetadataCreateManyInputSchema: z.ZodType<Prisma.RegistryMetadataCreateManyInput> = z.object({
+  id: z.string().cuid().optional(),
+  entryId: z.string().optional().nullable(),
+  namespace: z.string(),
+  key: z.string(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]),
+  description: z.string().optional().nullable(),
+  isEncrypted: z.boolean().optional(),
+  lastUpdatedBy: z.string().optional().nullable(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional()
+}).strict();
+
+export const RegistryMetadataUpdateManyMutationInputSchema: z.ZodType<Prisma.RegistryMetadataUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  entryId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  namespace: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isEncrypted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUpdatedBy: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const RegistryMetadataUncheckedUpdateManyInputSchema: z.ZodType<Prisma.RegistryMetadataUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  entryId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  namespace: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.lazy(() => JsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isEncrypted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  lastUpdatedBy: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
 export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.object({
   equals: z.string().optional(),
   in: z.string().array().optional(),
@@ -13116,6 +13579,87 @@ export const SessionToSignalMinOrderByAggregateInputSchema: z.ZodType<Prisma.Ses
   B: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
+export const RegistryEntryCountOrderByAggregateInputSchema: z.ZodType<Prisma.RegistryEntryCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  version: z.lazy(() => SortOrderSchema).optional(),
+  metadata: z.lazy(() => SortOrderSchema).optional(),
+  config: z.lazy(() => SortOrderSchema).optional(),
+  tags: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  lastUsedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegistryEntryMaxOrderByAggregateInputSchema: z.ZodType<Prisma.RegistryEntryMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  version: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  lastUsedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegistryEntryMinOrderByAggregateInputSchema: z.ZodType<Prisma.RegistryEntryMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  version: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  lastUsedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegistryMetadataNamespaceKeyCompoundUniqueInputSchema: z.ZodType<Prisma.RegistryMetadataNamespaceKeyCompoundUniqueInput> = z.object({
+  namespace: z.string(),
+  key: z.string()
+}).strict();
+
+export const RegistryMetadataCountOrderByAggregateInputSchema: z.ZodType<Prisma.RegistryMetadataCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  entryId: z.lazy(() => SortOrderSchema).optional(),
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  key: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  isEncrypted: z.lazy(() => SortOrderSchema).optional(),
+  lastUpdatedBy: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegistryMetadataMaxOrderByAggregateInputSchema: z.ZodType<Prisma.RegistryMetadataMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  entryId: z.lazy(() => SortOrderSchema).optional(),
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  key: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  isEncrypted: z.lazy(() => SortOrderSchema).optional(),
+  lastUpdatedBy: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegistryMetadataMinOrderByAggregateInputSchema: z.ZodType<Prisma.RegistryMetadataMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  entryId: z.lazy(() => SortOrderSchema).optional(),
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  key: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  isEncrypted: z.lazy(() => SortOrderSchema).optional(),
+  lastUpdatedBy: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
 export const StringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.StringFieldUpdateOperationsInput> = z.object({
   set: z.string().optional()
 }).strict();
@@ -14729,6 +15273,15 @@ export const SignalUpdateOneRequiredWithoutSessionToSignalNestedInputSchema: z.Z
   upsert: z.lazy(() => SignalUpsertWithoutSessionToSignalInputSchema).optional(),
   connect: z.lazy(() => SignalWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => SignalUpdateToOneWithWhereWithoutSessionToSignalInputSchema),z.lazy(() => SignalUpdateWithoutSessionToSignalInputSchema),z.lazy(() => SignalUncheckedUpdateWithoutSessionToSignalInputSchema) ]).optional(),
+}).strict();
+
+export const RegistryEntryCreatetagsInputSchema: z.ZodType<Prisma.RegistryEntryCreatetagsInput> = z.object({
+  set: z.string().array()
+}).strict();
+
+export const RegistryEntryUpdatetagsInputSchema: z.ZodType<Prisma.RegistryEntryUpdatetagsInput> = z.object({
+  set: z.string().array().optional(),
+  push: z.union([ z.string(),z.string().array() ]).optional(),
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -22635,6 +23188,120 @@ export const SessionToSignalFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Sessio
   where: SessionToSignalWhereUniqueInputSchema,
 }).strict() ;
 
+export const RegistryEntryFindFirstArgsSchema: z.ZodType<Prisma.RegistryEntryFindFirstArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryEntryOrderByWithRelationInputSchema.array(),RegistryEntryOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryEntryWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ RegistryEntryScalarFieldEnumSchema,RegistryEntryScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const RegistryEntryFindFirstOrThrowArgsSchema: z.ZodType<Prisma.RegistryEntryFindFirstOrThrowArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryEntryOrderByWithRelationInputSchema.array(),RegistryEntryOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryEntryWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ RegistryEntryScalarFieldEnumSchema,RegistryEntryScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const RegistryEntryFindManyArgsSchema: z.ZodType<Prisma.RegistryEntryFindManyArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryEntryOrderByWithRelationInputSchema.array(),RegistryEntryOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryEntryWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ RegistryEntryScalarFieldEnumSchema,RegistryEntryScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const RegistryEntryAggregateArgsSchema: z.ZodType<Prisma.RegistryEntryAggregateArgs> = z.object({
+  where: RegistryEntryWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryEntryOrderByWithRelationInputSchema.array(),RegistryEntryOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryEntryWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const RegistryEntryGroupByArgsSchema: z.ZodType<Prisma.RegistryEntryGroupByArgs> = z.object({
+  where: RegistryEntryWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryEntryOrderByWithAggregationInputSchema.array(),RegistryEntryOrderByWithAggregationInputSchema ]).optional(),
+  by: RegistryEntryScalarFieldEnumSchema.array(),
+  having: RegistryEntryScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const RegistryEntryFindUniqueArgsSchema: z.ZodType<Prisma.RegistryEntryFindUniqueArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryEntryFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.RegistryEntryFindUniqueOrThrowArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryMetadataFindFirstArgsSchema: z.ZodType<Prisma.RegistryMetadataFindFirstArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryMetadataOrderByWithRelationInputSchema.array(),RegistryMetadataOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryMetadataWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ RegistryMetadataScalarFieldEnumSchema,RegistryMetadataScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const RegistryMetadataFindFirstOrThrowArgsSchema: z.ZodType<Prisma.RegistryMetadataFindFirstOrThrowArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryMetadataOrderByWithRelationInputSchema.array(),RegistryMetadataOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryMetadataWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ RegistryMetadataScalarFieldEnumSchema,RegistryMetadataScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const RegistryMetadataFindManyArgsSchema: z.ZodType<Prisma.RegistryMetadataFindManyArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryMetadataOrderByWithRelationInputSchema.array(),RegistryMetadataOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryMetadataWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ RegistryMetadataScalarFieldEnumSchema,RegistryMetadataScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const RegistryMetadataAggregateArgsSchema: z.ZodType<Prisma.RegistryMetadataAggregateArgs> = z.object({
+  where: RegistryMetadataWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryMetadataOrderByWithRelationInputSchema.array(),RegistryMetadataOrderByWithRelationInputSchema ]).optional(),
+  cursor: RegistryMetadataWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const RegistryMetadataGroupByArgsSchema: z.ZodType<Prisma.RegistryMetadataGroupByArgs> = z.object({
+  where: RegistryMetadataWhereInputSchema.optional(),
+  orderBy: z.union([ RegistryMetadataOrderByWithAggregationInputSchema.array(),RegistryMetadataOrderByWithAggregationInputSchema ]).optional(),
+  by: RegistryMetadataScalarFieldEnumSchema.array(),
+  having: RegistryMetadataScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const RegistryMetadataFindUniqueArgsSchema: z.ZodType<Prisma.RegistryMetadataFindUniqueArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryMetadataFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.RegistryMetadataFindUniqueOrThrowArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereUniqueInputSchema,
+}).strict() ;
+
 export const DocumentCreateArgsSchema: z.ZodType<Prisma.DocumentCreateArgs> = z.object({
   select: DocumentSelectSchema.optional(),
   data: z.union([ DocumentCreateInputSchema,DocumentUncheckedCreateInputSchema ]),
@@ -24891,4 +25558,88 @@ export const SessionToSignalUpdateManyArgsSchema: z.ZodType<Prisma.SessionToSign
 
 export const SessionToSignalDeleteManyArgsSchema: z.ZodType<Prisma.SessionToSignalDeleteManyArgs> = z.object({
   where: SessionToSignalWhereInputSchema.optional(),
+}).strict() ;
+
+export const RegistryEntryCreateArgsSchema: z.ZodType<Prisma.RegistryEntryCreateArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  data: z.union([ RegistryEntryCreateInputSchema,RegistryEntryUncheckedCreateInputSchema ]),
+}).strict() ;
+
+export const RegistryEntryUpsertArgsSchema: z.ZodType<Prisma.RegistryEntryUpsertArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereUniqueInputSchema,
+  create: z.union([ RegistryEntryCreateInputSchema,RegistryEntryUncheckedCreateInputSchema ]),
+  update: z.union([ RegistryEntryUpdateInputSchema,RegistryEntryUncheckedUpdateInputSchema ]),
+}).strict() ;
+
+export const RegistryEntryCreateManyArgsSchema: z.ZodType<Prisma.RegistryEntryCreateManyArgs> = z.object({
+  data: z.union([ RegistryEntryCreateManyInputSchema,RegistryEntryCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const RegistryEntryCreateManyAndReturnArgsSchema: z.ZodType<Prisma.RegistryEntryCreateManyAndReturnArgs> = z.object({
+  data: z.union([ RegistryEntryCreateManyInputSchema,RegistryEntryCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const RegistryEntryDeleteArgsSchema: z.ZodType<Prisma.RegistryEntryDeleteArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  where: RegistryEntryWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryEntryUpdateArgsSchema: z.ZodType<Prisma.RegistryEntryUpdateArgs> = z.object({
+  select: RegistryEntrySelectSchema.optional(),
+  data: z.union([ RegistryEntryUpdateInputSchema,RegistryEntryUncheckedUpdateInputSchema ]),
+  where: RegistryEntryWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryEntryUpdateManyArgsSchema: z.ZodType<Prisma.RegistryEntryUpdateManyArgs> = z.object({
+  data: z.union([ RegistryEntryUpdateManyMutationInputSchema,RegistryEntryUncheckedUpdateManyInputSchema ]),
+  where: RegistryEntryWhereInputSchema.optional(),
+}).strict() ;
+
+export const RegistryEntryDeleteManyArgsSchema: z.ZodType<Prisma.RegistryEntryDeleteManyArgs> = z.object({
+  where: RegistryEntryWhereInputSchema.optional(),
+}).strict() ;
+
+export const RegistryMetadataCreateArgsSchema: z.ZodType<Prisma.RegistryMetadataCreateArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  data: z.union([ RegistryMetadataCreateInputSchema,RegistryMetadataUncheckedCreateInputSchema ]),
+}).strict() ;
+
+export const RegistryMetadataUpsertArgsSchema: z.ZodType<Prisma.RegistryMetadataUpsertArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereUniqueInputSchema,
+  create: z.union([ RegistryMetadataCreateInputSchema,RegistryMetadataUncheckedCreateInputSchema ]),
+  update: z.union([ RegistryMetadataUpdateInputSchema,RegistryMetadataUncheckedUpdateInputSchema ]),
+}).strict() ;
+
+export const RegistryMetadataCreateManyArgsSchema: z.ZodType<Prisma.RegistryMetadataCreateManyArgs> = z.object({
+  data: z.union([ RegistryMetadataCreateManyInputSchema,RegistryMetadataCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const RegistryMetadataCreateManyAndReturnArgsSchema: z.ZodType<Prisma.RegistryMetadataCreateManyAndReturnArgs> = z.object({
+  data: z.union([ RegistryMetadataCreateManyInputSchema,RegistryMetadataCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const RegistryMetadataDeleteArgsSchema: z.ZodType<Prisma.RegistryMetadataDeleteArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  where: RegistryMetadataWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryMetadataUpdateArgsSchema: z.ZodType<Prisma.RegistryMetadataUpdateArgs> = z.object({
+  select: RegistryMetadataSelectSchema.optional(),
+  data: z.union([ RegistryMetadataUpdateInputSchema,RegistryMetadataUncheckedUpdateInputSchema ]),
+  where: RegistryMetadataWhereUniqueInputSchema,
+}).strict() ;
+
+export const RegistryMetadataUpdateManyArgsSchema: z.ZodType<Prisma.RegistryMetadataUpdateManyArgs> = z.object({
+  data: z.union([ RegistryMetadataUpdateManyMutationInputSchema,RegistryMetadataUncheckedUpdateManyInputSchema ]),
+  where: RegistryMetadataWhereInputSchema.optional(),
+}).strict() ;
+
+export const RegistryMetadataDeleteManyArgsSchema: z.ZodType<Prisma.RegistryMetadataDeleteManyArgs> = z.object({
+  where: RegistryMetadataWhereInputSchema.optional(),
 }).strict() ;

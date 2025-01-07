@@ -93,7 +93,7 @@ export class ReportDistributionService {
       });
     } catch (error) {
       this.logger.error("Failed to distribute report", { error });
-      this.metrics.incrementError();
+      this.metrics.incrementError("report_distribution_failure", "1", "error");
       throw error;
     }
   }

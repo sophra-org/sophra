@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import logger from "@/lib/shared/logger";
 import { ExperimentStatus } from "@prisma/client";
 import { z } from "zod";
+import { prisma } from "@/lib/shared/database/client";
 
 const ExperimentSchema = z.object({
   name: z.string().min(1),
@@ -68,11 +69,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
     const experiment = await prisma.aBTest.create({
       data: {
         ...validation.data,
-        status: ExperimentStatus.PENDING
+        status: ExperimentStatus.PENDING,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
       }
     });
 

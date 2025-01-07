@@ -1,4 +1,5 @@
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";

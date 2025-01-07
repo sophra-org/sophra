@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './route';
 import { serviceManager } from '@/lib/cortex/utils/service-manager';
 import { Services } from '@/lib/cortex/types/services';
-import prisma from '@/lib/shared/database/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { MockNextRequest } from './__mocks__/next-server';
+import { mockPrisma } from '~/vitest.setup';
 
 vi.mock('@/lib/cortex/utils/service-manager', () => ({
     serviceManager: {
@@ -53,12 +53,12 @@ describe('POST /api/cortex/search', () => {
         };
 
         vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
-        vi.mocked(prisma.searchEvent.create).mockResolvedValue({
+        vi.mocked(mockPrisma.searchEvent.create).mockResolvedValue({
             id: 'event-1',
             query: '',
             timestamp: new Date(),
             sessionId: '',
-            searchType: '',
+            searchType: '', 
             totalHits: 0,
             took: 0,
             facetsUsed: '',
@@ -84,7 +84,7 @@ describe('POST /api/cortex/search', () => {
             body: JSON.stringify(validBody)
         });
 
-        const response = await POST(request);
+        const response = await POST(request as unknown as NextRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(200);
@@ -109,7 +109,7 @@ describe('POST /api/cortex/search', () => {
         };
 
         vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
-        vi.mocked(prisma.searchEvent.create).mockResolvedValue({
+        vi.mocked(mockPrisma.searchEvent.create).mockResolvedValue({
             id: 'event-2',
             query: '',
             timestamp: new Date(),
@@ -140,7 +140,7 @@ describe('POST /api/cortex/search', () => {
             body: JSON.stringify(validBody)
         });
 
-        const response = await POST(request);
+        const response = await POST(request as unknown as NextRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(200);
@@ -171,7 +171,7 @@ describe('POST /api/cortex/search', () => {
         };
 
         vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
-        vi.mocked(prisma.searchEvent.create).mockResolvedValue({
+        vi.mocked(mockPrisma.searchEvent.create).mockResolvedValue({
             id: 'event-3',
             query: '',
             timestamp: new Date(),
@@ -204,7 +204,7 @@ describe('POST /api/cortex/search', () => {
             body: JSON.stringify(validBody)
         });
 
-        const response = await POST(request);
+        const response = await POST(request as unknown as NextRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(200);
@@ -235,7 +235,7 @@ describe('POST /api/cortex/search', () => {
             body: JSON.stringify(invalidBody)
         });
 
-        const response = await POST(request);
+        const response = await POST(request as unknown as NextRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(500);

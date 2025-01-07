@@ -4,6 +4,7 @@ import {
   type BaseQuery,
 } from "@/lib/cortex/elasticsearch/types";
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";

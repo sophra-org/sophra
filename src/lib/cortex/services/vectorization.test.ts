@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { VectorizationService } from './vectorization'
-import { Logger } from '../../common/logger'
-import { MetricsClient } from '../../metrics/client'
-import { ConfigService } from '../config'
+import type { Logger } from '@/lib/shared/types'
 
 // Mock external dependencies
 vi.mock('some-external-dependency', () => ({

@@ -3,6 +3,7 @@ import logger from "@/lib/shared/logger";
 import { ExperimentStatus } from "@prisma/client";
 import { z } from "zod";
 import { createHash } from "crypto";
+import { prisma } from "@/lib/shared/database/client";
 
 const ApplySchema = z.object({
   experimentId: z.string(),
