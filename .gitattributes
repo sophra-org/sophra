@@ -1,8 +1,13 @@
 * text=auto eol=lf
 *.{cmd,[cC][mM][dD]} text eol=crlf
 *.{bat,[bB][aA][tT]} text eol=crlf
-*.xml text eol=lf
-coverage/**/*.xml text eol=lf
-test-report.junit.xml text eol=lf
-coverage/**/*.json text eol=lf
-*.lcov text eol=lf 
+
+# Coverage files - explicitly mark as text, not LFS
+*.{xml,[xX][mM][lL]} text eol=lf -filter -diff -merge
+*.{json,[jJ][sS][oO][nN]} text eol=lf -filter -diff -merge
+*.{lcov,[lL][cC][oO][vV]} text eol=lf -filter -diff -merge
+coverage/** text eol=lf -filter -diff -merge
+coverage/**/*.* text eol=lf -filter -diff -merge
+coverage/coverage-final.json text eol=lf -filter -diff -merge
+coverage/lcov.info text eol=lf -filter -diff -merge
+test-report.junit.xml text eol=lf -filter -diff -merge 

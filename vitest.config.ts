@@ -19,20 +19,30 @@ export default defineConfig({
     outputFile: './test-report.junit.xml',
     coverage: {
       provider: 'istanbul',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      reporter: ['text', 'json', 'html', 'lcov', 'cobertura'],
       reportsDirectory: './coverage',
-      include: ['src/**/*.ts'],
+      include: [
+        'src/**/*.ts',
+        'src/**/*.tsx'
+      ],
       exclude: [
         'node_modules/**',
         'dist/**',
         '**/*.d.ts',
         '**/*.test.ts',
-        'src/types/**'
+        'src/types/**',
+        'tests/**'
       ],
       all: true,
-      skipFull: false,
       clean: false,
-      enabled: true
+      enabled: true,
+      reportOnFailure: true,
+      thresholds: {
+        lines: 0,
+        functions: 0,
+        branches: 0,
+        statements: 0
+      }
     }
   }
 }) 
