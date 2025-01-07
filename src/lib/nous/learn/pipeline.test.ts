@@ -3,23 +3,9 @@ import { LearningPipeline } from './pipeline'
 import { Registry } from '@/lib/nous/registry'
 import { OpenAIClient } from '../clients/openai'
 import { Event, EventType, ModelType } from '@/lib/nous/types'
-import prisma from '@/lib/shared/database/client'
+import { mockPrisma } from '~/vitest.setup'
 
-// Mock dependencies
-vi.mock('@/lib/shared/database/client', () => ({
-  default: {
-    modelState: {
-      update: vi.fn(),
-      create: vi.fn(),
-      findUnique: vi.fn(),
-    },
-    modelVersion: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}))
-
+// Only keeping logger mock since other mocks are handled in vitest.setup
 vi.mock('@/lib/shared/logger', () => ({
   default: {
     info: vi.fn(),
@@ -75,12 +61,12 @@ describe('LearningPipeline', () => {
     pipeline = new LearningPipeline(mockRegistry, mockOpenAI)
 
     // Setup default model state
-    vi.mocked(prisma.modelState.create).mockResolvedValue(mockModelState)
-    vi.mocked(prisma.modelState.update).mockResolvedValue({
+    vi.mocked(mockPrisma.modelState.create).mockResolvedValue(mockModelState)
+    vi.mocked(mockPrisma.modelState.update).mockResolvedValue({
       ...mockModelState,
       trainingProgress: 100,
     })
-    vi.mocked(prisma.modelState.findUnique).mockResolvedValue(mockModelState)
+    vi.mocked(mockPrisma.modelState.findUnique).mockResolvedValue(mockModelState)
   })
 
   describe('calculateCost', () => {
@@ -139,7 +125,7 @@ describe('LearningPipeline', () => {
         .mockResolvedValueOnce(mockModel)
         .mockResolvedValueOnce(mockModel)
 
-      vi.mocked(prisma.modelVersion.findUnique).mockResolvedValueOnce({
+      vi.mocked(mockPrisma.modelVersion.findUnique).mockResolvedValueOnce({
         id: mockModelId,
         configId: JSON.stringify(mockConfig),
         createdAt: new Date(),
@@ -148,7 +134,7 @@ describe('LearningPipeline', () => {
         parentVersion: null,
       })
 
-      vi.mocked(prisma.modelState.update)
+      vi.mocked(mockPrisma.modelState.update)
         .mockResolvedValueOnce({
           ...mockModelState,
           trainingProgress: 0,
@@ -194,7 +180,7 @@ describe('LearningPipeline', () => {
         .mockResolvedValueOnce(mockModel)
         .mockResolvedValueOnce(mockModel)
 
-      vi.mocked(prisma.modelVersion.findUnique).mockResolvedValueOnce({
+      vi.mocked(mockPrisma.modelVersion.findUnique).mockResolvedValueOnce({
         id: 'test-model-id',
         configId: JSON.stringify(customConfig),
         createdAt: new Date(),
@@ -203,7 +189,7 @@ describe('LearningPipeline', () => {
         parentVersion: null,
       })
 
-      vi.mocked(prisma.modelState.update)
+      vi.mocked(mockPrisma.modelState.update)
         .mockResolvedValueOnce({
           ...mockModelState,
           trainingProgress: 0,
@@ -284,7 +270,7 @@ describe('LearningPipeline', () => {
         })
 
       // Mock model version lookup
-      vi.mocked(prisma.modelVersion.findUnique).mockResolvedValueOnce({
+      vi.mocked(mockPrisma.modelVersion.findUnique).mockResolvedValueOnce({
         id: mockModelId,
         configId: JSON.stringify({
           type: "OPENAI_FINE_TUNED",
@@ -315,13 +301,13 @@ describe('LearningPipeline', () => {
         })
 
       // Mock model state creation and updates
-      vi.mocked(prisma.modelState.create).mockResolvedValueOnce({
+      vi.mocked(mockPrisma.modelState.create).mockResolvedValueOnce({
         ...mockModelState,
         trainingProgress: 0,
         modelType: "OPENAI_FINE_TUNED"
       })
 
-      vi.mocked(prisma.modelState.update)
+      vi.mocked(mockPrisma.modelState.update)
         .mockResolvedValueOnce({
           ...mockModelState,
           trainingProgress: 50,
@@ -362,7 +348,7 @@ describe('LearningPipeline', () => {
         }],
       })
       expect(mockOpenAI.getFineTuneStatus).toHaveBeenCalledWith(mockJobId)
-      expect(prisma.modelState.update).toHaveBeenCalledTimes(3)
+      expect(mockPrisma.modelState.update).toHaveBeenCalledTimes(3)
     })
 
     it('should handle fine-tuning failure', async () => {
@@ -401,7 +387,7 @@ describe('LearningPipeline', () => {
         )
       ).rejects.toThrow('Fine-tuning failed')
 
-      expect(prisma.modelState.update).toHaveBeenCalledWith({
+      expect(mockPrisma.modelState.update).toHaveBeenCalledWith({
         where: { versionId: mockModelId },
         data: {
           lastTrainingError: 'Fine-tuning failed',
@@ -458,7 +444,7 @@ describe('LearningPipeline', () => {
         })
 
       // Mock model version lookup
-      vi.mocked(prisma.modelVersion.findUnique).mockResolvedValueOnce({
+      vi.mocked(mockPrisma.modelVersion.findUnique).mockResolvedValueOnce({
         id: mockModelId,
         configId: JSON.stringify(mockConfig),
         createdAt: new Date(),
@@ -468,13 +454,13 @@ describe('LearningPipeline', () => {
       })
 
       // Mock model state creation and updates
-      vi.mocked(prisma.modelState.create).mockResolvedValueOnce({
+      vi.mocked(mockPrisma.modelState.create).mockResolvedValueOnce({
         ...mockModelState,
         trainingProgress: 0,
       })
 
       // Mock model state updates - initial + 2 epochs + final
-      vi.mocked(prisma.modelState.update)
+      vi.mocked(mockPrisma.modelState.update)
         .mockResolvedValueOnce({
           ...mockModelState,
           trainingProgress: 0,
@@ -514,20 +500,20 @@ describe('LearningPipeline', () => {
       )
 
       expect(result.id).toBe(mockModelId)
-      expect(prisma.modelState.update).toHaveBeenCalledTimes(4)
-      expect(prisma.modelState.update).toHaveBeenNthCalledWith(1, {
+      expect(mockPrisma.modelState.update).toHaveBeenCalledTimes(4)
+      expect(mockPrisma.modelState.update).toHaveBeenNthCalledWith(1, {
         where: { versionId: mockModelId },
         data: { trainingProgress: 0 }
       })
-      expect(prisma.modelState.update).toHaveBeenNthCalledWith(2, {
+      expect(mockPrisma.modelState.update).toHaveBeenNthCalledWith(2, {
         where: { versionId: mockModelId },
         data: { currentEpoch: 0, trainingProgress: 0 }
       })
-      expect(prisma.modelState.update).toHaveBeenNthCalledWith(3, {
+      expect(mockPrisma.modelState.update).toHaveBeenNthCalledWith(3, {
         where: { versionId: mockModelId },
         data: { currentEpoch: 1, trainingProgress: 50 }
       })
-      expect(prisma.modelState.update).toHaveBeenNthCalledWith(4, {
+      expect(mockPrisma.modelState.update).toHaveBeenNthCalledWith(4, {
         where: { versionId: mockModelId },
         data: { trainingProgress: 100, isTrained: true }
       })

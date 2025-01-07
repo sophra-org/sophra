@@ -1,6 +1,6 @@
-import prisma from "@/lib/shared/database/client";
+import { Prisma, SignalType } from '@prisma/client';
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { SignalTypeSchema, JsonValueSchema } from "@/lib/shared/database/validation/generated";

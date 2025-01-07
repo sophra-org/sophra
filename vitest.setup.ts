@@ -1,138 +1,240 @@
 import { vi } from 'vitest';
 
-// Mock Prisma client
-vi.mock('@/lib/shared/database/client', () => {
-  const mockPrisma = new (vi.mocked(require('@prisma/client')).PrismaClient)();
-  return {
-    default: mockPrisma,
-    prisma: mockPrisma,
-  };
-});
+// Create base mock methods for all models
+const baseMethods = {
+  create: vi.fn(),
+  findMany: vi.fn(),
+  findUnique: vi.fn(),
+  findFirst: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+  upsert: vi.fn(),
+  count: vi.fn(),
+  groupBy: vi.fn(),
+};
 
-// Mock @prisma/client
-vi.mock('@prisma/client', () => {
-  class MockPrismaClient {
-    engineMetric = {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      upsert: vi.fn(),
-    };
-    learningMetric = {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      upsert: vi.fn(),
-    };
-    modelState = {
-      findMany: vi.fn(),
-      upsert: vi.fn(),
-      findFirst: vi.fn(),
-      findUnique: vi.fn(),
-    };
-    modelConfig = {
-      findUnique: vi.fn(),
-    };
-    engineState = {
-      findFirst: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-    };
-    $transaction = vi.fn((callback) => callback(this));
-  }
+// Mock Prisma client with all models from schema
+const mockPrisma = {
+  document: { ...baseMethods },
+  migration: { ...baseMethods },
+  searchAnalytics: { ...baseMethods },
+  session: { ...baseMethods },
+  conversation: { ...baseMethods },
+  message: { ...baseMethods },
+  aBTest: { ...baseMethods },
+  aBTestAssignment: { ...baseMethods },
+  aBTestMetric: { ...baseMethods },
+  searchFeedback: { ...baseMethods },
+  baseEvent: { ...baseMethods },
+  modelEvent: { ...baseMethods },
+  processedSignal: { ...baseMethods },
+  signalBatch: { ...baseMethods },
+  signalPattern: { ...baseMethods },
+  adaptationRule: { ...baseMethods },
+  modelConfig: { ...baseMethods },
+  modelVersion: { ...baseMethods },
+  learningRequest: { ...baseMethods },
+  feedbackRequest: { ...baseMethods },
+  modelMetrics: { ...baseMethods },
+  modelState: { ...baseMethods },
+  searchEvent: { ...baseMethods },
+  aBTestMetrics: { ...baseMethods },
+  signal: { ...baseMethods },
+  analyticsMetrics: { ...baseMethods },
+  analyticsTrend: { ...baseMethods },
+  performanceInsight: { ...baseMethods },
+  analyticsReport: { ...baseMethods },
+  adaptationSuggestion: { ...baseMethods },
+  learningMetric: { ...baseMethods },
+  learningEvent: { ...baseMethods },
+  learningPattern: { ...baseMethods },
+  engineState: { ...baseMethods },
+  engineOperation: { ...baseMethods },
+  engineMetric: { ...baseMethods },
+  engineLearningResult: { ...baseMethods },
+  engineOptimizationStrategy: { ...baseMethods },
+  engineConfidenceScore: { ...baseMethods },
+  searchWeights: { ...baseMethods },
+  searchConfig: { ...baseMethods },
+  experimentConfig: { ...baseMethods },
+  engineRecommendation: { ...baseMethods },
+  index: { ...baseMethods },
+  user: { ...baseMethods },
+  account: { ...baseMethods },
+  authSession: { ...baseMethods },
+  verificationToken: { ...baseMethods },
+  apiKey: { ...baseMethods },
+  adminToken: { ...baseMethods },
+  sessionToSignal: { ...baseMethods },
+  $transaction: vi.fn((callback) => callback(mockPrisma)),
+  $connect: vi.fn(),
+  $disconnect: vi.fn(),
+  $reset: vi.fn(),
+};
 
-  return {
-    PrismaClient: MockPrismaClient,
-    ModelType: {
-      SEARCH_RANKER: 'SEARCH_RANKER',
-      FEEDBACK_RANKER: 'FEEDBACK_RANKER',
-      PERFORMANCE_RANKER: 'PERFORMANCE_RANKER',
-    },
-    SignalType: {
-      SEARCH: 'SEARCH',
-      FEEDBACK: 'FEEDBACK',
-      PERFORMANCE: 'PERFORMANCE',
-    },
-    MetricType: {
-      LATENCY: 'LATENCY',
-      ERROR_RATE: 'ERROR_RATE',
-      THROUGHPUT: 'THROUGHPUT',
-      CPU_USAGE: 'CPU_USAGE',
-      MEMORY_USAGE: 'MEMORY_USAGE',
-    },
-    Prisma: {
-      JsonValue: {},
-      InputJsonValue: {},
-      JsonNull: null,
-    },
-  };
-});
-
-// Mock js-yaml
-vi.mock('js-yaml', () => {
-  const mockYaml = {
-    load: vi.fn(),
-    dump: vi.fn(),
-  };
-  return {
-    default: mockYaml,
-    ...mockYaml,
-  };
-});
-
-// Mock logger
-vi.mock('@/lib/shared/logger', () => ({
-  default: {
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-    debug: vi.fn(),
-    child: vi.fn().mockReturnValue({
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
-    }),
+// Mock @prisma/client with all enums from schema
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn(() => mockPrisma),
+  Prisma: {
+    JsonValue: undefined,
+    JsonObject: undefined,
+  },
+  EventType: {
+    SYSTEM: 'SYSTEM',
+    USER: 'USER',
+    STATE_CHANGE: 'STATE_CHANGE',
+    SEARCH: 'SEARCH',
+    MODEL: 'MODEL',
+    FEEDBACK: 'FEEDBACK',
+    ADAPTATION: 'ADAPTATION',
+    LEARNING: 'LEARNING',
+  },
+  SignalType: {
+    SEARCH: 'SEARCH',
+    PERFORMANCE: 'PERFORMANCE',
+    USER_BEHAVIOR_IMPRESSION: 'USER_BEHAVIOR_IMPRESSION',
+    USER_BEHAVIOR_VIEW: 'USER_BEHAVIOR_VIEW',
+    USER_BEHAVIOR_CLICK: 'USER_BEHAVIOR_CLICK',
+    USER_BEHAVIOR_CONVERSION: 'USER_BEHAVIOR_CONVERSION',
+    MODEL_PERFORMANCE: 'MODEL_PERFORMANCE',
+    FEEDBACK: 'FEEDBACK',
+    SYSTEM_HEALTH: 'SYSTEM_HEALTH',
+    SESSION: 'SESSION',
+  },
+  EngagementType: {
+    IMPRESSION: 'IMPRESSION',
+    VIEW: 'VIEW',
+    CLICK: 'CLICK',
+    CONVERSION: 'CONVERSION',
+  },
+  Severity: {
+    INFO: 'INFO',
+    WARNING: 'WARNING',
+    ERROR: 'ERROR',
+    CRITICAL: 'CRITICAL',
+  },
+  ModelType: {
+    SEARCH_RANKER: 'SEARCH_RANKER',
+    PATTERN_DETECTOR: 'PATTERN_DETECTOR',
+    QUERY_OPTIMIZER: 'QUERY_OPTIMIZER',
+    FEEDBACK_ANALYZER: 'FEEDBACK_ANALYZER',
+    OPENAI_FINE_TUNED: 'OPENAI_FINE_TUNED',
+  },
+  RulePriority: {
+    CRITICAL: 'CRITICAL',
+    HIGH: 'HIGH',
+    MEDIUM: 'MEDIUM',
+    LOW: 'LOW',
+  },
+  ExperimentStatus: {
+    PENDING: 'PENDING',
+    ACTIVE: 'ACTIVE',
+    COMPLETED: 'COMPLETED',
+    STOPPED: 'STOPPED',
+    FAILED: 'FAILED',
+  },
+  MetricType: {
+    FEEDBACK_SCORE: 'FEEDBACK_SCORE',
+    ENGAGEMENT_RATE: 'ENGAGEMENT_RATE',
+    RELEVANCE_SCORE: 'RELEVANCE_SCORE',
+    CLICK_THROUGH: 'CLICK_THROUGH',
+    CONVERSION_RATE: 'CONVERSION_RATE',
+    SEARCH_LATENCY: 'SEARCH_LATENCY',
+    MODEL_ACCURACY: 'MODEL_ACCURACY',
+    ADAPTATION_SUCCESS: 'ADAPTATION_SUCCESS',
+    CACHE_EFFICIENCY: 'CACHE_EFFICIENCY',
+    CACHE_HIT_RATE: 'CACHE_HIT_RATE',
+    REDIS_GET: 'REDIS_GET',
+    REDIS_SET: 'REDIS_SET',
+    REDIS_DELETE: 'REDIS_DELETE',
+    REDIS_EXISTS: 'REDIS_EXISTS',
+    REDIS_ERROR: 'REDIS_ERROR',
+    ERROR_RATE: 'ERROR_RATE',
+    THROUGHPUT: 'THROUGHPUT',
+    CPU_USAGE: 'CPU_USAGE',
+    MEMORY_USAGE: 'MEMORY_USAGE',
+  },
+  LearningEventType: {
+    SEARCH_PATTERN: 'SEARCH_PATTERN',
+    USER_FEEDBACK: 'USER_FEEDBACK',
+    MODEL_UPDATE: 'MODEL_UPDATE',
+    ADAPTATION_RULE: 'ADAPTATION_RULE',
+    SIGNAL_DETECTED: 'SIGNAL_DETECTED',
+    METRIC_THRESHOLD: 'METRIC_THRESHOLD',
+    SYSTEM_STATE: 'SYSTEM_STATE',
+    EXPERIMENT_RESULT: 'EXPERIMENT_RESULT',
+    PATTERN_DETECTION: 'PATTERN_DETECTION',
+    STRATEGY_GENERATION: 'STRATEGY_GENERATION',
+    FEEDBACK_ANALYSIS: 'FEEDBACK_ANALYSIS',
+    MODEL_TRAINING: 'MODEL_TRAINING',
+    SYSTEM_ADAPTATION: 'SYSTEM_ADAPTATION',
+  },
+  LearningEventStatus: {
+    PENDING: 'PENDING',
+    PROCESSING: 'PROCESSING',
+    COMPLETED: 'COMPLETED',
+    FAILED: 'FAILED',
+    IGNORED: 'IGNORED',
+  },
+  LearningEventPriority: {
+    CRITICAL: 'CRITICAL',
+    HIGH: 'HIGH',
+    MEDIUM: 'MEDIUM',
+    LOW: 'LOW',
+  },
+  EngineOptimizationType: {
+    WEIGHT_ADJUSTMENT: 'WEIGHT_ADJUSTMENT',
+    QUERY_TRANSFORMATION: 'QUERY_TRANSFORMATION',
+    INDEX_OPTIMIZATION: 'INDEX_OPTIMIZATION',
+    CACHE_STRATEGY: 'CACHE_STRATEGY',
+  },
+  EngineRiskLevel: {
+    LOW: 'LOW',
+    MEDIUM: 'MEDIUM',
+    HIGH: 'HIGH',
+  },
+  EngineOperationType: {
+    PATTERN_DETECTION: 'PATTERN_DETECTION',
+    STRATEGY_EXECUTION: 'STRATEGY_EXECUTION',
+    RULE_EVALUATION: 'RULE_EVALUATION',
+    ADAPTATION: 'ADAPTATION',
+    LEARNING_CYCLE: 'LEARNING_CYCLE',
+  },
+  EngineOperationStatus: {
+    PENDING: 'PENDING',
+    RUNNING: 'RUNNING',
+    COMPLETED: 'COMPLETED',
+    FAILED: 'FAILED',
   },
 }));
 
-// Mock fs
-vi.mock('fs', () => ({
-  readFileSync: vi.fn(),
-  writeFileSync: vi.fn(),
-  existsSync: vi.fn(),
-  mkdirSync: vi.fn(),
+// Mock database client
+vi.mock('./src/lib/shared/database/client', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma,
 }));
 
-// Mock next/server
-vi.mock('next/server', () => ({
-  NextResponse: {
-    json: vi.fn((data: any, init?: { status?: number }) => ({
-      status: init?.status || 200,
-      json: async () => data,
-    })),
-  },
-}));
-
-// Mock ioredis
-vi.mock('ioredis', () => {
-  class MockRedis {
-    quit = vi.fn();
-    connect = vi.fn();
-    constructor() {
-      return Object.assign(this, {
-        // Add any additional Redis methods needed by tests
-        get: vi.fn(),
-        set: vi.fn(),
-        del: vi.fn(),
-      });
-    }
-  }
-  return {
-    default: MockRedis,
-    Redis: MockRedis,
-  };
-});
+// Export mockPrisma for test files to use directly
+export { mockPrisma };
 
 // Reset all mocks before each test
 beforeEach(() => {
   vi.clearAllMocks();
+  // Reset all model methods
+  Object.entries(mockPrisma).forEach(([key, model]) => {
+    // Only reset methods for Prisma models, not utility methods like $transaction
+    if (typeof model === 'object' && model !== null && !key.startsWith('$')) {
+      Object.values(model).forEach(method => {
+        if (typeof method === 'function' && method.mockReset) {
+          method.mockReset();
+        }
+      });
+    }
+  });
+  // Reset transaction mock
+  mockPrisma.$transaction.mockReset();
+  mockPrisma.$transaction.mockImplementation((callback) => callback(mockPrisma));
+  // Reset connection mocks
+  mockPrisma.$connect.mockReset();
+  mockPrisma.$disconnect.mockReset();
 });

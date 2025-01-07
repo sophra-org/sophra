@@ -1,8 +1,10 @@
 import type { ElasticsearchService } from "@/lib/cortex/elasticsearch/services";
 import type {
   BaseDocument,
+  BaseQuery,
   ElasticsearchClientQuery,
   ProcessedDocumentMetadata,
+  SearchResponse,
 } from "@/lib/cortex/elasticsearch/types";
 import type { RedisCacheService } from "@/lib/cortex/redis/services";
 import type { VectorizationService } from "@/lib/cortex/services/vectorization";
@@ -99,7 +101,12 @@ export class DataSyncService {
 
       // Try to cache in Redis, but don't fail if Redis fails
       try {
-        await this.redis.set(`doc:${params.index}:${params.id}`, params.document);
+        await this.redis.set(
+          `doc:${params.index}:${params.id}`, 
+          JSON.stringify(params.document), 
+          "EX",
+          this.searchCacheTTL
+        );
       } catch (error) {
         this.logger.warn('Redis cache failure during document upsert', {
           error,
@@ -214,7 +221,7 @@ export class DataSyncService {
       const cachedResult = await this.redis.get(cacheKey);
       if (cachedResult) {
         this.logger.debug("Cache hit for search", { index: params.index });
-        const parsed = JSON.parse(cachedResult);
+        const parsed = JSON.parse(cachedResult as string);
         if (!parsed || !parsed.hits) {
           throw new Error('Invalid cached search response');
         }
@@ -222,15 +229,15 @@ export class DataSyncService {
       }
 
       // Cache miss - search in Elasticsearch
-      const searchResult = await this.es.search<T>({
-        index: params.index,
-        body: {
-          query: params.query,
+      const searchResult = await this.es.search<T>(
+        params.index,
+        {
+          query: params.query as BaseQuery,
           size: params.size,
           from: params.from,
           sort: params.sort,
         },
-      });
+      );
 
       if (!searchResult || !searchResult.hits) {
         throw new Error('Invalid search response');
@@ -252,7 +259,19 @@ export class DataSyncService {
         // Don't throw for cache errors
       }
 
-      return searchResult;
+      // Add max_score to match expected type
+      return {
+        ...searchResult,
+        took: searchResult.took || 0,  // Default to 0 if undefined
+        hits: {
+          ...searchResult.hits,
+          max_score: Math.max(...searchResult.hits.hits.map(hit => hit._score || 0)),
+          total: {
+            value: searchResult.hits.total.value,
+            relation: searchResult.hits.total.relation as "eq" | "gte"
+          }
+        }
+      };
     } catch (error) {
       this.logger.error("Search failed", {
         error,
@@ -330,10 +349,7 @@ export class DataSyncService {
 
       // Then delete from Elasticsearch
       try {
-        await this.es.delete({
-          index: params.index,
-          id: params.id,
-        });
+        await this.es.deleteDocument(params.index, params.id);
       } catch (esError) {
         this.logger.error('Failed to delete from Elasticsearch', {
           error: esError,

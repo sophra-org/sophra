@@ -1,7 +1,6 @@
+import { prisma } from "@/lib/shared/database/client";
 import { LearningEventType } from "@/lib/nous/types/learning";
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import type { LearningEvent } from "@prisma/client";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -94,7 +93,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: Array.isArray(events)
-        ? events.map((event: LearningEvent) => ({
+        ? events.map((event) => ({
             id: event.id,
             type: event.type,
             timestamp: event.timestamp,

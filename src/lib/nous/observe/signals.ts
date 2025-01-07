@@ -37,7 +37,7 @@ export class SignalRouter {
   route(signal: Signal): string[] {
     const matching_processors: string[] = [];
 
-    for (const [processor_id, criteria] of this._processors.entries()) {
+    for (const [processor_id, criteria] of Array.from(this._processors.entries())) {
       if (this._matches_criteria(signal, criteria)) {
         matching_processors.push(processor_id);
       }

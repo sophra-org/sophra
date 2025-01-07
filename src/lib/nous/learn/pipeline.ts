@@ -1,9 +1,9 @@
 import { Registry } from "@/lib/nous/registry";
 import { Event, ModelConfig, ModelType, ModelVersion } from "@/lib/nous/types";
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { JsonValue } from "@prisma/client/runtime/library";
 import { OpenAIClient } from "../clients/openai";
+import { prisma } from "@/lib/shared/database/client";
 
 interface TrainingStatus {
   status: "training" | "completed" | "failed";
@@ -154,20 +154,26 @@ export class LearningPipeline {
     // Implementation for OpenAI fine-tuning
     const response = await this.openai.createFineTune({
       model: "gpt-3.5-turbo",
-      training_data: trainingData.inputs.map((input, i) => ({
-        prompt: input,
-        completion: trainingData.outputs[i],
-      })),
+      trainingData: Buffer.from(
+        JSON.stringify(
+          trainingData.inputs.map((input, i) => ({
+            prompt: input,
+            completion: trainingData.outputs[i],
+          }))
+        )
+      )
     });
     // Update model with fine-tune job ID
     await this.registry.updateModel(modelId, {
       id: modelId,
-      type: "OPENAI_FINE_TUNED",
-      hyperparameters: {},
-      features: [],
-      trainingParams: {
-        jobId: response.jobId
-      }
+      configId: JSON.stringify({
+        type: "OPENAI_FINE_TUNED",
+        hyperparameters: {},
+        features: [],
+        trainingParams: {
+          jobId: response.jobId
+        }
+      })
     });
 
     // Monitor fine-tuning progress
@@ -175,7 +181,7 @@ export class LearningPipeline {
       const fineTuneStatus = await this.openai.getFineTuneStatus(response.jobId);
       // Calculate progress based on status
       const progress = Math.min(
-        ((fineTuneStatus.steps_completed ?? 0) / (fineTuneStatus.total_steps ?? 100)) * 100,
+        ((fineTuneStatus.status === "succeeded" ? 100 : 0) / 100) * 100,
         100
       );
       status.progress = progress;

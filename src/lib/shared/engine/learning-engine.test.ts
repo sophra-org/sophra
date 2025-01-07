@@ -1,3 +1,19 @@
+import { mockPrisma } from '../test/prisma.mock';
+
+// Mock Prisma before other imports
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn(() => mockPrisma),
+  Prisma: {
+    JsonValue: undefined,
+    JsonObject: undefined,
+  }
+}));
+
+vi.mock('../database/client', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
+}));
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Mocked } from 'vitest';
 import { 
@@ -18,78 +34,7 @@ import type { Logger } from '../types';
 import { LearningEngine } from "./learning-engine";
 import { MetricsAdapter } from "./adapters/metrics-adapter";
 import { MetricsService } from "../../cortex/monitoring/metrics";
-import { mockPrisma } from '../test/prisma.mock';
 import { EnhancedPrismaClient } from '../database/client';
-
-// Mock Prisma client
-const mockPrismaClient = {
-  engineOperation: {
-    create: vi.fn(),
-    update: vi.fn(),
-    findMany: vi.fn()
-  },
-  $connect: vi.fn(),
-  $disconnect: vi.fn(),
-  $on: vi.fn(),
-  $queryRaw: vi.fn(),
-  logger: {
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn()
-  } as unknown as Logger,
-  isConnected: false,
-  activeConnections: 0,
-  maxConnections: 10,
-  connect: vi.fn(),
-  disconnect: vi.fn(),
-  healthCheck: vi.fn(),
-  getConnection: vi.fn(),
-  releaseConnection: vi.fn(),
-  customExperimentConfig: undefined
-} as unknown as EnhancedPrismaClient;
-
-// Mock operation type
-type MockEngineOperation = {
-  id: string;
-  type: string;
-  status: string;
-  startTime: Date;
-  endTime: Date | null;
-  error: string | null;
-  metrics: JsonValue;
-  metadata: JsonValue;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn(() => mockPrismaClient),
-  EngineOperationType: {
-    PATTERN_DETECTION: 'PATTERN_DETECTION',
-    STRATEGY_GENERATION: 'STRATEGY_GENERATION',
-    STRATEGY_EXECUTION: 'STRATEGY_EXECUTION',
-    LEARNING: 'LEARNING',
-    OPTIMIZATION: 'OPTIMIZATION',
-    VALIDATION: 'VALIDATION',
-    ROLLBACK: 'ROLLBACK'
-  },
-  EngineOperationStatus: {
-    PENDING: 'PENDING',
-    IN_PROGRESS: 'IN_PROGRESS',
-    COMPLETED: 'COMPLETED',
-    FAILED: 'FAILED',
-    CANCELLED: 'CANCELLED'
-  },
-  EngineStatus: {
-    INITIALIZING: 'INITIALIZING',
-    READY: 'READY',
-    LEARNING: 'LEARNING',
-    OPTIMIZING: 'OPTIMIZING',
-    PAUSED: 'PAUSED',
-    ERROR: 'ERROR'
-  }
-}));
 
 type JsonValue = Prisma.JsonValue;
 
@@ -157,7 +102,7 @@ describe("LearningEngine", () => {
         timeBased: mockTimeBasedProcessor,
         strategy: mockStrategyProcessor,
       },
-      mockPrismaClient
+      mockPrisma
     );
   });
 
@@ -180,8 +125,8 @@ describe("LearningEngine", () => {
         updatedAt: new Date()
       };
       
-      vi.mocked(mockPrismaClient.engineOperation.create).mockResolvedValue(mockOperation);
-      vi.mocked(mockPrismaClient.engineOperation.update).mockResolvedValue({
+      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(mockOperation);
+      vi.mocked(mockPrisma.engineOperation.update).mockResolvedValue({
         ...mockOperation,
         status: EngineOperationStatus.COMPLETED,
         endTime: new Date(),

@@ -1,6 +1,6 @@
-import prisma from "@/lib/shared/database/client";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { EngagementType, Prisma, SignalType } from "@prisma/client";
+import { EngagementType, SignalType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime
@@ -19,7 +19,7 @@ const FeedbackSchema = z.object({
         customMetadata: z.record(z.unknown()).optional(),
         timestamp: z.string().datetime(),
         engagementType: z.nativeEnum(EngagementType).optional(),
-      }),
+      })
     })
   ),
 });

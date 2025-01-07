@@ -1,4 +1,4 @@
-import prisma from "@/lib/shared/database/client";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import type { AdaptationSuggestion } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";

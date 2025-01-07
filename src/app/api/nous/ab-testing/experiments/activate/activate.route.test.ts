@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './route';
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from 'next/server';
 

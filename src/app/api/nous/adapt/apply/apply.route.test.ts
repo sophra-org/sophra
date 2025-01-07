@@ -1,18 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './route';
-import prisma from "@/lib/shared/database/client";
 import { AdaptationEngine } from "@/lib/shared/engine/adaptation-engine";
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { RuleRegistry } from '@/lib/nous/adapt/rules';
+import { mockPrisma } from "~/vitest.setup";
 
 // Mock implementations
-vi.mock('@/lib/shared/database/client', () => ({
-    default: {
-        adaptationRule: {
-            findMany: vi.fn()
-        }
-    }
+vi.mock('@/lib/shared/database/client', () => ({ 
+    default: mockPrisma 
 }));
 
 vi.mock('@/lib/shared/engine/adaptation-engine', () => {
@@ -101,7 +97,7 @@ describe('Adaptation Apply Route Handler', () => {
             context: { test: true }
         });
 
-        vi.mocked(prisma.adaptationRule.findMany).mockResolvedValue([]);
+        vi.mocked(mockPrisma.adaptationRule.findMany).mockResolvedValue([]);
 
         const response = await POST(request);
         const data = await response.json();
@@ -118,7 +114,7 @@ describe('Adaptation Apply Route Handler', () => {
             metrics: { metric1: 100 }
         });
 
-        vi.mocked(prisma.adaptationRule.findMany).mockResolvedValue([
+        vi.mocked(mockPrisma.adaptationRule.findMany).mockResolvedValue([
             {
                 id: 'rule1',
                 enabled: true,
@@ -155,7 +151,7 @@ describe('Adaptation Apply Route Handler', () => {
             context: { test: true }
         });
 
-        vi.mocked(prisma.adaptationRule.findMany).mockRejectedValue(new Error('Database error'));
+        vi.mocked(mockPrisma.adaptationRule.findMany).mockRejectedValue(new Error('Database error'));
 
         const response = await POST(request);
         const data = await response.json();
@@ -173,7 +169,7 @@ describe('Adaptation Apply Route Handler', () => {
             context: { test: true }
         });
 
-        vi.mocked(prisma.adaptationRule.findMany).mockResolvedValue([
+        vi.mocked(mockPrisma.adaptationRule.findMany).mockResolvedValue([
             {
                 id: 'rule1',
                 name: 'Test Rule',

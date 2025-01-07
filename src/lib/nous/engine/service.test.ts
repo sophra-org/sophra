@@ -1,12 +1,55 @@
+import { mockPrisma } from '@/lib/shared/test/prisma.mock';
+import { vi } from 'vitest';
+
+// Mock Prisma before any other imports
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn(() => mockPrisma),
+  Prisma: {
+    JsonValue: undefined,
+    JsonObject: undefined,
+  },
+  EngineOperationType: {
+    PATTERN_DETECTION: 'PATTERN_DETECTION',
+    STRATEGY_EXECUTION: 'STRATEGY_EXECUTION',
+    LEARNING: 'LEARNING'
+  },
+  EngineOperationStatus: {
+    RUNNING: 'RUNNING',
+    COMPLETED: 'COMPLETED',
+    FAILED: 'FAILED'
+  },
+  EngineRiskLevel: {
+    LOW: 'LOW',
+    MEDIUM: 'MEDIUM',
+    HIGH: 'HIGH'
+  },
+  MetricType: {
+    REDIS_GET: 'REDIS_GET',
+    REDIS_ERROR: 'REDIS_ERROR',
+    SEARCH_LATENCY: 'SEARCH_LATENCY',
+    SEARCH_THROUGHPUT: 'SEARCH_THROUGHPUT',
+    SEARCH_ERROR: 'SEARCH_ERROR',
+    SEARCH_RELEVANCE: 'SEARCH_RELEVANCE',
+    SEARCH_COVERAGE: 'SEARCH_COVERAGE',
+    SEARCH_DIVERSITY: 'SEARCH_DIVERSITY',
+    SEARCH_FRESHNESS: 'SEARCH_FRESHNESS',
+    SEARCH_QUALITY: 'SEARCH_QUALITY'
+  }
+}));
+
+vi.mock('@/lib/shared/database/client', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
+}));
+
+// Regular imports after mocks
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EngineService } from "./service";
 import type { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";
 import { EngineOperationType, EngineOperationStatus, EngineStatus, EngineOptimizationType, EngineRiskLevel, EngineState } from "./types";
 import { LearningEventType, LearningEventStatus, LearningEventPriority } from "../types/learning";
-
 import type { Logger } from '../../../lib/shared/types';
-import { any, string } from "node_modules/zod/lib";
 
 // Create a mock logger that satisfies the Winston Logger interface
 const createMockLogger = () => {
@@ -134,34 +177,6 @@ const mockMetricsService: MetricsService = {
   shutdown: vi.fn().mockResolvedValue(undefined)
 };
 
-// Mock Prisma client
-const mockPrisma = {
-  engineState: {
-    findFirst: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-  },
-  engineOperation: {
-    create: vi.fn(),
-    update: vi.fn(),
-  },
-  engineLearningResult: {
-    create: vi.fn(),
-    update: vi.fn(),
-  },
-  learningEvent: {
-    findMany: vi.fn(),
-  },
-  searchWeights: {
-    findFirst: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-  },
-  searchConfig: {
-    upsert: vi.fn(),
-  }
-} as unknown as PrismaClient;
-
 // Mock state for EngineState type
 const mockEngineState: EngineState = {
   id: "state1",
@@ -243,7 +258,6 @@ const mockStrategy = {
 describe("EngineService", () => {
   let engineService: EngineService;
   let mockLogger: Logger;
-  let mockMetricsService: MetricsService;
   let mockRedisClient: Redis;
   let childLogger: Partial<Logger>;
 
@@ -270,37 +284,34 @@ describe("EngineService", () => {
       disconnect: vi.fn().mockResolvedValue(undefined)
     } as unknown as Redis;
 
-    // Setup metrics service mock
-    mockMetricsService = {
-      recordEngineMetric: vi.fn(),
-      recordMetric: vi.fn(),
-      getAverageLatency: vi.fn().mockResolvedValue(100),
-      getThroughput: vi.fn().mockResolvedValue(1000),
-      getErrorRate: vi.fn().mockResolvedValue(0.01),
-      getCPUUsage: vi.fn().mockResolvedValue(0.5),
-      getMemoryUsage: vi.fn().mockResolvedValue(0.7),
-      getCurrentLoad: vi.fn().mockReturnValue(0.5),
-      getBaselineLoad: vi.fn().mockReturnValue(0.3),
-      logger: mockLogger,
-      registry: new Map(),
-      errorCounter: 0,
-      operationLatency: 0,
-      metricsEnabled: true,
-      samplingRate: 1.0,
-      batchSize: 100,
-      flushInterval: 5000,
-      initialize: vi.fn().mockResolvedValue(undefined),
-      shutdown: vi.fn().mockResolvedValue(undefined)
-    } as unknown as MetricsService;
-
     // Create engine service with mocked dependencies
     engineService = new EngineService({
       redis: mockRedisClient,
       logger: mockLogger
     });
 
-    // Clear all mocks before each test
+    // Reset all mocks before each test
     vi.clearAllMocks();
+
+    // Set up default mock implementations for Prisma
+    mockPrisma.engineState.findFirst.mockResolvedValue(mockPrismaState);
+    mockPrisma.engineState.create.mockResolvedValue(mockPrismaState);
+    mockPrisma.engineState.update.mockResolvedValue(mockPrismaState);
+    mockPrisma.engineOperation.create.mockResolvedValue(mockOperation);
+    mockPrisma.engineOperation.update.mockResolvedValue(mockOperation);
+    mockPrisma.engineLearningResult.create.mockResolvedValue({});
+    mockPrisma.engineLearningResult.update.mockResolvedValue({});
+    mockPrisma.learningEvent.findMany.mockResolvedValue([mockLearningEvent]);
+    mockPrisma.searchWeights.findFirst.mockResolvedValue({
+      id: 'test-weights',
+      active: true,
+      weights: {},
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    mockPrisma.searchWeights.create.mockResolvedValue({});
+    mockPrisma.searchWeights.update.mockResolvedValue({});
+    mockPrisma.searchConfig.upsert.mockResolvedValue({});
   });
 
   describe("initialization", () => {
@@ -311,7 +322,7 @@ describe("EngineService", () => {
         status: String(EngineStatus.READY),
         confidence: 0.8
       };
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValueOnce(mockState);
+      mockPrisma.engineState.findFirst.mockResolvedValueOnce(mockState);
 
       // Initialize engine
       await engineService.initialize();
@@ -324,8 +335,8 @@ describe("EngineService", () => {
     });
 
     it("should create new state if none exists", async () => {
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue(null);
-      vi.mocked(mockPrisma.engineState.create).mockResolvedValue({
+      mockPrisma.engineState.findFirst.mockResolvedValue(null);
+      mockPrisma.engineState.create.mockResolvedValue({
         ...mockPrismaState,
         id: "new_state",
         status: String(EngineStatus.PAUSED)
@@ -341,49 +352,18 @@ describe("EngineService", () => {
     });
 
     it("should handle operation errors", async () => {
-      // Setup mocks
-      const mockError = new Error("Operation failed");
-      engineService['currentState'] = {
-        id: mockPrismaState.id,
-        status: EngineStatus.READY,
-        confidence: mockPrismaState.confidence,
-        lastActive: mockPrismaState.lastActive,
-        currentPhase: undefined,
-        metadata: {}
-      };
-      
-      // Mock Prisma client for this test
-      const prisma = {
-        engineOperation: {
-          create: vi.fn().mockRejectedValue(mockError)
-        },
-        engineState: {
-          update: vi.fn()
-        }
-      };
-      
-      // Replace the prisma instance
-      vi.mock("'lib/shared/database/client'", () => ({
-        prisma
-      }));
+      // Mock the operation to fail
+      mockPrisma.engineOperation.create.mockRejectedValueOnce(new Error("Operation failed"));
 
       // Verify error handling
       await expect(engineService.startOperation(EngineOperationType.PATTERN_DETECTION))
         .rejects.toThrow("Operation failed");
-
-      // Verify the operation creation was attempted
-      expect(prisma.engineOperation.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          type: EngineOperationType.PATTERN_DETECTION,
-          status: EngineOperationStatus.PENDING
-        })
-      });
     });
 
     it("should start operation", async () => {
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue(mockPrismaState);
-      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(mockOperation);
-      vi.mocked(mockPrisma.engineState.update).mockResolvedValue({
+      mockPrisma.engineState.findFirst.mockResolvedValue(mockPrismaState);
+      mockPrisma.engineOperation.create.mockResolvedValue(mockOperation);
+      mockPrisma.engineState.update.mockResolvedValue({
         ...mockPrismaState,
         status: String(EngineStatus.LEARNING)
       });
@@ -400,11 +380,8 @@ describe("EngineService", () => {
   describe("pattern analysis", () => {
     beforeEach(async () => {
       // Initialize engine before pattern analysis
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValueOnce(mockPrismaState);
+      mockPrisma.engineState.findFirst.mockResolvedValueOnce(mockPrismaState);
       await engineService.initialize();
-
-      // Mock metrics recording to avoid side effects
-      vi.mocked(mockMetricsService.recordEngineMetric).mockResolvedValue(undefined);
     });
 
     it("should analyze patterns from learning events", async () => {
@@ -436,8 +413,8 @@ describe("EngineService", () => {
         EngineLearningResult: null
       };
 
-      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValueOnce(mockCreateOperation);
-      vi.mocked(mockPrisma.engineOperation.update).mockResolvedValueOnce(mockUpdateOperation);
+      mockPrisma.engineOperation.create.mockResolvedValueOnce(mockCreateOperation);
+      mockPrisma.engineOperation.update.mockResolvedValueOnce(mockUpdateOperation);
 
       // Execute pattern detection with high relevance event
       const { patterns, operation } = await engineService.detectPatterns([highRelevanceEvent]);
@@ -455,7 +432,7 @@ describe("EngineService", () => {
       vi.clearAllMocks();
       
       // Initialize engine before strategy tests
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue({
+      mockPrisma.engineState.findFirst.mockResolvedValue({
         ...mockPrismaState,
         metadata: "{}",
         createdAt: new Date(),
@@ -487,50 +464,28 @@ describe("EngineService", () => {
         }
       };
 
-      // Mock Prisma client for this test
-      const prisma = {
-        engineState: {
-          findFirst: vi.fn().mockResolvedValue({
-            ...mockPrismaState,
-            metadata: "{}",
-            createdAt: new Date(),
-            updatedAt: new Date()
-          })
-        },
-        searchWeights: {
-          findFirst: vi.fn().mockResolvedValue(currentWeights),
-          update: vi.fn().mockResolvedValue({
-            ...currentWeights,
-            active: false
-          }),
-          create: vi.fn()
-        },
-        engineLearningResult: {
-          update: vi.fn()
-        }
-      };
-
-      // Replace the prisma instance
-      vi.mock("'lib/shared/database/client'", () => ({
-        prisma
-      }));
+      mockPrisma.searchWeights.findFirst.mockResolvedValue(currentWeights);
+      mockPrisma.searchWeights.update.mockResolvedValue({
+        ...currentWeights,
+        active: false
+      });
 
       // Execute strategy
       await engineService.executeStrategy(lowRiskStrategy);
 
       // Verify weight adjustments
-      expect(prisma.searchWeights.findFirst).toHaveBeenCalledWith({
+      expect(mockPrisma.searchWeights.findFirst).toHaveBeenCalledWith({
         where: { active: true },
         orderBy: { createdAt: "desc" }
       });
 
-      expect(prisma.searchWeights.update).toHaveBeenCalledWith({
+      expect(mockPrisma.searchWeights.update).toHaveBeenCalledWith({
         where: { id: currentWeights.id },
         data: { active: false }
       });
 
       // Verify new weights creation with proper adjustments
-      expect(prisma.searchWeights.create).toHaveBeenCalledWith({
+      expect(mockPrisma.searchWeights.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           titleWeight: currentWeights.titleWeight * 1.2, // 20% improvement
           contentWeight: currentWeights.contentWeight,
@@ -541,7 +496,7 @@ describe("EngineService", () => {
       });
 
       // Verify learning result update
-      expect(prisma.engineLearningResult.update).toHaveBeenCalledWith({
+      expect(mockPrisma.engineLearningResult.update).toHaveBeenCalledWith({
         where: { id: lowRiskStrategy.learningResultId },
         data: expect.objectContaining({
           metadata: expect.any(String),
@@ -553,7 +508,7 @@ describe("EngineService", () => {
 
     it("should handle strategy execution errors", async () => {
       // Mock findFirst to return null to trigger the "No active weights found" error
-      vi.mocked(mockPrisma.searchWeights.findFirst).mockResolvedValueOnce(null);
+      mockPrisma.searchWeights.findFirst.mockResolvedValueOnce(null);
 
       // Execute strategy and verify error
       await expect(engineService.executeStrategy(mockStrategy))

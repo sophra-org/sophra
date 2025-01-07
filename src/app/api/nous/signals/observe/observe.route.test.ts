@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET, POST } from "./route";
+import { mockPrisma } from "~/vitest.setup";
 
 vi.mock("@prisma/client", () => ({
   SignalType: {
@@ -10,22 +10,11 @@ vi.mock("@prisma/client", () => ({
     FEEDBACK: "FEEDBACK",
     CONVERSION: "CONVERSION",
     CUSTOM: "CUSTOM",
-  },
-  Prisma: {
-    SignalScalarFieldEnum: {
-      source: "source",
-      type: "type",
-      timestamp: "timestamp",
-    },
-  },
+  }
 }));
 
 vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    signal: {
-      groupBy: vi.fn(),
-    },
-  },
+  default: mockPrisma
 }));
 
 vi.mock("@/lib/shared/logger", () => ({
@@ -76,7 +65,7 @@ describe("Signals Observe Route Handler", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(prisma.signal.groupBy).mockReset();
+    vi.mocked(mockPrisma.signal.groupBy).mockReset();
   });
 
   afterEach(() => {
@@ -108,7 +97,7 @@ describe("Signals Observe Route Handler", () => {
         _sum: undefined,
       }];
 
-      vi.mocked(prisma.signal.groupBy).mockResolvedValue(mockStats);
+      vi.mocked(mockPrisma.signal.groupBy).mockResolvedValue(mockStats);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/observe");
       const response = await GET(request);
@@ -151,7 +140,7 @@ describe("Signals Observe Route Handler", () => {
         _sum: undefined,
       }];
 
-      vi.mocked(prisma.signal.groupBy).mockResolvedValue(mockStats);
+      vi.mocked(mockPrisma.signal.groupBy).mockResolvedValue(mockStats);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/signals/observe?source=test&type=SEARCH"
@@ -161,7 +150,7 @@ describe("Signals Observe Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(vi.mocked(prisma.signal.groupBy)).toHaveBeenCalledWith(
+      expect(vi.mocked(mockPrisma.signal.groupBy)).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             source: "test",
@@ -172,7 +161,7 @@ describe("Signals Observe Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.signal.groupBy).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.signal.groupBy).mockRejectedValue(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/observe");
       const response = await GET(request);
@@ -232,8 +221,8 @@ describe("Signals Observe Route Handler", () => {
         _sum: undefined,
       }];
 
-      vi.mocked(prisma.signal.groupBy).mockResolvedValueOnce(mockStats);
-      vi.mocked(prisma.signal.groupBy).mockResolvedValueOnce(mockTimeline);
+      vi.mocked(mockPrisma.signal.groupBy).mockResolvedValueOnce(mockStats);
+      vi.mocked(mockPrisma.signal.groupBy).mockResolvedValueOnce(mockTimeline);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/observe", {
         method: "POST",
@@ -277,7 +266,7 @@ describe("Signals Observe Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.signal.groupBy).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.signal.groupBy).mockRejectedValue(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/observe", {
         method: "POST",

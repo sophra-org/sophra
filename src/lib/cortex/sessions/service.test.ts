@@ -78,20 +78,20 @@ describe('SessionService', () => {
         metadata: { test: 'data' }
       };
 
-      mockRedisClient.get = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
+      mockRedisClient.getEx = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
 
       const session = await sessionService.getSession(mockSession.id);
 
       expect(session).toBeDefined();
       expect(session?.id).toBe(mockSession.id);
       expect(session?.userId).toBe(mockSession.userId);
-      expect(mockRedisClient.get).toHaveBeenCalledWith(
+      expect(mockRedisClient.getEx).toHaveBeenCalledWith(
         `session:${mockSession.id}`
       );
     });
 
     it('should return null for non-existent session', async () => {
-      mockRedisClient.get = vi.fn().mockResolvedValue(null);
+      mockRedisClient.getEx = vi.fn().mockResolvedValue(null);
 
       const session = await sessionService.getSession('non-existent');
       expect(session).toBeNull();
@@ -107,7 +107,7 @@ describe('SessionService', () => {
         expiresAt: new Date(Date.now() + 3600000).toISOString(),
       };
 
-      mockRedisClient.get = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
+      mockRedisClient.getEx = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
 
       const isValid = await sessionService.validateSession(mockSession.id);
       expect(isValid).toBe(true);
@@ -121,7 +121,7 @@ describe('SessionService', () => {
         expiresAt: new Date(Date.now() - 1000).toISOString(),
       };
 
-      mockRedisClient.get = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
+      mockRedisClient.getEx = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
 
       const isValid = await sessionService.validateSession(mockSession.id);
       expect(isValid).toBe(false);
@@ -138,7 +138,7 @@ describe('SessionService', () => {
         expiresAt: new Date(Date.now() + 3600000).toISOString(),
       };
 
-      mockRedisClient.get = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
+      mockRedisClient.getEx = vi.fn().mockResolvedValue(JSON.stringify(mockSession));
       mockRedisClient.setEx = vi.fn().mockResolvedValue('OK');
 
       const duration = 1800; // 30 minutes
@@ -149,7 +149,7 @@ describe('SessionService', () => {
     });
 
     it('should handle extension errors', async () => {
-      mockRedisClient.get = vi.fn().mockRejectedValue(new Error('Redis error'));
+      mockRedisClient.getEx = vi.fn().mockRejectedValue(new Error('Redis error'));
 
       const duration = 1800;
       await expect(

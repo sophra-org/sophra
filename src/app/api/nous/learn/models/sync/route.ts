@@ -1,8 +1,8 @@
-import prisma from "@/lib/shared/database/client";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
@@ -111,18 +111,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           versionId: latestVersion.id,
           weights: state.weights,
           bias: state.bias,
-          scaler: state.scaler as Prisma.InputJsonValue,
+          scaler: state.scaler as unknown as Prisma.InputJsonValue,
           featureNames: state.featureNames,
           isTrained: true,
           modelType: model.type,
-          hyperparameters:
-            (state.hyperparameters as Prisma.InputJsonValue) ??
-            model.hyperparameters,
+          hyperparameters: (state.hyperparameters || {}) as Prisma.InputJsonValue,
           currentEpoch: state.currentEpoch || 0,
           trainingProgress: state.trainingProgress || 1,
           lastTrainingError: state.lastTrainingError,
-          metrics: state.metrics
-            ? {
+          metrics: state.metrics ? {
                 create: {
                   modelVersionId: latestVersion.id,
                   accuracy: (state.metrics as any).accuracy || 0,
@@ -131,7 +128,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                   f1Score: (state.metrics as any).f1Score || 0,
                   latencyMs: (state.metrics as any).latencyMs || 0,
                   loss: (state.metrics as any).loss || 0,
-                  validationMetrics: state.metrics as Prisma.InputJsonValue,
+                  validationMetrics: state.metrics as Prisma.InputJsonValue || Prisma.JsonNull,
                   customMetrics: Prisma.JsonNull,
                   timestamp: new Date(),
                 },
@@ -141,15 +138,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         update: {
           weights: state.weights,
           bias: state.bias,
-          scaler: state.scaler as Prisma.InputJsonValue,
+          scaler: state.scaler as unknown as Prisma.InputJsonValue,
           featureNames: state.featureNames,
           isTrained: true,
-          hyperparameters: state.hyperparameters as Prisma.InputJsonValue,
-          currentEpoch: state.currentEpoch,
-          trainingProgress: state.trainingProgress,
+          hyperparameters: (state.hyperparameters || {}) as unknown as Prisma.InputJsonValue,
+          currentEpoch: state.currentEpoch || 0,
+          trainingProgress: state.trainingProgress || 1,
           lastTrainingError: state.lastTrainingError,
           metrics: state.metrics
             ? {
+                deleteMany: {},
                 create: {
                   modelVersionId: latestVersion.id,
                   accuracy: (state.metrics as any).accuracy || 0,

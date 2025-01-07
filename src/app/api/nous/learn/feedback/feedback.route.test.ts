@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import { mockPrisma } from "~/vitest.setup";
 
 vi.mock("next/server", () => {
   return {
@@ -39,57 +40,8 @@ vi.mock("next/server", () => {
   };
 });
 
-vi.mock("@prisma/client", () => ({
-  SignalType: {
-    SEARCH: 'SEARCH',
-    CLICK: 'CLICK',
-    HOVER: 'HOVER',
-    SCROLL: 'SCROLL',
-    COPY: 'COPY',
-    FEEDBACK: 'FEEDBACK',
-    CUSTOM: 'CUSTOM'
-  },
-  EngagementType: {
-    CLICK: 'CLICK',
-    HOVER: 'HOVER',
-    SCROLL: 'SCROLL',
-    COPY: 'COPY',
-    FEEDBACK: 'FEEDBACK',
-    CUSTOM: 'CUSTOM'
-  },
-  Prisma: {
-    PrismaClientKnownRequestError: class extends Error {
-      constructor(message: string, { code, clientVersion, meta }: any) {
-        super(message);
-        this.name = 'PrismaClientKnownRequestError';
-        this.code = code;
-        this.clientVersion = clientVersion;
-        this.meta = meta;
-      }
-    }
-  }
-}));
-
-vi.mock("@/lib/shared/database/client", () => {
-  const mockPrisma = {
-    feedbackRequest: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-    },
-  };
-  return { default: mockPrisma };
-});
-
-vi.mock("@/lib/shared/logger", () => ({
-  default: {
-    error: vi.fn(),
-    info: vi.fn(),
-  },
-}));
-
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { SignalType, EngagementType } from "@prisma/client";
-import prisma from "@/lib/shared/database/client";
 import { GET, POST } from "./route";
 
 describe("Feedback Route Handler", () => {
@@ -125,7 +77,7 @@ describe("Feedback Route Handler", () => {
         timestamp: new Date(),
       }];
 
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockResponse);
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue(mockResponse);
 
       const response = await GET();
       const data = await response.json();
@@ -133,14 +85,14 @@ describe("Feedback Route Handler", () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.data).toEqual(mockResponse);
-      expect(prisma.feedbackRequest.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.feedbackRequest.findMany).toHaveBeenCalledWith({
         orderBy: { timestamp: "desc" },
         take: 100,
       });
     });
 
     it("should handle empty results", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue([]);
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue([]);
 
       const response = await GET();
       const data = await response.json();
@@ -151,7 +103,7 @@ describe("Feedback Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockRejectedValue(new Error("DB Error"));
 
       const response = await GET();
       const data = await response.json();
@@ -170,7 +122,7 @@ describe("Feedback Route Handler", () => {
         timestamp: new Date(),
       };
 
-      vi.mocked(prisma.feedbackRequest.create).mockResolvedValue(mockResponse);
+      vi.mocked(mockPrisma.feedbackRequest.create).mockResolvedValue(mockResponse);
 
       const request = new (vi.mocked(require('next/server').NextRequest))(
         "http://localhost:3000/api/nous/learn/feedback",
@@ -276,7 +228,7 @@ describe("Feedback Route Handler", () => {
     });
 
     it("should handle database errors during creation", async () => {
-      vi.mocked(prisma.feedbackRequest.create).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.feedbackRequest.create).mockRejectedValue(new Error("DB Error"));
 
       const request = new (vi.mocked(require('next/server').NextRequest))(
         "http://localhost:3000/api/nous/learn/feedback",

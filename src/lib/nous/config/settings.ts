@@ -81,14 +81,16 @@ export class Settings {
         let current = config;
         for (let i = 0; i < path.length - 1; i++) {
           const segment = this.normalizeKey(path[i]);
-          current[segment] = current[segment] || {};
-          current = current[segment];
+          if (!current[segment as keyof typeof current]) {
+            (current as Record<string, any>)[segment] = {};
+          }
+          current = (current as Record<string, any>)[segment];
         }
 
         const lastSegment = this.normalizeKey(path[path.length - 1]);
         const value = process.env[key];
         if (value !== undefined) {
-          current[lastSegment] = this.convertValue(value);
+          (current as Record<string, any>)[lastSegment] = this.convertValue(value);
         }
       });
 

@@ -1,6 +1,6 @@
-import prisma from "@/lib/shared/database/client";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { Prisma, RulePriority } from "@prisma/client";
+import { RulePriority } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime

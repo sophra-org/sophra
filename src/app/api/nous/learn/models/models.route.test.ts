@@ -1,8 +1,18 @@
+import { mockPrisma } from "~/vitest.setup";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET, POST } from "./route";
 import { ModelType } from "@prisma/client";
+
+vi.mock('@prisma/client', () => ({
+  ModelType: {
+    PATTERN_DETECTOR: "PATTERN_DETECTOR",
+  }
+}));
+
+vi.mock('@/lib/shared/database/client', () => ({
+  default: mockPrisma
+}));
 
 vi.mock("next/server", () => {
   return {
@@ -28,29 +38,10 @@ vi.mock("next/server", () => {
   };
 });
 
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    modelConfig: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-    },
-    $transaction: vi.fn(),
-  },
-}));
-
 vi.mock("@/lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
-  },
-}));
-
-vi.mock("@prisma/client", () => ({
-  ModelType: {
-    PATTERN_DETECTOR: "PATTERN_DETECTOR",
-    FEEDBACK_CLASSIFIER: "FEEDBACK_CLASSIFIER",
-    RELEVANCE_RANKER: "RELEVANCE_RANKER",
-    ENGAGEMENT_PREDICTOR: "ENGAGEMENT_PREDICTOR",
   },
 }));
 
@@ -77,7 +68,7 @@ describe("Models Route Handler", () => {
         }
       ];
 
-      vi.mocked(prisma.modelConfig.findMany).mockResolvedValueOnce(mockModels);
+      vi.mocked(mockPrisma.modelConfig.findMany).mockResolvedValueOnce(mockModels);
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/models");
       const response = await GET(request);
@@ -98,7 +89,7 @@ describe("Models Route Handler", () => {
       expect(data.metadata).toBeDefined();
       expect(data.metadata.count).toBe(1);
 
-      expect(prisma.modelConfig.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.modelConfig.findMany).toHaveBeenCalledWith({
         include: {
           modelVersions: {
             orderBy: { createdAt: "desc" },
@@ -109,7 +100,7 @@ describe("Models Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.modelConfig.findMany).mockRejectedValueOnce(new Error("DB Error"));
+      vi.mocked(mockPrisma.modelConfig.findMany).mockRejectedValueOnce(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/models");
       const response = await GET(request);
@@ -142,7 +133,7 @@ describe("Models Route Handler", () => {
         }]
       };
 
-      vi.mocked(prisma.modelConfig.create).mockResolvedValueOnce(mockCreatedModel);
+      vi.mocked(mockPrisma.modelConfig.create).mockResolvedValueOnce(mockCreatedModel);
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/models");
       Object.defineProperty(request, 'json', {
@@ -191,7 +182,7 @@ describe("Models Route Handler", () => {
         features: ["feature1", "feature2"]
       };
 
-      vi.mocked(prisma.modelConfig.create).mockRejectedValueOnce(new Error("DB Error"));
+      vi.mocked(mockPrisma.modelConfig.create).mockRejectedValueOnce(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/models");
       Object.defineProperty(request, 'json', {

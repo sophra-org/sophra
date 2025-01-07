@@ -1,5 +1,5 @@
+import { prisma } from "@/lib/shared/database/client";
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { ExperimentStatus } from "@prisma/client";
 

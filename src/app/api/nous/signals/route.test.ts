@@ -1,8 +1,22 @@
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn(() => mockPrisma),
+  Prisma: {
+    JsonValue: undefined,
+    JsonObject: undefined,
+  }
+}));
+
+vi.mock('@/lib/shared/database/client', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
+}));
+
+import { mockPrisma } from '@/lib/shared/test/prisma.mock';
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET, POST } from "./route";
-import { SignalType, Prisma } from "@prisma/client";
+import { SignalType } from "@prisma/client";
+import { prisma } from "@/lib/shared/database/client";
 
 vi.mock("next/server", () => {
   return {
@@ -32,47 +46,12 @@ vi.mock("next/server", () => {
   };
 });
 
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    signal: {
-      findMany: vi.fn(),
-      count: vi.fn(),
-      create: vi.fn(),
-    },
-  },
-}));
-
 vi.mock("@/lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
   },
 }));
-
-vi.mock("@prisma/client", () => {
-  const ModelType = {
-    PATTERN_DETECTOR: "PATTERN_DETECTOR",
-    FEEDBACK_CLASSIFIER: "FEEDBACK_CLASSIFIER",
-    RELEVANCE_RANKER: "RELEVANCE_RANKER",
-    ENGAGEMENT_PREDICTOR: "ENGAGEMENT_PREDICTOR",
-  };
-  const SignalType = {
-    SEARCH: "SEARCH",
-    PERFORMANCE: "PERFORMANCE",
-    USER_BEHAVIOR_IMPRESSION: "USER_BEHAVIOR_IMPRESSION",
-    USER_BEHAVIOR_VIEW: "USER_BEHAVIOR_VIEW",
-    USER_BEHAVIOR_CLICK: "USER_BEHAVIOR_CLICK",
-    USER_BEHAVIOR_CONVERSION: "USER_BEHAVIOR_CONVERSION",
-    MODEL_PERFORMANCE: "MODEL_PERFORMANCE",
-    FEEDBACK: "FEEDBACK",
-    SYSTEM_HEALTH: "SYSTEM_HEALTH",
-    SESSION: "SESSION",
-  };
-  const Prisma = {
-    JsonNull: null,
-  };
-  return { ModelType, SignalType, Prisma };
-});
 
 describe("Signals Route Handler", () => {
   beforeEach(() => {

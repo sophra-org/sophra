@@ -1,22 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PUT, GET, DELETE } from './route';
-import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import prisma from '@/lib/shared/database/client';
-import logger from '@/lib/shared/logger';
+import { mockPrisma } from '~/vitest.setup';
 import { NextRequest, NextResponse } from 'next/server';
+
+// Note: No changes needed as code already matches edit plan requirements
 
 // Setup mocks
 vi.mock('@/lib/cortex/utils/service-manager', () => ({
     serviceManager: {
         getServices: vi.fn()
-    }
-}));
-
-vi.mock('@/lib/shared/database/client', () => ({
-    default: {
-        index: {
-            findUnique: vi.fn()
-        }
     }
 }));
 
@@ -65,7 +57,7 @@ beforeEach(() => {
 describe('Document API Routes', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(prisma.index.findUnique).mockResolvedValue({
+        vi.mocked(mockPrisma.index.findUnique).mockResolvedValue({
             name: 'test-index',
             id: '',
             status: '',
@@ -164,7 +156,7 @@ describe('Document API Routes', () => {
 
         it('should handle non-existent index', async () => {
             const documentId = '123';
-            vi.mocked(prisma.index.findUnique).mockResolvedValue(null);
+            vi.mocked(mockPrisma.index.findUnique).mockResolvedValue(null);
 
             const request = new NextRequest(`http://localhost/api/cortex/documents/${documentId}?index=test-index`);
             const response = await GET(request, { params: { id: documentId } });

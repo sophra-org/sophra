@@ -34,6 +34,8 @@ describe("SignalRouter", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         strength: 0.7,
+        retries: null,
+        manual: false
       };
 
       const processors = router.route(signal);
@@ -64,6 +66,8 @@ describe("SignalRouter", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         strength: 0.3,
+        retries: null,
+        manual: false
       };
 
       const processors = router.route(signal);
@@ -76,8 +80,8 @@ describe("SignalRouter", () => {
         min_strength: 0.5,
         max_strength: 1.0,
         required_fields: ["query"],
-        custom_filter: (signal: Signal) => 
-          signal.value && typeof signal.value === "object" && 
+        custom_filter: (signal: Signal): boolean => 
+          !!signal.value && typeof signal.value === "object" && 
           "query" in signal.value && 
           (signal.value as any).query.length > 5,
       };
@@ -98,6 +102,8 @@ describe("SignalRouter", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         strength: 0.7,
+        retries: null,
+        manual: false
       };
 
       const invalidSignal: Signal = {
@@ -114,6 +120,8 @@ describe("SignalRouter", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         strength: 0.7,
+        retries: null,
+        manual: false
       };
 
       expect(router.route(validSignal)).toContain("test_processor");
@@ -176,6 +184,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
         {
           id: "test_signal_2",
@@ -191,6 +201,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
       ];
 
@@ -217,6 +229,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
         {
           id: "test_signal_2",
@@ -232,6 +246,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
       ];
 
@@ -257,6 +273,8 @@ describe("BaseSignalProcessor", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         strength: 0.7,
+        retries: null,
+        manual: false
       };
 
       const processed = processor.process_signal(signal);
@@ -285,6 +303,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
         {
           id: "high_priority",
@@ -300,6 +320,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
         {
           id: "medium_priority",
@@ -315,6 +337,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
       ];
 
@@ -340,6 +364,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
         {
           id: "with_priority",
@@ -355,6 +381,8 @@ describe("BaseSignalProcessor", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           strength: 0.7,
+          retries: null,
+          manual: false
         },
       ];
 

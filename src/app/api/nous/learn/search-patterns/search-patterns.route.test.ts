@@ -1,25 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET, POST } from "./route";
+import { mockPrisma } from "~/vitest.setup";
 
 vi.mock("@prisma/client", () => ({
   ModelType: {
     PATTERN_DETECTOR: "PATTERN_DETECTOR",
-  },
-  Prisma: {
-    ModelStateWhereInput: {},
-  },
+  }
 }));
 
 vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    modelState: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-    },
-    $transaction: vi.fn(),
-  },
+  default: mockPrisma,
 }));
 
 vi.mock("@/lib/shared/logger", () => ({
@@ -101,7 +92,7 @@ describe("Search Patterns Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.modelState.findMany).mockResolvedValue(mockPatterns);
+      vi.mocked(mockPrisma.modelState.findMany).mockResolvedValue(mockPatterns);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/search-patterns"
@@ -145,7 +136,7 @@ describe("Search Patterns Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.modelState.findMany).mockResolvedValue(mockPatterns);
+      vi.mocked(mockPrisma.modelState.findMany).mockResolvedValue(mockPatterns);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/search-patterns?query=specific_query"
@@ -159,7 +150,7 @@ describe("Search Patterns Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.modelState.findMany).mockRejectedValue(
+      vi.mocked(mockPrisma.modelState.findMany).mockRejectedValue(
         new Error("DB Error")
       );
 
@@ -219,7 +210,7 @@ describe("Search Patterns Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.$transaction).mockResolvedValue(mockResponse);
+      vi.mocked(mockPrisma.$transaction).mockResolvedValue(mockResponse);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/search-patterns",

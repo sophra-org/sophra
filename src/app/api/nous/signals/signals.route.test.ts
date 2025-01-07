@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
+import { SignalType } from "@prisma/client";
 import { GET, POST } from "./route";
+import { mockPrisma } from "~/vitest.setup";
 
 vi.mock("@prisma/client", () => ({
   SignalType: {
@@ -19,13 +20,7 @@ vi.mock("@prisma/client", () => ({
 }));
 
 vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    signal: {
-      findMany: vi.fn(),
-      count: vi.fn(),
-      create: vi.fn(),
-    },
-  },
+  default: mockPrisma,
 }));
 
 vi.mock("@/lib/shared/logger", () => ({
@@ -94,8 +89,8 @@ describe("Signals Route Handler", () => {
         { id: "2", type: SignalType.SEARCH, source: "test", value: {}, error: null, priority: null, retries: null, timestamp: new Date(), processed: false, processedAt: null, manual: false, createdAt: new Date(), updatedAt: new Date(), metadata: null, strength: 1 },
       ];
 
-      vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
-      vi.mocked(prisma.signal.count).mockResolvedValue(2);
+      vi.mocked(mockPrisma.signal.findMany).mockResolvedValue(mockSignals);
+      vi.mocked(mockPrisma.signal.count).mockResolvedValue(2);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals");
       const response = await GET(request);
@@ -114,8 +109,8 @@ describe("Signals Route Handler", () => {
         { id: "1", type: SignalType.SEARCH, source: "test", value: {}, error: null, priority: null, retries: null, timestamp: new Date(), processed: false, processedAt: null, manual: false, createdAt: new Date(), updatedAt: new Date(), metadata: null, strength: 1 }
       ];
 
-      vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
-      vi.mocked(prisma.signal.count).mockResolvedValue(1);
+      vi.mocked(mockPrisma.signal.findMany).mockResolvedValue(mockSignals);
+      vi.mocked(mockPrisma.signal.count).mockResolvedValue(1);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/signals?source=test&type=SEARCH"
@@ -125,7 +120,7 @@ describe("Signals Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(vi.mocked(prisma.signal.findMany)).toHaveBeenCalledWith(
+      expect(vi.mocked(mockPrisma.signal.findMany)).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
             source: "test",
@@ -136,7 +131,7 @@ describe("Signals Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.signal.findMany).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.signal.findMany).mockRejectedValue(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals");
       const response = await GET(request);
@@ -173,7 +168,7 @@ describe("Signals Route Handler", () => {
         value: mockSignal.value,
       };
 
-      vi.mocked(prisma.signal.create).mockResolvedValue(mockResponse);
+      vi.mocked(mockPrisma.signal.create).mockResolvedValue(mockResponse);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals", {
         method: "POST",
@@ -190,7 +185,7 @@ describe("Signals Route Handler", () => {
         value: expect.any(Object),
       }));
 
-      expect(prisma.signal.create).toHaveBeenCalledWith({
+      expect(mockPrisma.signal.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           type: mockSignal.type,
           source: mockSignal.source,
@@ -245,7 +240,7 @@ describe("Signals Route Handler", () => {
         priority: null,
       };
 
-      vi.mocked(prisma.signal.create).mockRejectedValue(new Error("Database error"));
+      vi.mocked(mockPrisma.signal.create).mockRejectedValue(new Error("Database error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals", {
         method: "POST",

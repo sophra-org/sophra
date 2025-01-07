@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET } from "./route";
+import { mockPrisma } from "~/vitest.setup";
+
+vi.mock("@/lib/shared/database/client", () => ({ default: mockPrisma }));
 
 vi.mock("next/server", () => {
   return {
@@ -26,14 +28,6 @@ vi.mock("next/server", () => {
     }
   };
 });
-
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    feedbackRequest: {
-      findMany: vi.fn(),
-    },
-  },
-}));
 
 vi.mock("@/lib/shared/logger", () => ({
   default: {
@@ -80,7 +74,7 @@ describe("Feedback Patterns Route Handler", () => {
 
   describe("GET /api/nous/learn/feedback/patterns", () => {
     it("should fetch patterns with default parameters", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns"
@@ -99,7 +93,7 @@ describe("Feedback Patterns Route Handler", () => {
     });
 
     it("should handle custom timeframe and limit", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns?timeframe=7d&limit=50"
@@ -110,7 +104,7 @@ describe("Feedback Patterns Route Handler", () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.metadata.timeframe).toBe("7d");
-      expect(vi.mocked(prisma.feedbackRequest.findMany)).toHaveBeenCalledWith({
+      expect(vi.mocked(mockPrisma.feedbackRequest.findMany)).toHaveBeenCalledWith({
         where: {
           timestamp: {
             gte: expect.any(Date),
@@ -166,7 +160,7 @@ describe("Feedback Patterns Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockRejectedValue(
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockRejectedValue(
         new Error("DB Error")
       );
 
@@ -209,7 +203,7 @@ describe("Feedback Patterns Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedbackWithDuplicates);
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue(mockFeedbackWithDuplicates);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns"
@@ -234,7 +228,7 @@ describe("Feedback Patterns Route Handler", () => {
     });
 
     it("should handle empty results", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue([]);
+      vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue([]);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns"

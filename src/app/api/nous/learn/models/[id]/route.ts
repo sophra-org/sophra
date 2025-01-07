@@ -1,9 +1,8 @@
-import prisma from "@/lib/shared/database/client";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 export async function GET(
   req: NextRequest,

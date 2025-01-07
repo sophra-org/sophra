@@ -1,7 +1,7 @@
-import prisma from "@/lib/shared/database/client";
+import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
-import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 // Declare Node.js runtime
 export const runtime = "nodejs";

@@ -75,7 +75,7 @@ export class RedisCacheService extends BaseService {
    * @param {SearchResult<T>} results - What we found
    * @param {number} [ttl] - How long to keep it
    */
-  async set(key: string, value: unknown, ttl: number): Promise<void> {
+  async set(key: string, value: unknown, p0: string, ttl: number): Promise<void> {
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt < this.retryAttempts; attempt++) {

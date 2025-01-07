@@ -1,15 +1,21 @@
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn(() => mockPrisma),
+  Prisma: {
+    JsonValue: undefined,
+    JsonObject: undefined,
+  }
+}));
+
+vi.mock('@/lib/shared/database/client', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
+}));
+
+import { mockPrisma } from '@/lib/shared/test/prisma.mock';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PostgresDataService } from './services';
 import type { Logger } from '@/lib/shared/types';
 import { prisma } from '@/lib/shared/database/client';
-
-vi.mock('@/lib/shared/database/client', () => ({
-  prisma: {
-    $connect: vi.fn(),
-    $disconnect: vi.fn(),
-    $queryRaw: vi.fn(),
-  },
-}));
 
 describe('PostgresDataService', () => {
   let service: PostgresDataService;
@@ -36,7 +42,7 @@ describe('PostgresDataService', () => {
 
   describe('initialize', () => {
     it('should initialize successfully', async () => {
-      (prisma.$connect as jest.Mock).mockResolvedValue(undefined);
+      mockPrisma.$connect.mockResolvedValue(undefined);
       
       await service.initialize();
       
@@ -46,7 +52,7 @@ describe('PostgresDataService', () => {
 
     it('should handle initialization errors', async () => {
       const error = new Error('Connection failed');
-      (prisma.$connect as jest.Mock).mockRejectedValue(error);
+      mockPrisma.$connect.mockRejectedValue(error);
       
       await expect(service.initialize()).rejects.toThrow('Connection failed');
       expect(mockLogger.error).toHaveBeenCalledWith('Failed to initialize PostgreSQL connection', { error });

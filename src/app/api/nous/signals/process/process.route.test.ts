@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET, POST } from "./route";
 import { SignalType } from "@prisma/client";
+import { mockPrisma } from "~/vitest.setup";
 
 vi.mock("@prisma/client", () => ({
   SignalType: {
@@ -92,7 +92,7 @@ describe("Signals Process Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
+      vi.mocked(mockPrisma.signal.findMany).mockResolvedValue(mockSignals);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/process");
       const response = await GET(request);
@@ -103,7 +103,7 @@ describe("Signals Process Route Handler", () => {
       expect(data.data).toEqual(mockSignals);
       expect(data.metadata.count).toBe(1);
       expect(data.metadata.status).toBe(null);
-      expect(vi.mocked(prisma.signal.findMany)).toHaveBeenCalledWith(
+      expect(vi.mocked(mockPrisma.signal.findMany)).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             processed: false,
@@ -137,7 +137,7 @@ describe("Signals Process Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
+      vi.mocked(mockPrisma.signal.findMany).mockResolvedValue(mockSignals);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/signals/process?status=COMPLETED"
@@ -147,7 +147,7 @@ describe("Signals Process Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(vi.mocked(prisma.signal.findMany)).toHaveBeenCalledWith(
+      expect(vi.mocked(mockPrisma.signal.findMany)).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             processed: true,
@@ -161,7 +161,7 @@ describe("Signals Process Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.signal.findMany).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.signal.findMany).mockRejectedValue(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/process");
       const response = await GET(request);
@@ -197,7 +197,7 @@ describe("Signals Process Route Handler", () => {
         strength: 1,
       };
 
-      vi.mocked(prisma.signal.update).mockResolvedValue(mockSignal);
+      vi.mocked(mockPrisma.signal.update).mockResolvedValue(mockSignal);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/process", {
         method: "POST",
@@ -250,7 +250,7 @@ describe("Signals Process Route Handler", () => {
         }),
       });
 
-      vi.mocked(prisma.signal.update).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(mockPrisma.signal.update).mockRejectedValue(new Error("DB Error"));
 
       const response = await POST(request);
       const data = await response.json();
@@ -300,7 +300,7 @@ describe("Signals Process Route Handler", () => {
         strength: 1,
       };
 
-      vi.mocked(prisma.signal.update).mockResolvedValue(mockSignal);
+      vi.mocked(mockPrisma.signal.update).mockResolvedValue(mockSignal);
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals/process", {
         method: "POST",

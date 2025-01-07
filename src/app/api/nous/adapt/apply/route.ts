@@ -1,11 +1,11 @@
-import prisma from "@/lib/shared/database/client";
 import { AdaptationEngine } from "@/lib/shared/engine/adaptation-engine";
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { prisma } from "@/lib/shared/database/client";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 const AdaptationRequestSchema = z.object({
   ruleIds: z.array(z.string()),

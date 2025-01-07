@@ -1,6 +1,5 @@
 import type { BaseDocument } from "@/lib/cortex/elasticsearch/types";
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import JSON5 from "json5";
 import type { NextRequest } from "next/server";

@@ -1,34 +1,104 @@
 import { describe, it, expect } from 'vitest';
-import { Logger as WinstonLogger } from 'winston';
+import winston, { Logger as WinstonLogger } from 'winston';
 import { Logger, ServiceConfig, NousAdaptationType } from './index';
 
 describe('Types', () => {
   describe('Logger Interface', () => {
     it('should extend WinstonLogger', () => {
-      const mockLogger: Logger = {
+      let mockLogger: Logger;
+      mockLogger = {
+        input: () => mockLogger,
+        silly: () => mockLogger,
+        emerg: () => mockLogger,
+        alert: () => mockLogger,
+        crit: () => mockLogger,
+        warning: () => mockLogger,
+        notice: () => mockLogger,
+        query: () => mockLogger,
+        silent: true,
+        format: winston.format.json(),
+        levels: winston.config.npm.levels,
+        level: 'info',
+        data: () => mockLogger,
+        prompt: () => mockLogger,
+        http: () => mockLogger,
+        verbose: () => mockLogger,
+        transports: [],
+        rejections: {
+          handle: () => mockLogger,
+          unhandle: () => mockLogger,
+          logger: winston.createLogger(),
+          handlers: new Map(),
+          catcher: () => { },
+          getAllInfo: function (err: string | Error): object {
+            return {
+              process: { pid: 123, title: 'test' },
+              os: { platform: 'test', release: '1.0' },
+              trace: []
+            };
+          },
+          getProcessInfo: function (): object {
+            return {
+              pid: 123,
+              title: 'test'
+            };
+          },
+          getOsInfo: function (): object {
+            return {
+              platform: 'test',
+              release: '1.0'
+            };
+          },
+          getTrace: function (err: Error): object {
+            return {
+              message: err.message,
+              stack: err.stack,
+              name: err.name
+            };
+          }
+        },
+        profilers: {},
+        help: () => mockLogger,
         service: 'test-service',
-        info: () => undefined,
-        error: () => undefined,
-        warn: () => undefined,
-        debug: () => undefined,
-        log: () => undefined,
+        info: () => mockLogger,
+        error: () => mockLogger,
+        warn: () => mockLogger,
+        debug: () => mockLogger,
+        log: () => mockLogger,
         add: () => mockLogger,
         remove: () => mockLogger,
         clear: () => mockLogger,
         exceptions: {
           handle: () => mockLogger,
-          unhandle: () => mockLogger
+          unhandle: () => mockLogger,
+          logger: winston.createLogger(),
+          handlers: new Map(),
+          catcher: () => { },
+          getAllInfo: () => ({
+            process: { pid: 123, title: 'test' },
+            os: { platform: 'test', release: '1.0' },
+            trace: []
+          }),
+          getProcessInfo: () => ({
+            pid: 123,
+            title: 'test'
+          }),
+          getOsInfo: () => ({
+            platform: 'test',
+            release: '1.0'
+          }),
+          getTrace: (err: Error) => ({
+            message: err.message,
+            stack: err.stack,
+            name: err.name
+          })
         },
         exitOnError: true,
-        level: 'info',
-        format: undefined,
-        transports: [],
-        silent: false,
         profile: () => mockLogger,
         configure: () => mockLogger,
         child: () => mockLogger,
-        close: async () => undefined
-      };
+        close: () => mockLogger
+      } as unknown as Logger;
 
       // Type assertion test - if this compiles, the interface is correct
       const loggerTest: WinstonLogger = mockLogger;

@@ -1,32 +1,35 @@
+import { mockPrisma } from '@/lib/shared/test/prisma.mock';
+
+// Mock Prisma before other imports
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn(() => mockPrisma),
+  Prisma: {
+    JsonValue: undefined,
+    JsonObject: undefined,
+  },
+  ExperimentStatus: {
+    PENDING: 'PENDING',
+    ACTIVE: 'ACTIVE',
+    INACTIVE: 'INACTIVE'
+  }
+}));
+
+vi.mock('@/lib/shared/database/client', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
+}));
+
+// Regular imports after mocking
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
-
-// Mock modules before importing them
-vi.mock('@/lib/shared/database/client', () => ({
-  default: {
-    aBTest: {
-      findUnique: vi.fn(),
-      update: vi.fn()
-    },
-    adaptationRule: {
-      findMany: vi.fn()
-    }
-  }
-}));
+import logger from "@/lib/shared/logger";
+import { ExperimentStatus } from "@prisma/client";
 
 vi.mock('@/lib/shared/logger', () => ({
   default: {
     info: vi.fn(),
     error: vi.fn()
-  }
-}));
-
-vi.mock('@prisma/client', () => ({
-  ExperimentStatus: {
-    PENDING: 'PENDING',
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE'
   }
 }));
 
@@ -46,11 +49,6 @@ vi.mock('next/server', () => ({
     }))
   }
 }));
-
-// Import mocked modules after mocking
-import prisma from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
-import { ExperimentStatus } from "@prisma/client";
 
 describe('Apply Adaptation Route Handler', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
+import { prisma } from "@/lib/shared/database/client";
 import { TrainingMetrics } from "@/lib/nous/types";
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 
 export interface ModelMetrics extends TrainingMetrics {

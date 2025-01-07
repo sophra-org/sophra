@@ -1,76 +1,46 @@
-name: Testing and Coverage
+name: Test Coverage
 
 on:
   push:
-    branches:
-      - main
-      - dev
-      - dev-*
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-      - dev
-      - dev-*
+    branches: [ main ]
 
 jobs:
   test:
-    runs-on: windows-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-
-    - name: Install pnpm
-      run: npm install -g pnpm
-
-    - name: Install dependencies
-      run: pnpm install
-
-    - name: Run tests with coverage
-      id: tests
-      continue-on-error: true
-      run: |
-        pnpm test
-        dir coverage
-        type coverage/coverage-final.json
-
-    - name: Debug coverage files
-      if: always()
-      shell: bash
-      run: |
-        echo "Checking file formats..."
-        file coverage/coverage-final.json
-        file coverage/lcov.info
-        echo "Line ending check..."
-        cat -A coverage/coverage-final.json | head -n 1
-        cat -A coverage/lcov.info | head -n 1
-
-    - name: Upload coverage reports to Codecov
-      if: always()
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        slug: sophra-org/sophra
-        files: ./coverage/coverage-final.json,./coverage/lcov.info
-        fail_ci_if_error: true
-        verbose: true
-
-    - name: Upload test results to Codecov
-      if: always()
-      uses: codecov/test-results-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: test-report.junit.xml
-
-    - name: Check test status
-      if: steps.tests.outcome == 'failure'
-      run: exit 1
+    runs-on: ubuntu-latest
 
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      POSTGRESQL_URL: ${{ secrets.POSTGRESQL_URL }} 
+      POSTGRESQL_URL: ${{ secrets.POSTGRESQL_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests with coverage
+        run: pnpm test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./coverage/coverage-final.json,./coverage/cobertura-coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true 

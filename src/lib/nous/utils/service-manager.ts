@@ -1,6 +1,5 @@
 import { EventCollector } from "@/lib/nous/observe/collector";
 import { SignalCoordinator } from "@/lib/nous/observe/coordinator";
-import prisma from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";

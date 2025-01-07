@@ -1,23 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import prisma from "@/lib/shared/database/client";
 import { GET } from "./route";
-
-// Mock MetricType enum
-const MetricType = {
-  FEEDBACK_SCORE: "FEEDBACK_SCORE",
-  ENGAGEMENT_RATE: "ENGAGEMENT_RATE",
-  RELEVANCE_SCORE: "RELEVANCE_SCORE",
-  CLICK_THROUGH: "CLICK_THROUGH",
-  CONVERSION_RATE: "CONVERSION_RATE",
-  SEARCH_LATENCY: "SEARCH_LATENCY",
-  MODEL_ACCURACY: "MODEL_ACCURACY",
-  ADAPTATION_SUCCESS: "ADAPTATION_SUCCESS",
-} as const;
-
-vi.mock("@prisma/client", () => ({
-  MetricType: MetricType,
-}));
+import { mockPrisma } from "~/vitest.setup";
+import { MetricType } from "@prisma/client";
 
 vi.mock("next/server", () => {
   return {
@@ -89,8 +74,8 @@ describe("Learning Metrics Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce(mockMetrics);
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce(mockMetrics);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE,ENGAGEMENT_RATE&timeframe=24h&interval=1h&include_metadata=true"
@@ -112,7 +97,7 @@ describe("Learning Metrics Route Handler", () => {
     });
 
     it("should handle invalid metric types", async () => {
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=INVALID_METRIC&timeframe=24h&interval=1h&include_metadata=true"
@@ -134,7 +119,7 @@ describe("Learning Metrics Route Handler", () => {
     });
 
     it("should handle invalid timeframe parameter", async () => {
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE&timeframe=invalid&interval=1h&include_metadata=true"
@@ -156,7 +141,7 @@ describe("Learning Metrics Route Handler", () => {
     });
 
     it("should handle invalid interval parameter", async () => {
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE&timeframe=24h&interval=invalid&include_metadata=true"
@@ -178,7 +163,7 @@ describe("Learning Metrics Route Handler", () => {
     });
 
     it("should handle database connection failure", async () => {
-      vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error("DB connection failed"));
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockRejectedValueOnce(new Error("DB connection failed"));
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE&timeframe=24h&interval=1h&include_metadata=true"
@@ -200,8 +185,8 @@ describe("Learning Metrics Route Handler", () => {
     });
 
     it("should handle database query failure", async () => {
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
-      vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error("Query failed"));
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockRejectedValueOnce(new Error("Query failed"));
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE&timeframe=24h&interval=1h&include_metadata=true"
@@ -223,8 +208,8 @@ describe("Learning Metrics Route Handler", () => {
     });
 
     it("should handle empty results", async () => {
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([]);
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([]);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE&timeframe=24h&interval=1h&include_metadata=true"
@@ -265,8 +250,8 @@ describe("Learning Metrics Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB connection test
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce(mockMetrics);
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce([1]); // DB connection test
+      vi.mocked(mockPrisma.analyticsMetrics.findMany).mockResolvedValueOnce(mockMetrics);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics?metrics=FEEDBACK_SCORE,RELEVANCE_SCORE&timeframe=7d&interval=1h&include_metadata=true"
