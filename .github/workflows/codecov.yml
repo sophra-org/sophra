@@ -32,20 +32,27 @@ jobs:
       run: pnpm install
 
     - name: Run tests with coverage
+      id: tests
+      continue-on-error: true
       run: pnpm test --reporter=junit
 
     - name: Upload coverage reports to Codecov
+      if: always()
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         directory: './coverage'
 
     - name: Upload test results to Codecov
-      if: ${{ !cancelled() }}
+      if: always()
       uses: codecov/test-results-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: test-report.junit.xml
+
+    - name: Check test status
+      if: steps.tests.outcome == 'failure'
+      run: exit 1
 
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}

@@ -1,11 +1,138 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EngineService } from "./service";
-import { Logger } from "@/lib/shared/types";
-import { MetricsService } from "@/lib/cortex/monitoring/metrics";
 import type { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";
-import { EngineOperationType, EngineOperationStatus, EngineStatus, EngineOptimizationType, EngineRiskLevel } from "./types";
+import { EngineOperationType, EngineOperationStatus, EngineStatus, EngineOptimizationType, EngineRiskLevel, EngineState } from "./types";
 import { LearningEventType, LearningEventStatus, LearningEventPriority } from "../types/learning";
+
+import type { Logger } from '../../../lib/shared/types';
+import { any, string } from "node_modules/zod/lib";
+
+// Create a mock logger that satisfies the Winston Logger interface
+const createMockLogger = () => {
+  const logger = {
+    // Core logging methods
+    info: vi.fn(),
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    log: vi.fn(),
+    verbose: vi.fn(),
+    silly: vi.fn(),
+    http: vi.fn(),
+    
+    // Winston logger properties
+    service: "",
+    silent: false,
+    level: "info",
+    levels: { error: 0, warn: 1, info: 2, debug: 3 },
+    exitOnError: false,
+    format: { transform: vi.fn() },
+    transports: [],
+    exceptions: {
+      handle: vi.fn(),
+      unhandle: vi.fn(),
+      catcher: vi.fn(),
+      getAllInfo: vi.fn(),
+      getRequestData: vi.fn(),
+      getProcessData: vi.fn(),
+      getOsData: vi.fn(),
+      getTrace: vi.fn(),
+      logger: {} as any,
+      handlers: []
+    },
+    rejections: {
+      handle: vi.fn(),
+      unhandle: vi.fn(),
+      catcher: vi.fn(),
+      getAllInfo: vi.fn(),
+      getRequestData: vi.fn(),
+      getProcessData: vi.fn(),
+      getOsData: vi.fn(),
+      getTrace: vi.fn(),
+      logger: {} as any,
+      handlers: []
+    },
+    profilers: {},
+
+    // Event emitter methods
+    on: vi.fn(),
+    once: vi.fn(),
+    emit: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    removeAllListeners: vi.fn(),
+    setMaxListeners: vi.fn(),
+    getMaxListeners: vi.fn(),
+    listeners: vi.fn(),
+    rawListeners: vi.fn(),
+    listenerCount: vi.fn(),
+    prependListener: vi.fn(),
+    prependOnceListener: vi.fn(),
+    eventNames: vi.fn(),
+    
+    // Additional Winston methods
+    add: vi.fn(),
+    remove: vi.fn(),
+    clear: vi.fn(),
+    profile: vi.fn(),
+    startTimer: vi.fn(),
+    child: vi.fn(),
+    
+    // Additional properties
+    data: {},
+    help: vi.fn(),
+    close: vi.fn(),
+    configure: vi.fn()
+  };
+  return logger;
+}
+
+// Define MetricsService type since we're mocking it
+interface MetricsService {
+  recordEngineMetric: (name: string, value: any) => Promise<void>;
+  recordMetric: (name: string, value: any) => void;
+  getAverageLatency: () => Promise<number>;
+  getThroughput: () => Promise<number>;
+  getErrorRate: () => Promise<number>;
+  getCPUUsage: () => Promise<number>;
+  getMemoryUsage: () => Promise<number>;
+  getCurrentLoad: () => number;
+  getBaselineLoad: () => number;
+  logger: Logger;
+  registry: Map<any, any>;
+  errorCounter: number;
+  operationLatency: number;
+  metricsEnabled: boolean;
+  samplingRate: number;
+  batchSize: number;
+  flushInterval: number;
+  initialize: () => Promise<void>;
+  shutdown: () => Promise<void>;
+}
+
+// Setup mock metrics service
+const mockMetricsService: MetricsService = {
+  recordEngineMetric: vi.fn(),
+  recordMetric: vi.fn(),
+  getAverageLatency: vi.fn().mockResolvedValue(100),
+  getThroughput: vi.fn().mockResolvedValue(1000),
+  getErrorRate: vi.fn().mockResolvedValue(0.01),
+  getCPUUsage: vi.fn().mockResolvedValue(0.5),
+  getMemoryUsage: vi.fn().mockResolvedValue(0.7),
+  getCurrentLoad: vi.fn().mockReturnValue(0.5),
+  getBaselineLoad: vi.fn().mockReturnValue(0.3),
+  logger: {} as Logger,
+  registry: new Map(),
+  errorCounter: 0,
+  operationLatency: 0,
+  metricsEnabled: true,
+  samplingRate: 1.0,
+  batchSize: 100,
+  flushInterval: 5000,
+  initialize: vi.fn().mockResolvedValue(undefined),
+  shutdown: vi.fn().mockResolvedValue(undefined)
+};
 
 // Mock Prisma client
 const mockPrisma = {
@@ -35,9 +162,20 @@ const mockPrisma = {
   }
 } as unknown as PrismaClient;
 
-const mockEngineState = {
+// Mock state for EngineState type
+const mockEngineState: EngineState = {
   id: "state1",
   status: EngineStatus.READY,
+  confidence: 0.8,
+  lastActive: new Date(),
+  currentPhase: undefined,
+  metadata: {}
+};
+
+// Mock state for Prisma type
+const mockPrismaState = {
+  id: "state1",
+  status: String(EngineStatus.READY),
   confidence: 0.8,
   lastActive: new Date(),
   createdAt: new Date(),
@@ -107,90 +245,70 @@ describe("EngineService", () => {
   let mockLogger: Logger;
   let mockMetricsService: MetricsService;
   let mockRedisClient: Redis;
-  let childLogger: {
-    info: ReturnType<typeof vi.fn>;
-    debug: ReturnType<typeof vi.fn>;
-    error: ReturnType<typeof vi.fn>;
-    warn: ReturnType<typeof vi.fn>;
-    service: string;
-  };
+  let childLogger: Partial<Logger>;
 
-    beforeEach(async () => {
-      // Setup basic mocks
-      childLogger = {
-        info: vi.fn(),
-        debug: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        service: "EngineService"
-      };
+  beforeEach(async () => {
+    // Setup basic mocks
+    // Setup child logger
+    childLogger = createMockLogger() as unknown as Partial<Logger>;
+    childLogger.service = "EngineService";
 
-      mockLogger = {
-        info: vi.fn(),
-        debug: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        child: vi.fn().mockReturnValue(childLogger),
-        service: "test"
-      } as unknown as Logger;
+    // Setup mock logger
+    mockLogger = createMockLogger() as unknown as Logger;
+    mockLogger.service = "test";
+    mockLogger.child = vi.fn().mockReturnValue(childLogger);
 
-      mockRedisClient = {
-        xadd: vi.fn().mockResolvedValue('ok'),
-        get: vi.fn().mockResolvedValue(null),
-        set: vi.fn().mockResolvedValue('OK'),
-        connect: vi.fn().mockResolvedValue(undefined),
-        disconnect: vi.fn().mockResolvedValue(undefined)
-      } as unknown as Redis;
+    // Cast loggers to satisfy type requirements
+    mockLogger = mockLogger as unknown as Logger;
+    childLogger = childLogger as unknown as Logger;
 
-      // Setup metrics service mock
-      mockMetricsService = {
-        recordEngineMetric: vi.fn(),
-        recordMetric: vi.fn(),
-        getAverageLatency: vi.fn().mockResolvedValue(100),
-        getThroughput: vi.fn().mockResolvedValue(1000),
-        getErrorRate: vi.fn().mockResolvedValue(0.01),
-        getCPUUsage: vi.fn().mockResolvedValue(0.5),
-        getMemoryUsage: vi.fn().mockResolvedValue(0.7),
-        getCurrentLoad: vi.fn().mockReturnValue(0.5),
-        getBaselineLoad: vi.fn().mockReturnValue(0.3),
-        logger: mockLogger,
-        registry: new Map(),
-        errorCounter: 0,
-        operationLatency: 0,
-        metricsEnabled: true,
-        samplingRate: 1.0,
-        batchSize: 100,
-        flushInterval: 5000,
-        initialize: vi.fn().mockResolvedValue(undefined),
-        shutdown: vi.fn().mockResolvedValue(undefined)
-      } as unknown as MetricsService;
+    mockRedisClient = {
+      xadd: vi.fn().mockResolvedValue('ok'),
+      get: vi.fn().mockResolvedValue(null),
+      set: vi.fn().mockResolvedValue('OK'),
+      connect: vi.fn().mockResolvedValue(undefined),
+      disconnect: vi.fn().mockResolvedValue(undefined)
+    } as unknown as Redis;
 
-      // Mock MetricsService constructor
-      vi.mock("../../../cortex/monitoring/metrics", () => ({
-        MetricsService: vi.fn().mockImplementation(() => mockMetricsService)
-      }));
+    // Setup metrics service mock
+    mockMetricsService = {
+      recordEngineMetric: vi.fn(),
+      recordMetric: vi.fn(),
+      getAverageLatency: vi.fn().mockResolvedValue(100),
+      getThroughput: vi.fn().mockResolvedValue(1000),
+      getErrorRate: vi.fn().mockResolvedValue(0.01),
+      getCPUUsage: vi.fn().mockResolvedValue(0.5),
+      getMemoryUsage: vi.fn().mockResolvedValue(0.7),
+      getCurrentLoad: vi.fn().mockReturnValue(0.5),
+      getBaselineLoad: vi.fn().mockReturnValue(0.3),
+      logger: mockLogger,
+      registry: new Map(),
+      errorCounter: 0,
+      operationLatency: 0,
+      metricsEnabled: true,
+      samplingRate: 1.0,
+      batchSize: 100,
+      flushInterval: 5000,
+      initialize: vi.fn().mockResolvedValue(undefined),
+      shutdown: vi.fn().mockResolvedValue(undefined)
+    } as unknown as MetricsService;
 
-      // Mock Prisma client
-      vi.mock("../../../shared/database/client", () => ({
-        prisma: mockPrisma
-      }));
+    // Create engine service with mocked dependencies
+    engineService = new EngineService({
+      redis: mockRedisClient,
+      logger: mockLogger
+    });
 
-      // Create engine service
-      engineService = new EngineService({
-        redis: mockRedisClient,
-        logger: mockLogger
-      });
-
-      // Clear all mocks before each test
-      vi.clearAllMocks();
+    // Clear all mocks before each test
+    vi.clearAllMocks();
   });
 
   describe("initialization", () => {
     it("should initialize with default state", async () => {
       // Setup mock state
       const mockState = {
-        ...mockEngineState,
-        status: EngineStatus.READY,
+        ...mockPrismaState,
+        status: String(EngineStatus.READY),
         confidence: 0.8
       };
       vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValueOnce(mockState);
@@ -208,9 +326,9 @@ describe("EngineService", () => {
     it("should create new state if none exists", async () => {
       vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue(null);
       vi.mocked(mockPrisma.engineState.create).mockResolvedValue({
-        ...mockEngineState,
+        ...mockPrismaState,
         id: "new_state",
-        status: EngineStatus.PAUSED
+        status: String(EngineStatus.PAUSED)
       });
 
       await expect(engineService.initialize()).resolves.not.toThrow();
@@ -222,34 +340,52 @@ describe("EngineService", () => {
       vi.clearAllMocks();
     });
 
-    /* TODO: Fix this test case
     it("should handle operation errors", async () => {
       // Setup mocks
       const mockError = new Error("Operation failed");
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue(mockEngineState);
-      vi.mocked(mockPrisma.engineOperation.create).mockRejectedValue(mockError);
+      engineService['currentState'] = {
+        id: mockPrismaState.id,
+        status: EngineStatus.READY,
+        confidence: mockPrismaState.confidence,
+        lastActive: mockPrismaState.lastActive,
+        currentPhase: undefined,
+        metadata: {}
+      };
+      
+      // Mock Prisma client for this test
+      const prisma = {
+        engineOperation: {
+          create: vi.fn().mockRejectedValue(mockError)
+        },
+        engineState: {
+          update: vi.fn()
+        }
+      };
+      
+      // Replace the prisma instance
+      vi.mock("'lib/shared/database/client'", () => ({
+        prisma
+      }));
 
-      // Initialize and verify error handling
-      await engineService.initialize();
+      // Verify error handling
       await expect(engineService.startOperation(EngineOperationType.PATTERN_DETECTION))
         .rejects.toThrow("Operation failed");
 
       // Verify the operation creation was attempted
-      expect(mockPrisma.engineOperation.create).toHaveBeenCalledWith({
+      expect(prisma.engineOperation.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           type: EngineOperationType.PATTERN_DETECTION,
           status: EngineOperationStatus.PENDING
         })
       });
     });
-    */
 
     it("should start operation", async () => {
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue(mockEngineState);
+      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue(mockPrismaState);
       vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(mockOperation);
       vi.mocked(mockPrisma.engineState.update).mockResolvedValue({
-        ...mockEngineState,
-        status: EngineStatus.LEARNING
+        ...mockPrismaState,
+        status: String(EngineStatus.LEARNING)
       });
 
       // Initialize before test
@@ -264,7 +400,7 @@ describe("EngineService", () => {
   describe("pattern analysis", () => {
     beforeEach(async () => {
       // Initialize engine before pattern analysis
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValueOnce(mockEngineState);
+      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValueOnce(mockPrismaState);
       await engineService.initialize();
 
       // Mock metrics recording to avoid side effects
@@ -320,14 +456,15 @@ describe("EngineService", () => {
       
       // Initialize engine before strategy tests
       vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue({
-        ...mockEngineState,
-        metadata: JSON.stringify({ riskTolerance: 'high' })
+        ...mockPrismaState,
+        metadata: "{}",
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
       await engineService.initialize();
     });
 
-    /* TODO: Fix this test case
     it("should execute strategy with low risk", async () => {
       const currentWeights = {
         id: 'weights1',
@@ -350,60 +487,69 @@ describe("EngineService", () => {
         }
       };
 
-      // Mock the entire chain with simpler mocks
-      vi.mocked(mockPrisma.engineState.findFirst).mockResolvedValue({
-        ...mockEngineState,
-        metadata: JSON.stringify({ riskTolerance: 'low' })
-      });
-
-      vi.mocked(mockPrisma.searchWeights.findFirst).mockResolvedValue(currentWeights);
-
-      vi.mocked(mockPrisma.searchWeights.update).mockResolvedValue({
-        ...currentWeights,
-        active: false
-      });
-
-      const expectedNewWeights = {
-        ...currentWeights,
-        id: 'weights2',
-        titleWeight: currentWeights.titleWeight * 1.2,
-        contentWeight: currentWeights.contentWeight,
-        tagWeight: currentWeights.tagWeight * 1.1,
-        active: true,
-        metadata: JSON.stringify({
-          optimizationId: lowRiskStrategy.id,
-          previousWeights: currentWeights,
-          confidence: lowRiskStrategy.confidence,
-        })
+      // Mock Prisma client for this test
+      const prisma = {
+        engineState: {
+          findFirst: vi.fn().mockResolvedValue({
+            ...mockPrismaState,
+            metadata: "{}",
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+        },
+        searchWeights: {
+          findFirst: vi.fn().mockResolvedValue(currentWeights),
+          update: vi.fn().mockResolvedValue({
+            ...currentWeights,
+            active: false
+          }),
+          create: vi.fn()
+        },
+        engineLearningResult: {
+          update: vi.fn()
+        }
       };
 
-      vi.mocked(mockPrisma.searchWeights.create).mockResolvedValue(expectedNewWeights);
+      // Replace the prisma instance
+      vi.mock("'lib/shared/database/client'", () => ({
+        prisma
+      }));
 
       // Execute strategy
       await engineService.executeStrategy(lowRiskStrategy);
 
       // Verify weight adjustments
-      expect(mockPrisma.searchWeights.findFirst).toHaveBeenCalledWith({
+      expect(prisma.searchWeights.findFirst).toHaveBeenCalledWith({
         where: { active: true },
         orderBy: { createdAt: "desc" }
       });
 
-      expect(mockPrisma.searchWeights.update).toHaveBeenCalledWith({
+      expect(prisma.searchWeights.update).toHaveBeenCalledWith({
         where: { id: currentWeights.id },
         data: { active: false }
       });
 
-      expect(mockPrisma.searchWeights.create).toHaveBeenCalledWith({
+      // Verify new weights creation with proper adjustments
+      expect(prisma.searchWeights.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          titleWeight: currentWeights.titleWeight * 1.2,
+          titleWeight: currentWeights.titleWeight * 1.2, // 20% improvement
           contentWeight: currentWeights.contentWeight,
           tagWeight: currentWeights.tagWeight * 1.1,
           active: true,
           metadata: expect.any(String)
         })
       });
+
+      // Verify learning result update
+      expect(prisma.engineLearningResult.update).toHaveBeenCalledWith({
+        where: { id: lowRiskStrategy.learningResultId },
+        data: expect.objectContaining({
+          metadata: expect.any(String),
+          validatedAt: expect.any(Date),
+          performance: expect.any(String)
+        })
+      });
     });
-    */
 
     it("should handle strategy execution errors", async () => {
       // Mock findFirst to return null to trigger the "No active weights found" error
