@@ -1,38 +1,84 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { RealTimeLearner } from "./real-time-learner";
-import { ElasticsearchService } from "@/lib/cortex/elasticsearch/services";
-import { MetricsService } from "@/lib/cortex/monitoring/metrics";
-import { Redis } from "ioredis";
-import { Logger } from "@/lib/shared/types";
-import { prisma } from "@/lib/shared/database/client";
-import { LearningEvent, LearningEventStatus, LearningEventType, LearningEventPriority } from "@prisma/client";
-import { mockPrisma } from "@/lib/shared/test/prisma.mock";
 
-// Mock Prisma client
-vi.mock("@prisma/client", () => ({
-  PrismaClient: vi.fn(() => mockPrisma),
-  EngineOperationType: {
-    PATTERN_DETECTION: 'PATTERN_DETECTION',
-    STRATEGY_GENERATION: 'STRATEGY_GENERATION',
-    STRATEGY_EXECUTION: 'STRATEGY_EXECUTION'
-  },
-  EngineOperationStatus: {
-    PENDING: 'PENDING',
-    IN_PROGRESS: 'IN_PROGRESS',
-    COMPLETED: 'COMPLETED',
-    FAILED: 'FAILED'
-  },
-  EngineStatus: {
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE',
-    ERROR: 'ERROR'
-  }
+// Mock modules before any other imports
+vi.mock("@prisma/client", () => {
+  return {
+    PrismaClient: vi.fn(() => ({
+      engineState: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: "state1",
+          status: "READY",
+          confidence: 0.9,
+          lastActive: new Date(),
+          metadata: "{}",
+          currentPhase: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }),
+        create: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn()
+      },
+      learningEvent: {
+        findFirst: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn()
+      }
+    })),
+    EngineOperationType: {
+      PATTERN_DETECTION: 'PATTERN_DETECTION',
+      STRATEGY_GENERATION: 'STRATEGY_GENERATION',
+      STRATEGY_EXECUTION: 'STRATEGY_EXECUTION'
+    },
+    EngineOperationStatus: {
+      PENDING: 'PENDING',
+      IN_PROGRESS: 'IN_PROGRESS',
+      COMPLETED: 'COMPLETED',
+      FAILED: 'FAILED'
+    },
+    EngineStatus: {
+      ACTIVE: 'ACTIVE',
+      INACTIVE: 'INACTIVE',
+      ERROR: 'ERROR'
+    },
+    LearningEventType: {
+      SEARCH_PATTERN: 'SEARCH_PATTERN',
+      FEEDBACK: 'FEEDBACK',
+      PERFORMANCE: 'PERFORMANCE'
+    },
+    LearningEventStatus: {
+      PENDING: 'PENDING',
+      IN_PROGRESS: 'IN_PROGRESS',
+      COMPLETED: 'COMPLETED',
+      FAILED: 'FAILED'
+    },
+    LearningEventPriority: {
+      LOW: 'LOW',
+      MEDIUM: 'MEDIUM',
+      HIGH: 'HIGH'
+    }
+  };
+});
+
+vi.mock("../../../lib/cortex/elasticsearch/services", () => ({
+  ElasticsearchService: vi.fn().mockImplementation(() => ({
+    search: vi.fn(),
+    index: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn()
+  }))
 }));
 
-vi.mock("@/lib/cortex/elasticsearch/services");
-vi.mock("@/lib/cortex/monitoring/metrics");
+vi.mock("../../../lib/cortex/monitoring/metrics", () => ({
+  MetricsService: vi.fn().mockImplementation(() => ({
+    getAverageLatency: vi.fn().mockResolvedValue(100),
+    getThroughput: vi.fn().mockResolvedValue(1000),
+    getErrorRate: vi.fn().mockResolvedValue(0.01),
+    getCPUUsage: vi.fn().mockResolvedValue(0.5)
+  }))
+}));
 
-// Mock Redis with proper constructor and methods
 vi.mock("ioredis", () => {
   const mockRedis = {
     xread: vi.fn(),
@@ -42,17 +88,22 @@ vi.mock("ioredis", () => {
     disconnect: vi.fn()
   };
   return {
-    default: vi.fn(() => mockRedis)
+    Redis: vi.fn(() => mockRedis)
   };
 });
 
-vi.mock("@/lib/shared/database/client", () => ({
-  prisma: mockPrisma,
-  JsonValue: {
-    parse: JSON.parse,
-    stringify: JSON.stringify
-  }
+vi.mock("../../../lib/shared/database/client", () => ({
+  prisma: new (require("@prisma/client").PrismaClient)()
 }));
+
+// Now import everything else
+import { RealTimeLearner } from "./real-time-learner";
+import { ElasticsearchService } from "../../../lib/cortex/elasticsearch/services";
+import { MetricsService } from "../../../lib/cortex/monitoring/metrics";
+import { Redis } from "ioredis";
+import { Logger } from "../../../lib/shared/types";
+import { prisma } from "../../../lib/shared/database/client";
+import { LearningEvent, LearningEventStatus, LearningEventType, LearningEventPriority } from "@prisma/client";
 
 const mockEvent: LearningEvent = {
   id: "event1",
@@ -83,10 +134,20 @@ describe("RealTimeLearner", () => {
   let mockLogger: Logger;
 
   beforeEach(() => {
+    // Reset all mocks
+    vi.clearAllMocks();
+
+    const xreadMock = vi.fn();
+    xreadMock.mockResolvedValue([
+      ["stream", [["1234567890-0", ["event", JSON.stringify(mockEvent)]]]]
+    ]);
+
     mockRedis = {
-      xread: vi.fn().mockResolvedValue([
-        ["stream", [["1234567890-0", ["event", JSON.stringify(mockEvent)]]]]
-      ]),
+      xread: xreadMock,
+      xadd: vi.fn(),
+      xdel: vi.fn(),
+      connect: vi.fn(),
+      disconnect: vi.fn()
     } as unknown as Redis;
 
     mockElasticsearch = new ElasticsearchService({} as any);
@@ -159,18 +220,6 @@ describe("RealTimeLearner", () => {
         }
       });
 
-      // Setup success case
-      vi.mocked(prisma.engineState.findFirst).mockResolvedValue({
-        id: "state1",
-        status: "READY",
-        confidence: 0.9,
-        lastActive: new Date(),
-        metadata: "{}",
-        currentPhase: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
       const successPromise = learner.start();
       expect(mockLogger.info).toHaveBeenCalled();
       await learner.stop();
@@ -180,24 +229,19 @@ describe("RealTimeLearner", () => {
       vi.clearAllMocks();
 
       // Setup error case
-      const mockError = new Error("Processing failed");
-      vi.mocked(mockRedis.xread).mockRejectedValue(mockError);
+      const xreadMock = vi.fn();
+      xreadMock.mockRejectedValue(new Error("Processing failed"));
+      (mockRedis as any).xread = xreadMock;
 
       const errorPromise = learner.start();
       await learner.stop();
       await errorPromise;
-      expect(mockLogger.error).toHaveBeenCalledWith("Stream consumer error", { error: mockError });
+      expect(mockLogger.error).toHaveBeenCalledWith("Stream consumer error", { error: expect.any(Error) });
     });
   });
 
   describe("pattern analysis", () => {
     it("should validate strategies and calculate strength", async () => {
-      // Setup metrics
-      vi.mocked(mockMetrics.getAverageLatency).mockResolvedValue(100);
-      vi.mocked(mockMetrics.getThroughput).mockResolvedValue(1000);
-      vi.mocked(mockMetrics.getErrorRate).mockResolvedValue(0.01);
-      vi.mocked(mockMetrics.getCPUUsage).mockResolvedValue(0.5);
-
       const mockPattern = {
         id: "pattern1",
         eventId: "event1",
@@ -233,4 +277,4 @@ describe("RealTimeLearner", () => {
       expect(strength).toBeLessThanOrEqual(1);
     });
   });
-}); 
+});
