@@ -1,5 +1,4 @@
-import { ChatCompletionMessage } from "openai/resources/chat";
-import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
+import ChatCompletionMessage from "openai";
 
 export interface FineTuneResponse {
   id: string;

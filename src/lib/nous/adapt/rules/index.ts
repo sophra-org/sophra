@@ -43,7 +43,7 @@ export class RuleRegistry {
   private evaluateAll(context: RuleContext): Rule[] {
     const triggered: Rule[] = [];
 
-    for (const rule of this.rules.values()) {
+    for (const rule of Array.from(this.rules.values())) {
       if (rule.enabled && rule.evaluate(context)) {
         triggered.push(rule);
       }

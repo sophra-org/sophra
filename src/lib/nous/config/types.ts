@@ -4,6 +4,8 @@ export enum Environment {
   PRODUCTION = 'production',
   DEVELOPMENT = 'development',
   STAGING = 'staging',
+  PROD = "PROD",
+  DEV = "DEV",
 }
 
 export const ServerConfigSchema = z.object({
