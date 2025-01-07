@@ -24,7 +24,8 @@
       "@lib/*": ["./src/lib/*"],
       "~/*": ["./*"]
     },
-    "baseUrl": "."
+    "baseUrl": ".",
+    "downlevelIteration": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules"]

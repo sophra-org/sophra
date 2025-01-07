@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { NextRequest } from 'next/server';
 
 class MockResponse {
     constructor(data: any, init?: ResponseInit) {
@@ -26,56 +27,34 @@ class MockResponse {
     }
 }
 
-class MockRequest {
+class MockRequest implements Partial<NextRequest> {
     readonly url: string;
     readonly nextUrl: URL;
     readonly headers: Headers;
+    readonly cookies: Map<string, string>;
+    readonly geo: { country?: string; city?: string; region?: string } | null;
+    readonly ip: string | null;
+    readonly body: string | null;
     readonly searchParams: URLSearchParams;
-    private readonly _body: string | undefined;
 
     constructor(url: string, init?: RequestInit) {
         this.url = url;
         this.nextUrl = new URL(url);
         this.headers = new Headers(init?.headers);
+        this.cookies = new Map();
+        this.geo = null;
+        this.ip = null;
+        this.body = init?.body?.toString() || null;
         this.searchParams = this.nextUrl.searchParams;
-        this._body = init?.body?.toString();
     }
 
-    json() {
-        return Promise.resolve(this._body ? JSON.parse(this._body) : {});
+    async json() {
+        return this.body ? JSON.parse(this.body) : {};
     }
 
-    text() {
-        return Promise.resolve(this._body || '');
+    async text() {
+        return this.body || '';
     }
 }
 
-export const mockNextServer = () => {
-    const NextResponse = {
-        json: vi.fn().mockImplementation((data: any, init?: ResponseInit) => {
-            const response = new MockResponse(data, init);
-            response.json = () => Promise.resolve(data);
-            return response;
-        }),
-        redirect: vi.fn().mockImplementation((url: string, init?: ResponseInit) => {
-            return new MockResponse(null, { ...init, status: 302 });
-        }),
-        next: vi.fn().mockImplementation((init?: ResponseInit) => {
-            return new MockResponse(null, init);
-        }),
-        rewrite: vi.fn().mockImplementation((url: string, init?: ResponseInit) => {
-            return new MockResponse(null, init);
-        }),
-    };
-
-    const NextRequest = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
-        return new MockRequest(url, init);
-    });
-
-    vi.mock('next/server', () => ({
-        NextResponse,
-        NextRequest,
-    }));
-
-    return { NextResponse, NextRequest };
-}; 
+export { MockRequest, MockResponse }; 

@@ -28,7 +28,7 @@ vi.mock('next/server', () => {
 describe('AB Testing Results API', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockPrisma.$reset();
+        (mockPrisma as any).$reset?.();
     });
 
     describe('POST /api/nous/ab-testing/results', () => {

@@ -103,8 +103,7 @@ export class DataSyncService {
       try {
         await this.redis.set(
           `doc:${params.index}:${params.id}`, 
-          JSON.stringify(params.document), 
-          "EX",
+          params.document,
           this.searchCacheTTL
         );
       } catch (error) {
@@ -247,16 +246,14 @@ export class DataSyncService {
       try {
         await this.redis.set(
           cacheKey,
-          JSON.stringify(searchResult),
-          "EX",
+          searchResult,
           this.searchCacheTTL
         );
-      } catch (cacheError) {
-        this.logger.warn("Failed to cache search results", {
-          error: cacheError,
+      } catch (error) {
+        this.logger.warn('Redis cache failure during search', {
+          error,
           index: params.index,
         });
-        // Don't throw for cache errors
       }
 
       // Add max_score to match expected type

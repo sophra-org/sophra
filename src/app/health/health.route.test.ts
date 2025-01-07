@@ -53,7 +53,20 @@ describe('Health Check Route Handler', () => {
     it('should return healthy status when all services are connected', async () => {
         const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost:3000/api/health');
         const services = await serviceManager.getServices();
-        vi.mocked(services.elasticsearch.ping).mockResolvedValue(true);
+        vi.mocked(services.elasticsearch.ping).mockResolvedValue({ 
+          status: 'green',
+          cluster_name: 'test-cluster',
+          number_of_nodes: 1,
+          active_shards: 5,
+          relocating_shards: 0,
+          initializing_shards: 0,
+          unassigned_shards: 0,
+          delayed_unassigned_shards: 0,
+          number_of_pending_tasks: 0,
+          number_of_in_flight_fetch: 0,
+          task_max_waiting_in_queue_millis: 0,
+          active_shards_percent_as_number: 100.0
+        });
         vi.mocked(services.postgres.ping).mockResolvedValue(true);
         vi.mocked(services.redis.ping).mockResolvedValue(true);
 

@@ -32,16 +32,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (experiment.status === ExperimentStatus.INACTIVE) {
-      logger.info("Experiment is already inactive", {
-        experimentId: body.experimentId,
-        name: experiment.name,
-      });
+    if (experiment.status === ExperimentStatus.STOPPED) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Experiment is already inactive",
-        },
+        { success: false, error: 'Experiment is already stopped' },
         { status: 400 }
       );
     }
@@ -49,7 +42,7 @@ export async function POST(request: NextRequest) {
     const updatedExperiment = await prisma.aBTest.update({
       where: { id: body.experimentId },
       data: {
-        status: ExperimentStatus.INACTIVE,
+        status: ExperimentStatus.STOPPED,
         endDate: new Date(),
       },
     });

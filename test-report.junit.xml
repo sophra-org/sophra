@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="1" failures="1" errors="0" time="3422.793">
-    <testsuite name="src/app/api/nous/adapt/suggest/suggest.route.test.ts" timestamp="2025-01-07T22:18:48.444Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.test.ts" name="src/app/api/nous/adapt/suggest/suggest.route.test.ts" time="0">
+<testsuites name="vitest tests" tests="1" failures="1" errors="0" time="4621.926">
+    <testsuite name="src/app/api/nous/learn/models/models.route.test.ts" timestamp="2025-01-07T22:38:47.578Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="src/app/api/nous/learn/models/models.route.test.ts" time="0">
             <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/app/api/nous/adapt/rules/rules.route.test.ts. Does the file exist?" type="Error">
 Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/app/api/nous/adapt/rules/rules.route.test.ts. Does the file exist?
  ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17

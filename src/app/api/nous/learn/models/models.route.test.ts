@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 import { GET, POST } from "./route";
 import { ModelType } from "@prisma/client";
+import { MockRequest } from "@/lib/test/next-server.mock";
+import { MockNextRequest } from "@/app/api/cortex/search/__mocks__/next-server";
 
 vi.mock('@prisma/client', () => ({
   ModelType: {
@@ -24,12 +26,13 @@ vi.mock("next/server", () => {
         json: () => Promise.resolve(data)
       })
     },
-    NextRequest: class MockNextRequest {
-      url: string;
-      headers: Headers;
+    NextRequest: class MockNextRequest extends Request {
+      nextUrl = new URL("http://localhost:3000");
+      cookies = new Map();
+      geo = {};
+      ip = "";
       constructor(url: string) {
-        this.url = url;
-        this.headers = new Headers();
+        super(url);
       }
       json() {
         return Promise.resolve({});
@@ -45,28 +48,61 @@ vi.mock("@/lib/shared/logger", () => ({
   },
 }));
 
-describe("Models Route Handler", () => {
+describe("Learning Models Route Handler", () => {
+  const mockModel = {
+    id: "test-1",
+    type: "PATTERN_DETECTOR" as const,
+    features: ["feature1", "feature2"],
+    hyperparameters: {
+      learningRate: 0.01,
+      epochs: 100
+    },
+    trainingParams: {
+      batchSize: 32,
+      optimizer: "adam"
+    },
+    modelVersions: [{
+      artifactPath: "models/v1",
+      metrics: { accuracy: 0.95 },
+      createdAt: new Date()
+    }]
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   describe("GET /api/nous/learn/models", () => {
+    it("should fetch models with default parameters", async () => {
+      vi.mocked(mockPrisma.modelConfig.findMany).mockResolvedValueOnce([mockModel]);
+      vi.mocked(mockPrisma.modelConfig.count).mockResolvedValueOnce(1);
+      const request = new MockNextRequest("http://localhost:3000/api/nous/learn/models") as unknown as NextRequest;
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.data).toEqual([mockModel]);
+      expect(data.meta).toEqual({
+        total: 1,
+        page: 1,
+        pageSize: 10
+      });
+    });
+
     it("should fetch models with their latest versions", async () => {
-      const mockModels = [
-        {
-          id: "1",
-          type: ModelType.PATTERN_DETECTOR,
-          modelVersions: [{
-            artifactPath: "path/to/artifact",
-            metrics: { accuracy: 0.95 },
-            createdAt: new Date("2023-01-01")
-          }]
-        }
-      ];
+      const mockModels = [{
+        id: "1",
+        type: ModelType.PATTERN_DETECTOR,
+        hyperparameters: { learning_rate: 0.01 },
+        features: ["feature1"],
+        trainingParams: { epochs: 100 },
+        modelVersions: [{
+          artifactPath: "path/to/artifact",
+          metrics: { accuracy: 0.95 },
+          createdAt: new Date("2023-01-01")
+        }]
+      }];
 
       vi.mocked(mockPrisma.modelConfig.findMany).mockResolvedValueOnce(mockModels);
 
@@ -114,17 +150,12 @@ describe("Models Route Handler", () => {
 
   describe("POST /api/nous/learn/models", () => {
     it("should create a new model with valid data", async () => {
-      const mockModel = {
-        name: "Test Model",
-        type: ModelType.PATTERN_DETECTOR,
-        hyperparameters: { learning_rate: 0.01 },
-        features: ["feature1", "feature2"],
-        trainingParams: { epochs: 100 }
-      };
-
       const mockCreatedModel = {
         id: "1",
         type: ModelType.PATTERN_DETECTOR,
+        hyperparameters: { learning_rate: 0.01 },
+        features: ["feature1"],
+        trainingParams: { epochs: 100 },
         modelVersions: [{
           metrics: {},
           artifactPath: "",
@@ -175,13 +206,6 @@ describe("Models Route Handler", () => {
     });
 
     it("should handle database errors during creation", async () => {
-      const mockModel = {
-        type: ModelType.PATTERN_DETECTOR,
-        name: "Test Model",
-        hyperparameters: { learning_rate: 0.01 },
-        features: ["feature1", "feature2"]
-      };
-
       vi.mocked(mockPrisma.modelConfig.create).mockRejectedValueOnce(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/models");

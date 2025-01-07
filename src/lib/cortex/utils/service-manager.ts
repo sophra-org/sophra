@@ -152,7 +152,10 @@ export class ServiceManager {
     return redis;
   }
   private async createBaseServices() {
-    const metricsService = new MetricsService(logger);
+    const metricsService = new MetricsService({ 
+      logger,
+      environment: this.config.environment
+    });
 
     const elasticsearch = new ElasticsearchService({
       environment: process.env.NODE_ENV as
@@ -217,7 +220,7 @@ export class ServiceManager {
       prisma,
     });
 
-    const sessions = new SessionService(this.redis!, logger);
+    const sessions = new SessionService(this.redis!);
 
     const baseServices = {
       elasticsearch,
@@ -240,7 +243,7 @@ export class ServiceManager {
         testService: async () => {
           const start = Date.now();
           try {
-            const metrics = await metricsService.getEngineMetrics();
+            const metrics = await MetricsService.getEngineMetrics();
             return {
               operational: true,
               latency: Date.now() - start,

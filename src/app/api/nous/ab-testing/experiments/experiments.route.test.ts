@@ -40,22 +40,25 @@ describe('Experiments Route Handler', () => {
         {
           id: 'test-1',
           name: 'Test Experiment 1',
-          status: ExperimentStatus.ACTIVE,
-          description: 'Test description 1',
+          status: 'ACTIVE' as const,
+          description: 'Test description',
           startDate: new Date(),
-          endDate: null,
-          configuration: null,
+          endDate: new Date(),
+          configuration: {},
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
           id: 'test-2',
           name: 'Test Experiment 2',
-          status: ExperimentStatus.PENDING,
+          status: 'PENDING' as const,
           description: 'Test description 2',
-          startDate: null,
-          endDate: null,
-          configuration: null,
+          startDate: new Date(),
+          endDate: new Date(),
+          configuration: {
+            variants: ['A', 'B'],
+            distribution: [0.5, 0.5]
+          },
           createdAt: new Date(),
           updatedAt: new Date()
         }
@@ -91,11 +94,11 @@ describe('Experiments Route Handler', () => {
         {
           id: 'test-3',
           name: 'Test Experiment 3',
-          status: ExperimentStatus.ACTIVE,
+          status: 'ACTIVE' as const,
           description: 'Test description 3',
           startDate: new Date(),
-          endDate: null,
-          configuration: null,
+          endDate: new Date(),
+          configuration: {},
           createdAt: new Date(),
           updatedAt: new Date()
         }
@@ -131,11 +134,11 @@ describe('Experiments Route Handler', () => {
         {
           id: 'test-1',
           name: 'Test Experiment 1',
-          status: ExperimentStatus.ACTIVE,
+          status: 'ACTIVE' as const,
           description: 'Test description 1',
           startDate: new Date(),
-          endDate: null,
-          configuration: null,
+          endDate: new Date(),
+          configuration: {},
           createdAt: new Date(),
           updatedAt: new Date()
         }
@@ -152,13 +155,13 @@ describe('Experiments Route Handler', () => {
       expect(data.success).toBe(true);
       expect(data.data).toEqual(mockExperiments);
       expect(mockPrisma.aBTest.findMany).toHaveBeenCalledWith({
-        where: { status: ExperimentStatus.ACTIVE },
+        where: { status: 'ACTIVE' },
         skip: 0,
         take: 10,
         orderBy: { createdAt: 'desc' }
       });
       expect(mockPrisma.aBTest.count).toHaveBeenCalledWith({ 
-        where: { status: ExperimentStatus.ACTIVE } 
+        where: { status: 'ACTIVE' } 
       });
     });
 
@@ -192,9 +195,9 @@ describe('Experiments Route Handler', () => {
       const mockCreatedExperiment = {
         id: 'new-test-1',
         ...newExperiment,
-        status: ExperimentStatus.PENDING,
-        startDate: null,
-        endDate: null,
+        status: 'PENDING' as const,
+        startDate: new Date(),
+        endDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
       };

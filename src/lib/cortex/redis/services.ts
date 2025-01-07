@@ -75,40 +75,9 @@ export class RedisCacheService extends BaseService {
    * @param {SearchResult<T>} results - What we found
    * @param {number} [ttl] - How long to keep it
    */
-  async set(key: string, value: unknown, p0: string, ttl: number): Promise<void> {
-    let lastError: Error | null = null;
-
-    for (let attempt = 0; attempt < this.retryAttempts; attempt++) {
-      try {
-        const serialized = JSON.stringify(value);
-        await this.client.setEx(key, ttl, serialized);
-        return;
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-        this.logger.warn("Redis set attempt failed", {
-          key,
-          attempt: attempt + 1,
-          maxAttempts: this.retryAttempts,
-          error: lastError.message,
-        });
-
-        if (attempt < this.retryAttempts - 1) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, this.retryDelay * Math.pow(2, attempt))
-          );
-        }
-      }
-    }
-
-    this.metrics.incrementMetric("redis_set_failed", {
-      error_type: lastError?.name || "unknown",
-    });
-
-    // Log error but don't throw
-    this.logger.error("Redis set failed after retries", {
-      key,
-      error: lastError,
-    });
+  async set(key: string, value: unknown, ttl: number): Promise<void> {
+    const serializedValue = JSON.stringify(value);
+    await this.client.set(key, serializedValue, { EX: ttl });
   }
 
   /**

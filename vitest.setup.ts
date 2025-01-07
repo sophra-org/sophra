@@ -1,4 +1,5 @@
-import { vi } from 'vitest';
+import { vi, Mock } from 'vitest';
+import type { PrismaClient } from '@prisma/client';
 
 // Create base mock methods for all models
 const baseMethods = {
@@ -11,7 +12,7 @@ const baseMethods = {
   upsert: vi.fn(),
   count: vi.fn(),
   groupBy: vi.fn(),
-};
+} as const;
 
 // Mock Prisma client with all models from schema
 const mockPrisma = {
@@ -66,11 +67,12 @@ const mockPrisma = {
   apiKey: { ...baseMethods },
   adminToken: { ...baseMethods },
   sessionToSignal: { ...baseMethods },
-  $transaction: vi.fn((callback) => callback(mockPrisma)),
+  $transaction: vi.fn((callback: (tx: typeof mockPrisma) => Promise<any>) => callback(mockPrisma)),
   $connect: vi.fn(),
   $disconnect: vi.fn(),
+  $queryRaw: vi.fn(),
   $reset: vi.fn(),
-};
+} as unknown as jest.Mocked<PrismaClient>;
 
 // Mock @prisma/client with all enums from schema
 vi.mock('@prisma/client', () => ({
@@ -225,15 +227,15 @@ beforeEach(() => {
     // Only reset methods for Prisma models, not utility methods like $transaction
     if (typeof model === 'object' && model !== null && !key.startsWith('$')) {
       Object.values(model).forEach(method => {
-        if (typeof method === 'function' && method.mockReset) {
-          method.mockReset();
+        if (typeof method === 'function' && 'mockReset' in method) {
+          (method as Mock).mockReset();
         }
       });
     }
   });
   // Reset transaction mock
   mockPrisma.$transaction.mockReset();
-  mockPrisma.$transaction.mockImplementation((callback) => callback(mockPrisma));
+  mockPrisma.$transaction.mockImplementation((callback: (tx: typeof mockPrisma) => Promise<any>) => callback(mockPrisma));
   // Reset connection mocks
   mockPrisma.$connect.mockReset();
   mockPrisma.$disconnect.mockReset();
