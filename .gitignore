@@ -1,0 +1,82 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.pnpm-store/
+.npm
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+/build
+/dist
+*.egg-info/
+*.egg
+*.whl
+
+# Environment
+.env*
+.venv
+env/
+venv/
+ENV/
+.python-version
+.env.local
+.env.development.local
+.env.production.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*.pem
+
+# Logs and debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Cache
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+__pycache__/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+.Python
+develop-eggs/
+downloads/
+eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/

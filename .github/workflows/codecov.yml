@@ -1,0 +1,51 @@
+name: Testing and Coverage
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - dev-*
+  pull_request:
+    branches:
+      - main
+      - dev
+      - dev-*
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Run tests with coverage
+      run: pnpm test --reporter=junit --outputFile=test-report.junit.xml
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: './coverage'
+
+    - name: Upload test results to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: test-report.junit.xml
+
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET }} 

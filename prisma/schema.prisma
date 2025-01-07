@@ -1,0 +1,943 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider                 = "zod-prisma-types"
+  output                   = "../src/lib/shared/database/validation/generated"
+  createInputTypes         = "true"
+  addIncludeTypes          = "true"
+  addInputTypeValidation   = "true"
+  createModelTypes         = "true"
+  validateWhereUniqueInput = "true"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  data       Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("documents")
+}
+
+model Migration {
+  id         Int      @id @default(autoincrement())
+  name       String
+  version    Int      @unique
+  applied_at DateTime @default(now())
+
+  @@map("migrations")
+}
+
+model SearchAnalytics {
+  id         String   @id @default(cuid())
+  query      String
+  searchType String
+  totalHits  Int
+  took       Int
+  timestamp  DateTime @default(now())
+  facetsUsed Json?
+  sessionId  String?
+  resultIds  Json?
+  page       Int      @default(1)
+  pageSize   Int      @default(10)
+  filters    Json?
+
+  @@index([timestamp])
+  @@index([searchType])
+  @@index([sessionId])
+}
+
+model Session {
+  id               String             @id @default(cuid())
+  userId           String?
+  startedAt        DateTime           @default(now())
+  lastActiveAt     DateTime           @default(now())
+  metadata         Json?
+  data             Json?
+  expiresAt        DateTime
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  abAssignments    ABTestAssignment[]
+  abMetrics        ABTestMetric[]
+  analyticsMetrics AnalyticsMetrics[]
+  conversations    Conversation[]
+  learningMetrics  LearningMetric[]
+  searchEvents     SearchEvent[]
+  SessionToSignal  SessionToSignal[]
+
+  @@index([userId])
+  @@index([lastActiveAt])
+  @@map("sessions")
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  sessionId String
+  title     String?
+  context   Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  session   Session   @relation(fields: [sessionId], references: [id])
+  messages  Message[]
+
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  timestamp      DateTime     @default(now())
+  metadata       Json?
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId])
+  @@index([timestamp])
+}
+
+model ABTest {
+  id            String             @id @default(cuid())
+  name          String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  status        ExperimentStatus
+  configuration Json
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  assignments   ABTestAssignment[]
+  metrics       ABTestMetric[]
+  ABTestMetrics ABTestMetrics[]
+}
+
+model ABTestAssignment {
+  id        String   @id @default(cuid())
+  testId    String
+  sessionId String
+  variantId String
+  timestamp DateTime @default(now())
+  session   Session  @relation(fields: [sessionId], references: [id])
+  test      ABTest   @relation(fields: [testId], references: [id])
+
+  @@unique([testId, sessionId])
+}
+
+model ABTestMetric {
+  id        String   @id @default(cuid())
+  testId    String
+  variantId String
+  eventType String
+  value     Float
+  timestamp DateTime @default(now())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id])
+  test      ABTest   @relation(fields: [testId], references: [id])
+
+  @@index([testId, variantId])
+  @@index([sessionId])
+  @@index([timestamp])
+}
+
+model SearchFeedback {
+  id             String        @id @default(cuid())
+  searchId       String
+  queryHash      String
+  resultId       String
+  relevanceScore Float
+  userAction     String
+  timestamp      DateTime      @default(now())
+  metadata       Json?
+  SearchEvent    SearchEvent[] @relation("SearchEventToSearchFeedback")
+
+  @@index([queryHash])
+  @@index([searchId])
+}
+
+model BaseEvent {
+  id            String       @id @default(cuid())
+  type          EventType
+  timestamp     DateTime
+  data          Json
+  source        String
+  priority      Int?
+  processed     Boolean?
+  metadata      Json?
+  correlationId String?
+  searchEventid String?
+  searchEvent   SearchEvent? @relation(fields: [searchEventid], references: [id])
+  modelEvent    ModelEvent?
+
+  @@index([type])
+  @@index([timestamp])
+  @@index([processed])
+}
+
+model ModelEvent {
+  id          String    @id @default(cuid())
+  baseEventId String    @unique
+  modelId     String
+  version     String
+  parameters  Json
+  metrics     Json
+  results     Json
+  baseEvent   BaseEvent @relation(fields: [baseEventId], references: [id])
+
+  @@index([modelId])
+  @@index([version])
+}
+
+model ProcessedSignal {
+  id                 String   @id @default(cuid())
+  signalId           String
+  originalSignalId   String
+  processingTime     Float
+  transformations    String[]
+  confidence         Float
+  processed          Boolean  @default(false)
+  processingMetadata Json?
+  signal             Signal   @relation(fields: [signalId], references: [id])
+
+  @@index([signalId])
+  @@index([originalSignalId])
+}
+
+model SignalBatch {
+  id           String   @id @default(cuid())
+  batchId      String   @unique
+  startTime    DateTime
+  endTime      DateTime
+  metadata     Json
+  priority     Int?
+  sourceSystem String?
+  signalIds    String[]
+
+  @@index([startTime, endTime])
+}
+
+model SignalPattern {
+  id              String   @id @default(cuid())
+  patternId       String   @unique
+  signalIds       String[]
+  confidence      Float
+  patternType     String
+  frequency       Float?
+  impactScore     Float?
+  relatedPatterns String[]
+
+  @@index([patternType])
+  @@index([confidence])
+}
+
+model AdaptationRule {
+  id            String       @id @default(cuid())
+  name          String
+  description   String
+  type          String
+  conditions    Json
+  actions       Json
+  priority      RulePriority
+  enabled       Boolean
+  lastTriggered DateTime?
+
+  @@index([priority])
+  @@index([enabled])
+}
+
+model ModelConfig {
+  id              String           @id @default(cuid())
+  type            ModelType
+  hyperparameters Json
+  features        String[]
+  trainingParams  Json?
+  metrics         LearningMetric[]
+  modelVersions   ModelVersion[]
+
+  @@index([type])
+}
+
+model ModelVersion {
+  id            String      @id @default(cuid())
+  configId      String
+  createdAt     DateTime    @default(now())
+  metrics       Json
+  artifactPath  String
+  parentVersion String?
+  config        ModelConfig @relation(fields: [configId], references: [id])
+
+  @@index([configId])
+}
+
+model LearningRequest {
+  id        String   @id @default(cuid())
+  patterns  Json
+  timestamp DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model FeedbackRequest {
+  id        String   @id @default(cuid())
+  feedback  Json
+  timestamp DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model ModelMetrics {
+  id                String       @id @default(cuid())
+  modelVersionId    String
+  accuracy          Float
+  precision         Float
+  recall            Float
+  f1Score           Float
+  latencyMs         Float
+  loss              Float
+  validationMetrics Json
+  customMetrics     Json?
+  timestamp         DateTime     @default(now())
+  ModelState        ModelState[] @relation("ModelMetricsToModelState")
+
+  @@index([modelVersionId])
+  @@index([timestamp])
+}
+
+model ModelState {
+  id                String         @id @default(cuid())
+  versionId         String         @unique
+  weights           Float[]
+  bias              Float
+  scaler            Json
+  featureNames      String[]
+  isTrained         Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  modelType         ModelType      @default(SEARCH_RANKER)
+  hyperparameters   Json?
+  currentEpoch      Int            @default(0)
+  trainingProgress  Float          @default(0)
+  lastTrainingError String?
+  metrics           ModelMetrics[] @relation("ModelMetricsToModelState")
+
+  @@index([modelType])
+  @@index([createdAt])
+  @@index([isTrained])
+}
+
+model SearchEvent {
+  id         String           @id @default(cuid())
+  sessionId  String
+  query      String
+  searchType String
+  totalHits  Int
+  took       Int
+  timestamp  DateTime         @default(now())
+  facetsUsed Json?
+  resultIds  Json?
+  page       Int              @default(1)
+  pageSize   Int              @default(10)
+  filters    Json?
+  BaseEvent  BaseEvent[]
+  session    Session          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  feedback   SearchFeedback[] @relation("SearchEventToSearchFeedback")
+
+  @@index([sessionId])
+  @@index([timestamp])
+  @@index([searchType])
+}
+
+model ABTestMetrics {
+  id        String   @id @default(cuid())
+  testId    String
+  variantId String
+  queryHash String
+  metrics   Json
+  timestamp DateTime @default(now())
+  test      ABTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([testId, variantId])
+  @@index([queryHash])
+}
+
+model Signal {
+  id              String            @id @default(cuid())
+  type            SignalType
+  source          String
+  value           Json
+  priority        Int?
+  retries         Int?
+  timestamp       DateTime          @default(now())
+  processed       Boolean           @default(false)
+  processedAt     DateTime?
+  metadata        Json?
+  error           String?
+  manual          Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  strength        Float
+  ProcessedSignal ProcessedSignal[]
+  SessionToSignal SessionToSignal[]
+
+  @@index([type])
+  @@index([source])
+  @@index([processed])
+  @@index([timestamp])
+}
+
+model AnalyticsMetrics {
+  id                  String   @id @default(cuid())
+  totalSearches       Int
+  averageLatency      Float
+  successRate         Float
+  errorRate           Float
+  cacheHitRate        Float
+  queryCount          Int
+  uniqueUsers         Int
+  avgResultsPerQuery  Float
+  clickThroughRate    Float
+  conversionRate      Float
+  avgRelevanceScore   Float
+  p95Latency          Float
+  p99Latency          Float
+  resourceUtilization Json
+  searchTypes         Json
+  timeWindow          String?
+  timestamp           DateTime @default(now())
+  sessionId           String?
+  session             Session? @relation(fields: [sessionId], references: [id])
+
+  @@index([timeWindow])
+  @@index([timestamp])
+  @@index([sessionId])
+}
+
+model AnalyticsTrend {
+  id        String   @id @default(cuid())
+  metric    String
+  current   Float
+  change    Float
+  trend     String
+  timestamp DateTime @default(now())
+
+  @@index([metric])
+  @@index([timestamp])
+}
+
+model PerformanceInsight {
+  id               String   @id @default(cuid())
+  type             String
+  severity         String
+  message          String
+  metric           String
+  currentValue     Float
+  recommendedValue Float?
+  action           String
+  timestamp        DateTime @default(now())
+
+  @@index([type])
+  @@index([severity])
+  @@index([timestamp])
+}
+
+model AnalyticsReport {
+  id             String   @id @default(cuid())
+  timeWindow     String
+  generatedAt    DateTime
+  metrics        Json
+  trends         Json
+  insights       Json
+  popularQueries Json
+  timestamp      DateTime @default(now())
+
+  @@index([timeWindow])
+  @@index([timestamp])
+}
+
+model AdaptationSuggestion {
+  id         String   @id @default(cuid())
+  queryHash  String
+  patterns   Json
+  confidence Float
+  status     String   @default("PENDING")
+  metadata   Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([queryHash])
+  @@index([status])
+}
+
+model LearningMetric {
+  id         String       @id @default(cuid())
+  type       MetricType
+  value      Float
+  timestamp  DateTime     @default(now())
+  interval   String
+  sessionId  String?
+  modelId    String?
+  metadata   Json?
+  timeframe  String
+  aggregated Boolean      @default(false)
+  count      Int          @default(1)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  model      ModelConfig? @relation(fields: [modelId], references: [id])
+  session    Session?     @relation(fields: [sessionId], references: [id])
+
+  @@index([type])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@index([modelId])
+  @@index([timeframe])
+}
+
+model LearningEvent {
+  id            String                @id @default(cuid())
+  type          LearningEventType
+  status        LearningEventStatus   @default(PENDING)
+  priority      LearningEventPriority @default(MEDIUM)
+  timestamp     DateTime              @default(now())
+  processedAt   DateTime?
+  metadata      Json?
+  correlationId String?
+  sessionId     String?
+  userId        String?
+  clientId      String?
+  environment   String?
+  version       String?
+  tags          String[]
+  error         String?
+  retryCount    Int                   @default(0)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  patterns      LearningPattern[]
+
+  @@index([type])
+  @@index([status])
+  @@index([priority])
+  @@index([timestamp])
+  @@index([correlationId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([clientId])
+}
+
+model LearningPattern {
+  id         String        @id @default(cuid())
+  type       String
+  confidence Float
+  features   Json
+  metadata   Json?
+  eventId    String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  event      LearningEvent @relation(fields: [eventId], references: [id])
+
+  @@index([type])
+  @@index([eventId])
+}
+
+model EngineState {
+  id           String   @id @default(cuid())
+  status       String
+  currentPhase String?
+  confidence   Float    @default(0)
+  lastActive   DateTime @default(now())
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([lastActive])
+}
+
+model EngineOperation {
+  id                   String                 @id @default(cuid())
+  type                 String
+  status               String
+  startTime            DateTime               @default(now())
+  endTime              DateTime?
+  metrics              Json?
+  metadata             Json?
+  error                String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  EngineLearningResult EngineLearningResult[]
+
+  @@index([type])
+  @@index([status])
+  @@index([startTime])
+}
+
+model EngineMetric {
+  id          String     @id @default(cuid())
+  type        MetricType
+  value       Float
+  confidence  Float
+  timestamp   DateTime   @default(now())
+  metadata    Json?
+  operationId String?
+
+  @@index([type])
+  @@index([timestamp])
+  @@index([operationId])
+}
+
+model EngineLearningResult {
+  id                         String                       @id @default(cuid())
+  patterns                   Json
+  confidence                 Float
+  metadata                   Json
+  performance                Json?
+  validatedAt                DateTime?
+  abTestMetrics              Json?
+  operationId                String
+  operation                  EngineOperation              @relation(fields: [operationId], references: [id])
+  EngineOptimizationStrategy EngineOptimizationStrategy[]
+  recommendations            EngineRecommendation[]
+
+  @@index([confidence])
+  @@index([validatedAt])
+  @@index([operationId])
+}
+
+model EngineOptimizationStrategy {
+  id               String                 @id @default(cuid())
+  type             EngineOptimizationType
+  priority         Float
+  confidence       Float
+  impact           Float
+  metadata         Json
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  learningResultId String
+  learningResult   EngineLearningResult   @relation(fields: [learningResultId], references: [id])
+
+  @@index([type])
+  @@index([priority])
+  @@index([confidence])
+  @@index([learningResultId])
+}
+
+model EngineConfidenceScore {
+  id        String   @id @default(cuid())
+  value     Float
+  factors   Json
+  metadata  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([value])
+  @@index([createdAt])
+}
+
+model SearchWeights {
+  id            String   @id @default(cuid())
+  titleWeight   Float    @default(1.0)
+  contentWeight Float    @default(1.0)
+  tagWeight     Float    @default(1.0)
+  active        Boolean  @default(true)
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
+}
+
+model SearchConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+model ExperimentConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EngineRecommendation {
+  id               String                 @id @default(cuid())
+  type             EngineOptimizationType
+  priority         Float
+  confidence       Float
+  impact           Float
+  metadata         Json
+  learningResultId String
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  learningResult   EngineLearningResult   @relation(fields: [learningResultId], references: [id])
+
+  @@index([type])
+  @@index([priority])
+  @@index([confidence])
+  @@index([learningResultId])
+}
+
+model Index {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  status     String    @default("active")
+  settings   Json?
+  mappings   Json?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  doc_count  Int       @default(0)
+  size_bytes Int       @default(0)
+  health     String    @default("green")
+
+  @@index([name])
+  @@index([status])
+  @@index([health])
+  @@map("indices")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String        @unique
+  password      String
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  accounts      Account[]
+  sessions      AuthSession[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model AuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  clientId    String
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastUsedAt  DateTime?
+  allowedIps  String[]  @default([])
+  rateLimit   Int?
+  usageCount  Int       @default(0)
+
+  @@index([clientId])
+  @@index([isActive])
+  @@index([expiresAt])
+}
+
+model AdminToken {
+  id          String    @id @default(cuid())
+  token       String    @unique
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastUsedAt  DateTime?
+
+  @@index([token])
+  @@index([isActive])
+}
+
+model SessionToSignal {
+  A        String
+  B        String
+  sessions Session @relation(fields: [A], references: [id], onDelete: Cascade)
+  Signal   Signal  @relation(fields: [B], references: [id], onDelete: Cascade)
+
+  @@id([A, B], map: "_SessionToSignal_AB_pkey")
+  @@index([B], map: "_SessionToSignal_B_index")
+  @@map("_SessionToSignal")
+}
+
+enum EventType {
+  SYSTEM
+  USER
+  STATE_CHANGE
+  SEARCH
+  MODEL
+  FEEDBACK
+  ADAPTATION
+  LEARNING
+}
+
+enum SignalType {
+  SEARCH
+  PERFORMANCE
+  USER_BEHAVIOR_IMPRESSION
+  USER_BEHAVIOR_VIEW
+  USER_BEHAVIOR_CLICK
+  USER_BEHAVIOR_CONVERSION
+  MODEL_PERFORMANCE
+  FEEDBACK
+  SYSTEM_HEALTH
+  SESSION
+}
+
+enum EngagementType {
+  IMPRESSION
+  VIEW
+  CLICK
+  CONVERSION
+}
+
+enum Severity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum ModelType {
+  SEARCH_RANKER
+  PATTERN_DETECTOR
+  QUERY_OPTIMIZER
+  FEEDBACK_ANALYZER
+  OPENAI_FINE_TUNED
+}
+
+enum RulePriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ExperimentStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  STOPPED
+  FAILED
+}
+
+enum MetricType {
+  FEEDBACK_SCORE
+  ENGAGEMENT_RATE
+  RELEVANCE_SCORE
+  CLICK_THROUGH
+  CONVERSION_RATE
+  SEARCH_LATENCY
+  MODEL_ACCURACY
+  ADAPTATION_SUCCESS
+  CACHE_EFFICIENCY
+  CACHE_HIT_RATE
+  REDIS_GET
+  REDIS_SET
+  REDIS_DELETE
+  REDIS_EXISTS
+  REDIS_ERROR
+  ERROR_RATE
+  THROUGHPUT
+  CPU_USAGE
+  MEMORY_USAGE
+}
+
+enum LearningEventType {
+  SEARCH_PATTERN
+  USER_FEEDBACK
+  MODEL_UPDATE
+  ADAPTATION_RULE
+  SIGNAL_DETECTED
+  METRIC_THRESHOLD
+  SYSTEM_STATE
+  EXPERIMENT_RESULT
+  PATTERN_DETECTION
+  STRATEGY_GENERATION
+  FEEDBACK_ANALYSIS
+  MODEL_TRAINING
+  SYSTEM_ADAPTATION
+}
+
+enum LearningEventStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  IGNORED
+}
+
+enum LearningEventPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum EngineOptimizationType {
+  WEIGHT_ADJUSTMENT
+  QUERY_TRANSFORMATION
+  INDEX_OPTIMIZATION
+  CACHE_STRATEGY
+}
+
+enum EngineRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum EngineOperationType {
+  PATTERN_DETECTION
+  STRATEGY_EXECUTION
+  RULE_EVALUATION
+  ADAPTATION
+  LEARNING_CYCLE
+}
+
+enum EngineOperationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}

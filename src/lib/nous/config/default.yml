@@ -1,0 +1,37 @@
+# Development environment configuration
+environment: development
+
+server:
+  host: "0.0.0.0"
+  port: 3002
+  corsOrigins: ["*"]
+  corsAllowCredentials: true
+  corsAllowMethods: ["*"]
+  corsAllowHeaders: ["*"]
+
+registry:
+  storagePath: "./data/registry"
+  maxVersionsPerEntry: 10
+  enableVersionPruning: true
+  metadataValidation: true
+
+observe:
+  eventBufferSize: 1000
+  batchSize: 100
+  processingIntervalMs: 500
+
+learn:
+  modelCacheSize: 5
+  trainingBatchSize: 32
+  evaluationInterval: 1000
+  minSamplesRequired: 100
+
+debug: true
+logLevel: "DEBUG"
+
+additionalSettings:
+  tempDir: "./data/temp"
+  maxConcurrentTasks: 4
+  retryAttempts: 3
+  metricsEnabled: true
+  metricsInterval: 60000

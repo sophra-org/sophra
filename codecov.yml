@@ -1,0 +1,302 @@
+# codecov.yml
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  status:
+    project:
+      default:
+        target: auto
+    patch:
+      default:
+        target: auto
+
+comment: false
+
+component_management:
+  individual_components:
+    - component_id: admin
+      name: Admin
+      paths:
+        - src/app/api/admin/**
+    - component_id: cortex_ab_test_assign
+      name: Cortex AB Test Assign
+      paths:
+        - src/app/api/cortex/ab-test/assign/**
+    - component_id: cortex_ab_test_create
+      name: Cortex AB Test Create
+      paths:
+        - src/app/api/cortex/ab-test/create/**
+    - component_id: cortex_analytics_reports
+      name: Cortex Analytics Reports
+      paths:
+        - src/app/api/cortex/analytics/reports/**
+    - component_id: cortex_analytics_search
+      name: Cortex Analytics Search
+      paths:
+        - src/app/api/cortex/analytics/search/**
+    - component_id: cortex_documents_bulk
+      name: Cortex Documents Bulk
+      paths:
+        - src/app/api/cortex/documents/bulk/**
+    - component_id: cortex_documents_verify
+      name: Cortex Documents Verify
+      paths:
+        - src/app/api/cortex/documents/verify/**
+    - component_id: cortex_documents_id
+      name: Cortex Documents ID
+      paths:
+        - src/app/api/cortex/documents/[id]/**
+    - component_id: cortex_documents_id_vectorize
+      name: Cortex Documents ID Vectorize
+      paths:
+        - src/app/api/cortex/documents/[id]/vectorize/**
+    - component_id: cortex_engine_health
+      name: Cortex Engine Health
+      paths:
+        - src/app/api/cortex/engine/health/**
+    - component_id: cortex_feedback
+      name: Cortex Feedback
+      paths:
+        - src/app/api/cortex/feedback/**
+    - component_id: cortex_health
+      name: Cortex Health
+      paths:
+        - src/app/api/cortex/health/**
+    - component_id: cortex_indices
+      name: Cortex Indices
+      paths:
+        - src/app/api/cortex/indices/**
+    - component_id: cortex_metrics
+      name: Cortex Metrics
+      paths:
+        - src/app/api/cortex/metrics/**
+    - component_id: cortex_search
+      name: Cortex Search
+      paths:
+        - src/app/api/cortex/search/**
+    - component_id: cortex_sessions
+      name: Cortex Sessions
+      paths:
+        - src/app/api/cortex/sessions/**
+    - component_id: cortex_sessions_analytics
+      name: Cortex Sessions Analytics
+      paths:
+        - src/app/api/cortex/sessions/[sessionId]/analytics/**
+    - component_id: nous_ab_testing_experiments
+      name: Nous AB Testing Experiments
+      paths:
+        - src/app/api/nous/ab-testing/experiments/**
+    - component_id: nous_ab_testing_experiments_activate
+      name: Nous AB Testing Experiments Activate
+      paths:
+        - src/app/api/nous/ab-testing/experiments/activate/**
+    - component_id: nous_ab_testing_experiments_apply
+      name: Nous AB Testing Experiments Apply
+      paths:
+        - src/app/api/nous/ab-testing/experiments/apply/**
+    - component_id: nous_ab_testing_experiments_deactivate
+      name: Nous AB Testing Experiments Deactivate
+      paths:
+        - src/app/api/nous/ab-testing/experiments/deactivate/**
+    - component_id: nous_ab_testing_results
+      name: Nous AB Testing Results
+      paths:
+        - src/app/api/nous/ab-testing/results/**
+    - component_id: nous_adapt_apply
+      name: Nous Adapt Apply
+      paths:
+        - src/app/api/nous/adapt/apply/**
+    - component_id: nous_adapt_rules
+      name: Nous Adapt Rules
+      paths:
+        - src/app/api/nous/adapt/rules/**
+    - component_id: nous_adapt_suggest
+      name: Nous Adapt Suggest
+      paths:
+        - src/app/api/nous/adapt/suggest/**
+    - component_id: nous_learn_events
+      name: Nous Learn Events
+      paths:
+        - src/app/api/nous/learn/events/**
+    - component_id: nous_learn_feedback
+      name: Nous Learn Feedback
+      paths:
+        - src/app/api/nous/learn/feedback/**
+    - component_id: nous_learn_feedback_patterns
+      name: Nous Learn Feedback Patterns
+      paths:
+        - src/app/api/nous/learn/feedback/patterns/**
+    - component_id: nous_learn_metrics
+      name: Nous Learn Metrics
+      paths:
+        - src/app/api/nous/learn/metrics/**
+    - component_id: nous_learn_models
+      name: Nous Learn Models
+      paths:
+        - src/app/api/nous/learn/models/**
+    - component_id: nous_learn_models_sync
+      name: Nous Learn Models Sync
+      paths:
+        - src/app/api/nous/learn/models/sync/**
+    - component_id: nous_learn_search_patterns
+      name: Nous Learn Search Patterns
+      paths:
+        - src/app/api/nous/learn/search-patterns/**
+    - component_id: nous_signals_observe
+      name: Nous Signals Observe
+      paths:
+        - src/app/api/nous/signals/observe/**
+    - component_id: nous_signals_process
+      name: Nous Signals Process
+      paths:
+        - src/app/api/nous/signals/process/**
+    - component_id: nous_signals
+      name: Nous Signals
+      paths:
+        - src/app/api/nous/signals/**
+    - component_id: health
+      name: Health
+      paths:
+        - src/app/health/**
+    - component_id: pages
+      name: Pages
+      paths:
+        - src/app/pages/**
+    - component_id: lib_cortex_ab_testing
+      name: Lib Cortex AB Testing
+      paths:
+        - src/lib/cortex/ab-testing/**
+    - component_id: lib_cortex_analytics
+      name: Lib Cortex Analytics
+      paths:
+        - src/lib/cortex/analytics/**
+    - component_id: lib_cortex_core
+      name: Lib Cortex Core
+      paths:
+        - src/lib/cortex/core/**
+    - component_id: lib_cortex_documents
+      name: Lib Cortex Documents
+      paths:
+        - src/lib/cortex/documents/**
+    - component_id: lib_cortex_elasticsearch
+      name: Lib Cortex Elasticsearch
+      paths:
+        - src/lib/cortex/elasticsearch/**
+    - component_id: lib_cortex_events
+      name: Lib Cortex Events
+      paths:
+        - src/lib/cortex/events/**
+    - component_id: lib_cortex_feedback
+      name: Lib Cortex Feedback
+      paths:
+        - src/lib/cortex/feedback/**
+    - component_id: lib_cortex_middleware
+      name: Lib Cortex Middleware
+      paths:
+        - src/lib/cortex/middleware/**
+    - component_id: lib_cortex_monitoring
+      name: Lib Cortex Monitoring
+      paths:
+        - src/lib/cortex/monitoring/**
+    - component_id: lib_cortex_postgres
+      name: Lib Cortex Postgres
+      paths:
+        - src/lib/cortex/postgres/**
+    - component_id: lib_cortex_redis
+      name: Lib Cortex Redis
+      paths:
+        - src/lib/cortex/redis/**
+    - component_id: lib_cortex_reporting
+      name: Lib Cortex Reporting
+      paths:
+        - src/lib/cortex/reporting/**
+    - component_id: lib_cortex_services
+      name: Lib Cortex Services
+      paths:
+        - src/lib/cortex/services/**
+    - component_id: lib_cortex_sessions
+      name: Lib Cortex Sessions
+      paths:
+        - src/lib/cortex/sessions/**
+    - component_id: lib_cortex_types
+      name: Lib Cortex Types
+      paths:
+        - src/lib/cortex/types/**
+    - component_id: lib_cortex_utils
+      name: Lib Cortex Utils
+      paths:
+        - src/lib/cortex/utils/**
+    - component_id: lib_nous_adapt
+      name: Lib Nous Adapt
+      paths:
+        - src/lib/nous/adapt/**
+    - component_id: lib_nous_clients
+      name: Lib Nous Clients
+      paths:
+        - src/lib/nous/clients/**
+    - component_id: lib_nous_config
+      name: Lib Nous Config
+      paths:
+        - src/lib/nous/config/**
+    - component_id: lib_nous_engine
+      name: Lib Nous Engine
+      paths:
+        - src/lib/nous/engine/**
+    - component_id: lib_nous_learn
+      name: Lib Nous Learn
+      paths:
+        - src/lib/nous/learn/**
+    - component_id: lib_nous_models
+      name: Lib Nous Models
+      paths:
+        - src/lib/nous/models/**
+    - component_id: lib_nous_monitoring
+      name: Lib Nous Monitoring
+      paths:
+        - src/lib/nous/monitoring/**
+    - component_id: lib_nous_observe
+      name: Lib Nous Observe
+      paths:
+        - src/lib/nous/observe/**
+    - component_id: lib_nous_registry
+      name: Lib Nous Registry
+      paths:
+        - src/lib/nous/registry/**
+    - component_id: lib_nous_types
+      name: Lib Nous Types
+      paths:
+        - src/lib/nous/types/**
+    - component_id: lib_nous_utils
+      name: Lib Nous Utils
+      paths:
+        - src/lib/nous/utils/**
+    - component_id: lib_shared_database
+      name: Lib Shared Database
+      paths:
+        - src/lib/shared/database/**
+    - component_id: lib_shared_engine
+      name: Lib Shared Engine
+      paths:
+        - src/lib/shared/engine/**
+    - component_id: lib_shared_logger
+      name: Lib Shared Logger
+      paths:
+        - src/lib/shared/logger/**
+    - component_id: lib_shared_types
+      name: Lib Shared Types
+      paths:
+        - src/lib/shared/types/**
+    - component_id: lib_shared_utils
+      name: Lib Shared Utils
+      paths:
+        - src/lib/shared/**/*.ts
+        - "!src/lib/shared/types/**"
+        - "!src/lib/shared/logger/**"
+        - "!src/lib/shared/engine/**"
+        - "!src/lib/shared/database/**"
+    - component_id: types
+      name: Types
+      paths:
+        - src/types/**
+  # End of Selection

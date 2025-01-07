@@ -1,0 +1,61 @@
+# Dependencies
+node_modules
+.pnpm-store
+.npm
+.yarn
+.pnp.*
+
+# Build outputs
+.next
+out
+dist
+build
+*.tsbuildinfo
+
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Development files
+.env*
+.editorconfig
+.eslintrc*
+.prettierrc*
+.vscode
+.idea
+*.log
+*.lock
+*.md
+*.test.*
+__tests__
+test
+tests
+coverage
+
+# Cache and temp files
+.cache
+.temp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs
+*.md
+CHANGELOG*
+LICENSE*
+
+# Postman collections
+postman
+
+# Debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Docker files (except Dockerfile)
+.dockerignore
+docker-compose*

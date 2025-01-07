@@ -1,0 +1,43 @@
+# Production environment configuration
+environment: production
+
+server:
+  host: "0.0.0.0"
+  port: 3002
+  corsOrigins: 
+    - "https://api.nous.com"
+    - "https://admin.nous.com"
+  corsAllowCredentials: true
+  corsAllowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  corsAllowHeaders: ["Content-Type", "Authorization"]
+
+registry:
+  storagePath: "/var/lib/nous/registry"
+  maxVersionsPerEntry: 5
+  enableVersionPruning: true
+  metadataValidation: true
+
+observe:
+  eventBufferSize: 5000
+  batchSize: 500
+  processingIntervalMs: 250
+
+learn:
+  modelCacheSize: 10
+  trainingBatchSize: 64
+  evaluationInterval: 5000
+  minSamplesRequired: 1000
+
+debug: false
+logLevel: "INFO"
+
+additionalSettings:
+  tempDir: "/var/lib/nous/temp"
+  maxConcurrentTasks: 8
+  retryAttempts: 5
+  metricsEnabled: true
+  metricsInterval: 30000
+  metricsRetention: 604800000  # 7 days in milliseconds
+  healthCheckInterval: 30000
+  backupEnabled: true
+  backupInterval: 86400000  # 24 hours in milliseconds

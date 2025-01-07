@@ -1,0 +1,5 @@
+license_key: ${NEW_RELIC_LICENSE_KEY}
+display_name: sophra-api
+custom_attributes:
+  environment: ${NODE_ENV}
+  service: sophra-api

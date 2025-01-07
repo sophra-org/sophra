@@ -1,0 +1,2188 @@
+openapi: 3.0.0
+info:
+  title: Sophra
+  description: '# Overview
+
+
+    Sophra is an intelligent search platform built on a dual-service architecture
+    that combines sophisticated document processing with adaptive learning. Through
+    Cortex and Nous, the platform manages both core search operations and continuous
+    learning processes, delivering increasingly relevant search experiences through
+    real-time optimization.
+
+
+    Cortex serves as the foundational search engine, handling document operations,
+    session management, and search execution with comprehensive analytics tracking.
+    It maintains system health and performance while providing detailed operational
+    insights through extensive monitoring capabilities. Nous, the intelligence layer,
+    processes learning signals, manages adaptations, and orchestrates systematic testing
+    of both search behavior and business logic.
+
+
+    The platform''s strength lies in its ability to seamlessly integrate traditional
+    search capabilities with advanced AI-driven optimizations. Through sophisticated
+    signal processing and learning pipelines, Sophra continuously evolves its search
+    behavior based on real-world usage patterns while maintaining strict performance
+    standards and system stability. This creates a self-improving system that delivers
+    increasingly relevant results while providing granular control over its learning
+    and adaptation processes.'
+  version: 1.0.0
+servers:
+- url: http://67.205.179.110:3000/api
+  description: Production Server
+- url: http://localhost:3000/api
+  description: Local Development
+- url: https://app.sophra.org/api
+  description: Production Server
+tags:
+- name: Administration
+- name: Cortex
+  description: 'Cortex is the foundational search engine at the heart of Sophra, handling
+    all core search and document operations with precision and scale. It transforms
+    raw documents into rich, searchable content through advanced processing pipelines
+    that include automatic vectorization, semantic analysis, and intelligent indexing.
+
+
+    Beyond basic search capabilities, Cortex manages the entire document lifecycle
+    - from initial ingestion and processing to storage and retrieval. It employs sophisticated
+    caching strategies and real-time optimization to ensure fast, reliable search
+    performance even under heavy loads. The service automatically handles document
+    versioning, maintains consistency across distributed systems, and provides detailed
+    analytics about search performance and document usage.
+
+
+    What sets Cortex apart is its tight integration with Nous, Sophra''s learning layer.
+    Every search operation, document access, and user interaction generates valuable
+    signals that feed into the platform''s continuous learning processes. This symbiotic
+    relationship allows Cortex to dynamically adjust its search parameters, relevance
+    calculations, and document rankings based on real-world usage patterns and explicit feedback.
+
+
+    For developers, Cortex provides a comprehensive API that makes complex search
+    operations accessible and manageable. Whether you''re implementing basic keyword
+    search or advanced semantic queries, Cortex''s flexible architecture adapts to
+    your needs while maintaining consistent performance and reliability.EndFragment'
+- name: Cortex > System Health
+  description: "The Health endpoint provides comprehensive system diagnostics across\
+    \ all critical services, offering real-time insights into the platform's operational\
+    \ status. It performs deep health checks across Elasticsearch, PostgreSQL, and\
+    \ Redis services, measuring not just availability but also detailed performance\
+    \ metrics and resource utilization.\n\nThis endpoint serves as the primary diagnostic\
+    \ tool for system administrators and monitoring services, providing granular visibility\
+    \ into each service's operational state. When called, it conducts parallel health\
+    \ checks with built-in timeout protection, ensuring responsive monitoring even\
+    \ when individual services may be experiencing issues.\n\nThe health check returns\
+    \ detailed metrics including connection states, performance indicators, and resource\
+    \ usage statistics, all while maintaining a strict service timeout of 15 seconds\
+    \ to prevent cascading failures.\n\n``` typescript\nexport async function GET(_req:\
+    \ NextRequest): Promise<NextResponse> {\n  logger.info(\"Starting health check...\"\
+    );\n  const startTime = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    const health = {\n      timestamp: new Date().toISOString(),\n      services:\
+    \ {\n        elasticsearch: await checkService(\"elasticsearch\", services.elasticsearch,\
+    \ {\n          cluster: {\n            status: \"unknown\",\n            nodes:\
+    \ 0,\n            // ... other default metrics\n          }\n        }),\n   \
+    \     postgres: await checkService(\"postgres\", services.postgres, {\n      \
+    \    connections: {\n            active: 0,\n            idle: 0,\n          \
+    \  // ... other default metrics\n          }\n        }),\n        redis: await\
+    \ checkService(\"redis\", services.redis, {\n          memory: {\n           \
+    \ used: \"0b\",\n            peak: \"0b\",\n            // ... other default metrics\n\
+    \          }\n        })\n      },\n      overall: false\n    };\n    // Calculate\
+    \ overall health\n    health.overall = Object.values(health.services).every(\n\
+    \      (service) => service.operational\n    );\n    return NextResponse.json({\n\
+    \      success: true,\n      data: health,\n      meta: {\n        took: Date.now()\
+    \ - startTime\n      }\n    });\n  } catch (error) {\n    // Error handling\n\
+    \  }\n}\n\n ```\n\nThe endpoint returns detailed metrics about:\n\n- Elasticsearch\
+    \ cluster health and performance\n    \n- PostgreSQL connection pools and query\
+    \ performance\n    \n- Redis memory utilization and operation throughput\n   \
+    \ \n- Overall system operational status"
+- name: Cortex > Session Management
+  description: "# Session Management\n\nThe Session Management system in Sophra provides\
+    \ comprehensive tracking and analysis of user interactions throughout their search\
+    \ journey. It maintains stateful sessions with built-in caching, analytics collection,\
+    \ and real-time metric tracking, enabling detailed insights into user behavior\
+    \ and search patterns.\n\nThe system handles session lifecycle management, from\
+    \ creation through analytics collection to expiration, while maintaining performance\
+    \ through Redis-backed caching. It automatically tracks key metrics including\
+    \ search patterns, click-through rates, and interaction latencies, providing a\
+    \ complete picture of user engagement.\n\nEach session maintains its state across\
+    \ multiple searches while collecting analytics data, which can be retrieved through\
+    \ dedicated endpoints for monitoring and optimization purposes. The system includes\
+    \ built-in error handling and logging, ensuring reliable session tracking even\
+    \ under high load.\n\n``` typescript:src/app/api/cortex/sessions/route.ts\nexport\
+    \ async function POST(req: NextRequest): Promise<NextResponse> {\n  const startTime\
+    \ = Date.now();\n  const services = await serviceManager.getServices();\n  try\
+    \ {\n    const body = await req.json();\n    const session = await services.sessions.createSession({\n\
+    \      userId: body.userId,\n      metadata: body.metadata\n    });\n    // Cache\
+    \ session for performance\n    await services.sessions.cacheSession(\n      session.id,\n\
+    \      JSON.stringify(session)\n    );\n    return NextResponse.json({\n     \
+    \ success: true,\n      data: {\n        sessionId: session.id,\n        ...session\n\
+    \      },\n      cached: true\n    });\n  } catch (error) {\n    // Error handling\
+    \ with metrics tracking\n  }\n}\n\n ```\n\n**Key Features:**\n\n- Real-time session\
+    \ creation and tracking\n    \n- Redis-backed session caching\n    \n- Comprehensive\
+    \ analytics collection\n    \n- Automatic metric tracking\n    \n- Built-in error\
+    \ handling and logging\n    \n- Session state persistence\n    \n- Performance\
+    \ monitoring\n    \n\nThe system maintains detailed metrics about:\n\n- User search\
+    \ patterns and behavior\n    \n- Session duration and activity\n    \n- Click-through\
+    \ rates and engagement\n    \n- Query performance and latency\n    \n- Error rates\
+    \ and system health"
+- name: Cortex > Index Management
+  description: "The Index Management endpoints provide comprehensive control over\
+    \ Sophra's search indices, offering capabilities for creation, configuration,\
+    \ and maintenance of the platform's search infrastructure. These endpoints handle\
+    \ everything from basic index operations to advanced configuration management,\
+    \ ensuring optimal search performance and data organization.\n\nThrough these\
+    \ endpoints, administrators can manage the complete lifecycle of search indices,\
+    \ from initial creation through ongoing maintenance to eventual deletion. The\
+    \ system provides granular control over index settings, including shard allocation,\
+    \ replication strategies, and analysis configurations, while maintaining strict\
+    \ consistency and performance standards.\n\nEach operation is protected by built-in\
+    \ validation and error handling, ensuring safe modifications to the index structure\
+    \ even in high-traffic environments. The endpoints track detailed metrics about\
+    \ index operations, providing insights into performance patterns and resource\
+    \ utilization.\n\n``` typescript\nexport async function POST(req: NextRequest):\
+    \ Promise<NextResponse> {\n  const startTime = Date.now();\n  try {\n    const\
+    \ services = await serviceManager.getServices();\n    const body = await req.json();\n\
+    \    // Index creation with validation and configuration\n    const index = await\
+    \ services.indices.createIndex({\n      name: body.name,\n      settings: body.settings,\n\
+    \      mappings: body.mappings\n    });\n    return NextResponse.json({\n    \
+    \  success: true,\n      data: index,\n      meta: {\n        took: Date.now()\
+    \ - startTime\n      }\n    });\n  } catch (error) {\n    // Error handling with\
+    \ detailed logging\n  }\n}\n\n ```\n\n**Key Operations:**\n\n- Index creation\
+    \ and configuration\n    \n- Index settings management\n    \n- Mapping updates\
+    \ and modifications\n    \n- Index health monitoring\n    \n- Performance optimization\n\
+    \    \n- Deletion and cleanup\n    \n\nThe endpoints maintain detailed metrics\
+    \ about:\n\n- Index health and status\n    \n- Document counts and storage usage\n\
+    \    \n- Shard allocation and replication\n    \n- Query performance and throughput\n\
+    \    \n- Resource utilization and efficiency"
+- name: Cortex > Document Operations
+  description: "The Document Operations endpoints form the core of Sophra's content\
+    \ management system, handling all aspects of document processing, storage, and\
+    \ retrieval. These endpoints manage the entire document lifecycle, from initial\
+    \ ingestion through vectorization to eventual deletion, while maintaining performance\
+    \ and consistency across all operations.\n\nThese endpoints incorporate sophisticated\
+    \ processing pipelines that automatically handle document vectorization, metadata\
+    \ extraction, and content analysis. Each document operation is tracked and measured,\
+    \ providing detailed insights into processing performance and system efficiency.\
+    \ The system includes built-in retry mechanisms and failure handling to ensure\
+    \ reliable document processing even under heavy loads.\n\nDocument operations\
+    \ are designed to maintain consistency across distributed systems while providing\
+    \ real-time access to processed content. The system automatically handles versioning,\
+    \ maintains processing queues, and manages document state transitions throughout\
+    \ their lifecycle.\n\n``` typescript\nexport async function POST(req: NextRequest):\
+    \ Promise<NextResponse> {\n  const startTime = Date.now();\n  try {\n    const\
+    \ services = await serviceManager.getServices();\n    const body = await req.json();\n\
+    \    // Document creation with automatic processing\n    const document = await\
+    \ services.documents.createDocument({\n      index: body.index,\n      document:\
+    \ {\n        title: body.document.title,\n        content: body.document.content,\n\
+    \        abstract: body.document.abstract,\n        authors: body.document.authors,\n\
+    \        tags: body.document.tags,\n        source: body.document.source\n   \
+    \   }\n    });\n    return NextResponse.json({\n      success: true,\n      data:\
+    \ {\n        id: document.id,\n        index: document.index,\n        vectorized:\
+    \ document.vectorized,\n        // ... other document metadata\n      }\n    });\n\
+    \  } catch (error) {\n    // Comprehensive error handling\n  }\n}\n\n ```\n\n\
+    **Key Features:**\n\n- Automatic document vectorization\n    \n- Content analysis\
+    \ and metadata extraction\n    \n- Version control and state management\n    \n\
+    - Batch processing capabilities\n    \n- Real-time document updates\n    \n- Comprehensive\
+    \ error handling\n    \n\nThe system maintains metrics about:\n\n- Document processing\
+    \ times\n    \n- Vectorization status and quality\n    \n- Storage utilization\n\
+    \    \n- Processing queue health\n    \n- Error rates and types\n    \n- System\
+    \ throughput and latency"
+- name: Cortex > Search Operations
+  description: "The Search Operations endpoints form the heart of Sophra's search\
+    \ functionality, delivering intelligent and contextually aware search results\
+    \ across diverse content types. These endpoints handle everything from basic keyword\
+    \ queries to advanced semantic search operations, while automatically optimizing\
+    \ results based on user behavior and system learning.\n\nThe system employs a\
+    \ sophisticated hybrid search approach, combining traditional text-based search\
+    \ with vector similarity matching and machine learning-enhanced ranking. Each\
+    \ search request triggers a complex processing pipeline that includes query analysis,\
+    \ context enrichment, and dynamic result ranking, all while maintaining sub-second\
+    \ response times.\n\nBuilt-in performance optimization automatically balances\
+    \ search accuracy with response time, utilizing intelligent caching and query\
+    \ optimization strategies. The system adapts to search patterns in real-time,\
+    \ adjusting relevance calculations and ranking strategies based on user interactions\
+    \ and feedback.\n\n``` typescript:src/app/api/cortex/search/route.ts\nexport async\
+    \ function POST(req: NextRequest): Promise<NextResponse> {\n  const startTime\
+    \ = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    const body = await req.json();\n    // Execute search with context and optimization\n\
+    \    const results = await services.search.execute({\n      query: body.query,\n\
+    \      filters: body.filters,\n      boost: body.boost,\n      context: {\n  \
+    \      sessionId: body.sessionId,\n        userId: body.userId,\n        searchType:\
+    \ body.searchType\n      },\n      pagination: {\n        from: body.from || 0,\n\
+    \        size: body.size || 10\n      }\n    });\n    return NextResponse.json({\n\
+    \      success: true,\n      data: {\n        hits: results.hits,\n        total:\
+    \ results.total,\n        took: Date.now() - startTime,\n        searchContext:\
+    \ results.context\n      }\n    });\n  } catch (error) {\n    // Error handling\
+    \ with fallback strategies\n  }\n}\n\n ```\n\n**Key Capabilities:**\n\n- Hybrid\
+    \ search (text + vector)\n    \n- Context-aware ranking\n    \n- Real-time result\
+    \ optimization\n    \n- Intelligent query processing\n    \n- Automatic relevance\
+    \ tuning\n    \n- Performance optimization\n    \n\nThe system tracks metrics\
+    \ about:\n\n- Query performance and latency\n    \n- Result relevance scores\n\
+    \    \n- User interaction patterns\n    \n- Cache hit rates\n    \n- Resource\
+    \ utilization\n    \n- Error rates and types"
+- name: Cortex > A/B Testing
+  description: "The A/B Testing endpoints provide a sophisticated experimentation\
+    \ framework within Sophra's search infrastructure, enabling systematic optimization\
+    \ of search experiences through controlled testing. These endpoints manage the\
+    \ complete testing lifecycle, from variant creation to statistical analysis, while\
+    \ ensuring consistent user experiences and reliable data collection.\n\nThe system\
+    \ handles test assignment, traffic allocation, and result collection automatically,\
+    \ maintaining strict isolation between test variants while gathering meaningful\
+    \ metrics. Each test can be configured with multiple variants, custom success\
+    \ metrics, and specific targeting rules, allowing for precise control over experimentation\
+    \ parameters.\n\nBuilt-in analytics processing provides real-time insights into\
+    \ test performance, automatically calculating statistical significance and identifying\
+    \ winning variants. The system maintains detailed logs of all test interactions,\
+    \ enabling deep analysis of user behavior and search performance across variants.\n\
+    \n``` typescript:src/app/api/cortex/ab/route.ts\nexport async function POST(req:\
+    \ NextRequest): Promise<NextResponse> {\n  const startTime = Date.now();\n  try\
+    \ {\n    const services = await serviceManager.getServices();\n    const body\
+    \ = await req.json();\n    // Test creation with variant configuration\n    const\
+    \ test = await services.abTesting.createTest({\n      name: body.name,\n     \
+    \ variants: body.variants,\n      trafficAllocation: body.trafficAllocation,\n\
+    \      successMetrics: body.successMetrics,\n      targetingRules: body.targetingRules\n\
+    \    });\n    return NextResponse.json({\n      success: true,\n      data: {\n\
+    \        testId: test.id,\n        status: test.status,\n        variants: test.variants,\n\
+    \        metrics: test.metrics\n      }\n    });\n  } catch (error) {\n    //\
+    \ Error handling with metric tracking\n  }\n}\n\n ```\n\n**Key Capabilities:**\n\
+    \n- Multi-variant test management\n    \n- Automatic traffic allocation\n    \n\
+    - Real-time performance monitoring\n    \n- Statistical significance calculation\n\
+    \    \n- User assignment and tracking\n    \n- Results analysis and reporting\n\
+    \    \n\nThe system tracks metrics including:\n\n- Variant performance comparisons\n\
+    \    \n- User engagement metrics\n    \n- Conversion rates by variant\n    \n\
+    - Statistical confidence levels\n    \n- Test duration and sample sizes\n    \n\
+    - Error rates and anomalies"
+- name: Cortex > Analytics
+  description: "The Analytics endpoints serve as Sophra's comprehensive data collection\
+    \ and analysis system, providing deep insights into search behavior, user interactions,\
+    \ and system performance. These endpoints capture, process, and analyze a wide\
+    \ range of events and metrics, enabling data-driven optimization of search experiences\
+    \ and system performance.\n\nThe system processes analytics events in real-time,\
+    \ maintaining detailed audit trails while handling high-volume data ingestion.\
+    \ Each analytics event is enriched with contextual information, including user\
+    \ session data, search parameters, and system state, providing rich datasets for\
+    \ analysis. The endpoints support both real-time monitoring and historical analysis,\
+    \ with built-in aggregation and filtering capabilities.\n\nAdvanced processing\
+    \ pipelines automatically calculate key performance indicators, identify trends,\
+    \ and detect anomalies, while maintaining data consistency and accessibility.\
+    \ The system includes sophisticated sampling and data retention policies to manage\
+    \ storage efficiently while preserving analytical value.\n\n``` typescript\nexport\
+    \ async function POST(req: NextRequest): Promise<NextResponse> {\n  const startTime\
+    \ = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    const body = await req.json();\n    // Process and store analytics event\n\
+    \    const event = await services.analytics.trackEvent({\n      sessionId: body.sessionId,\n\
+    \      eventType: body.eventType,\n      timestamp: new Date(),\n      metadata:\
+    \ {\n        query: body.query,\n        results: body.results,\n        userActions:\
+    \ body.userActions,\n        performance: body.performance\n      }\n    });\n\
+    \    return NextResponse.json({\n      success: true,\n      data: {\n       \
+    \ eventId: event.id,\n        processed: true,\n        metrics: event.metrics\n\
+    \      }\n    });\n  } catch (error) {\n    // Error handling with fallback processing\n\
+    \  }\n}\n\n ```\n\n**Key Features:**\n\n- Real-time event processing\n    \n-\
+    \ User behavior tracking\n    \n- Performance monitoring\n    \n- Trend analysis\n\
+    \    \n- Anomaly detection\n    \n- Custom metric calculation\n    \n\nThe system\
+    \ collects metrics about:\n\n- Search patterns and effectiveness\n    \n- User\
+    \ engagement and satisfaction\n    \n- System performance and reliability\n  \
+    \  \n- Error rates and types\n    \n- Resource utilization\n    \n- Business impact\
+    \ metrics"
+- name: Cortex > Feedback
+  description: "# Feedback\n\nThe Feedback endpoints manage Sophra's learning mechanisms,\
+    \ collecting and processing user interactions and explicit feedback to continuously\
+    \ improve search relevance. These endpoints handle various types of feedback signals,\
+    \ from explicit ratings to implicit behavioral cues, incorporating them into the\
+    \ platform's adaptive learning system.\n\nThe system processes feedback in real-time,\
+    \ using it to adjust search rankings, update learning models, and refine relevance\
+    \ calculations. Each feedback signal is contextualized with session data, search\
+    \ parameters, and user interactions, providing rich information for the learning\
+    \ pipeline. The endpoints support both immediate adjustments and long-term learning\
+    \ patterns, ensuring balanced optimization of search experiences.\n\nAdvanced\
+    \ processing pipelines automatically analyze feedback patterns, identify significant\
+    \ trends, and trigger appropriate adaptation rules, while maintaining system stability\
+    \ and preventing feedback loops. The system includes sophisticated weighting mechanisms\
+    \ to balance different types of feedback and prevent gaming or manipulation.\n\
+    \n``` typescript:src/app/api/cortex/feedback/route.ts\nexport async function POST(req:\
+    \ NextRequest): Promise<NextResponse> {\n  const startTime = Date.now();\n  try\
+    \ {\n    const services = await serviceManager.getServices();\n    const body\
+    \ = await req.json();\n    // Process feedback with context\n    const feedback\
+    \ = await services.feedback.process({\n      sessionId: body.sessionId,\n    \
+    \  resultId: body.resultId,\n      feedbackType: body.type,\n      score: body.score,\n\
+    \      context: {\n        query: body.query,\n        position: body.position,\n\
+    \        interactionTime: body.interactionTime,\n        userActions: body.actions\n\
+    \      }\n    });\n    return NextResponse.json({\n      success: true,\n    \
+    \  data: {\n        feedbackId: feedback.id,\n        processed: true,\n     \
+    \   impact: feedback.impact\n      }\n    });\n  } catch (error) {\n    // Error\
+    \ handling with feedback preservation\n  }\n}\n\n ```\n\n**Key Features:**\n\n\
+    - Real-time feedback processing\n    \n- Multi-signal feedback collection\n  \
+    \  \n- Contextual feedback analysis\n    \n- Adaptive learning integration\n \
+    \   \n- Feedback validation\n    \n- Impact measurement\n    \n\nThe system tracks\
+    \ metrics about:\n\n- Feedback patterns and trends\n    \n- Learning effectiveness\n\
+    \    \n- Adaptation impact\n    \n- User satisfaction levels\n    \n- System responsiveness\n\
+    \    \n- Feedback quality scores"
+- name: Cortex > Metrics
+  description: "The Metrics endpoints serve as Sophra's central nervous system for\
+    \ operational monitoring, collecting and aggregating performance data across all\
+    \ system components. These endpoints handle comprehensive metric collection, from\
+    \ low-level system performance to high-level business KPIs, providing a complete\
+    \ view of platform health and effectiveness.\n\nThe system processes metrics in\
+    \ real-time, supporting both push and pull collection methods while maintaining\
+    \ high throughput and low latency. Each metric is automatically tagged with relevant\
+    \ context, including service identifiers, environment information, and temporal\
+    \ markers, enabling precise analysis and troubleshooting. The endpoints support\
+    \ various metric types, from simple counters to complex histograms and distributions.\n\
+    \nBuilt-in aggregation pipelines automatically process raw metrics into meaningful\
+    \ insights, supporting both real-time monitoring and historical trend analysis.\
+    \ The system includes sophisticated sampling and storage optimization strategies\
+    \ to handle high-volume metric collection efficiently.\n\n``` typescript\nexport\
+    \ async function POST(req: NextRequest): Promise<NextResponse> {\n  const startTime\
+    \ = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    const body = await req.json();\n    // Process and store metrics\n    const\
+    \ metric = await services.metrics.record({\n      name: body.name,\n      value:\
+    \ body.value,\n      type: body.type,\n      labels: body.labels,\n      timestamp:\
+    \ new Date(),\n      context: {\n        service: body.service,\n        environment:\
+    \ body.environment,\n        instance: body.instance\n      }\n    });\n    return\
+    \ NextResponse.json({\n      success: true,\n      data: {\n        metricId:\
+    \ metric.id,\n        processed: true,\n        aggregations: metric.aggregations\n\
+    \      }\n    });\n  } catch (error) {\n    // Error handling with metric buffering\n\
+    \  }\n}\n\n ```\n\n**Key Capabilities:**\n\n- Real-time metric collection\n  \
+    \  \n- Multi-dimensional aggregation\n    \n- Automatic tagging and context\n\
+    \    \n- Historical trend analysis\n    \n- Alert threshold monitoring\n    \n\
+    - Performance impact tracking\n    \n\nThe system tracks various metric types:\n\
+    \n- System performance metrics\n    \n- Business KPIs\n    \n- User experience\
+    \ metrics\n    \n- Resource utilization\n    \n- Error rates and patterns\n  \
+    \  \n- Service health indicators"
+- name: Nous
+  description: 'Nous serves as Sophra''s intelligent adaptation layer, continuously
+    learning and evolving to optimize search experiences. As the platform''s cognitive
+    engine, it processes signals from user interactions, search patterns, and system
+    performance to make real-time adjustments that improve relevance and efficiency.
+
+
+    At its core, Nous employs sophisticated machine learning models that analyze search
+    behaviors and outcomes. It identifies successful search patterns, learns from
+    user feedback, and automatically generates adaptation rules to enhance future
+    searches. Through comprehensive A/B testing capabilities, Nous systematically
+    evaluates different search strategies, automatically promoting those that deliver
+    the best results.
+
+
+    The service maintains a deep understanding of search context by processing multiple
+    signal types - from explicit user feedback to implicit behavioral cues. These
+    signals feed into Nous''s learning pipeline, which continuously updates its models
+    and adaptation strategies. This creates a self-improving system where each interaction
+    contributes to better search experiences for all users.
+
+
+    What makes Nous particularly powerful is its ability to balance immediate adaptations
+    with long-term learning. While it can make real-time adjustments to search parameters
+    based on current conditions, it also builds deeper understanding over time, identifying
+    trends and patterns that inform more strategic optimizations. This dual approach
+    ensures both immediate responsiveness and sustained improvement in search quality.'
+- name: Nous > Health
+  description: "The Nous Health endpoints provide comprehensive monitoring of Sophra's\
+    \ intelligence layer, offering deep insights into the platform's learning systems\
+    \ and adaptation mechanisms. These endpoints track the health and performance\
+    \ of all AI components, from model serving infrastructure to learning pipeline\
+    \ efficiency.\n\nThe system conducts continuous health checks across all intelligence\
+    \ components, monitoring model performance, learning effectiveness, and adaptation\
+    \ quality. Each health check evaluates multiple aspects of the AI infrastructure,\
+    \ including model latency, prediction quality, and learning convergence rates,\
+    \ while maintaining strict performance boundaries to ensure reliable operation.\n\
+    \nAdvanced monitoring pipelines automatically detect anomalies in model behavior,\
+    \ identify potential degradation in learning quality, and track the effectiveness\
+    \ of adaptation mechanisms. The system includes sophisticated fallback strategies\
+    \ to maintain service quality even when components show signs of degradation.\n\
+    \n``` typescript\nexport async function GET(_req: NextRequest): Promise<NextResponse>\
+    \ {\n  const startTime = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    // Comprehensive AI system health check\n    const health = {\n      timestamp:\
+    \ new Date().toISOString(),\n      models: {\n        serving: await checkModelServing(services.models),\n\
+    \        training: await checkTrainingPipeline(services.training),\n        adaptation:\
+    \ await checkAdaptationSystem(services.adaptation)\n      },\n      learning:\
+    \ {\n        effectiveness: await measureLearningEffectiveness(services.learning),\n\
+    \        convergence: await checkConvergenceRates(services.learning),\n      \
+    \  stability: await assessSystemStability(services.learning)\n      },\n     \
+    \ overall: false\n    };\n    health.overall = Object.values(health.models).every(\n\
+    \      (component) => component.operational\n    );\n    return NextResponse.json({\n\
+    \      success: true,\n      data: health,\n      meta: {\n        took: Date.now()\
+    \ - startTime\n      }\n    });\n  } catch (error) {\n    // Error handling with\
+    \ fallback checks\n  }\n}\n\n ```\n\n**Key Features:**\n\n- AI component health\
+    \ monitoring\n    \n- Model performance tracking\n    \n- Learning quality assessment\n\
+    \    \n- Adaptation effectiveness measurement\n    \n- System stability monitoring\n\
+    \    \n- Anomaly detection\n    \n\nThe system tracks metrics about:\n\n- Model\
+    \ serving performance\n    \n- Learning pipeline health\n    \n- Adaptation effectiveness\n\
+    \    \n- Resource utilization\n    \n- Error rates and patterns\n    \n- System\
+    \ stability indicators"
+- name: Nous > A/B Testing
+  description: "# Nous A/B Testing\n\nThe Nous A/B Testing endpoints manage controlled\
+    \ experiments for Sophra's intelligence layer, focusing on testing and validating\
+    \ changes to core business logic, learning algorithms, and adaptation strategies.\
+    \ Unlike Cortex's contextual search testing, these endpoints handle experiments\
+    \ that affect the platform's fundamental decision-making processes and learning\
+    \ behaviors.\n\nThe system orchestrates sophisticated multi-variant tests of AI\
+    \ components, measuring the impact of different learning strategies, model configurations,\
+    \ and business rule sets. Each test is carefully isolated to prevent cross-contamination\
+    \ while maintaining system stability. The endpoints support complex experimental\
+    \ designs, including multi-armed bandits and sequential testing, while ensuring\
+    \ consistent platform performance.\n\nBuilt-in safeguards automatically monitor\
+    \ test impact on system health and user experience, with automatic rollback capabilities\
+    \ if predefined thresholds are breached. The system includes detailed tracking\
+    \ of both technical metrics and business KPIs to provide comprehensive insight\
+    \ into test outcomes.\n\n``` typescript\nexport async function POST(req: NextRequest):\
+    \ Promise<NextResponse> {\n  const startTime = Date.now();\n  try {\n    const\
+    \ services = await serviceManager.getServices();\n    const body = await req.json();\n\
+    \    // Create AI component test\n    const experiment = await services.experiments.create({\n\
+    \      name: body.name,\n      type: body.type, // e.g., 'learning_strategy',\
+    \ 'model_config', 'business_rules'\n      variants: body.variants,\n      metrics:\
+    \ {\n        technical: body.technicalMetrics,\n        business: body.businessMetrics,\n\
+    \        guardrails: body.guardrails\n      },\n      rolloutStrategy: body.rolloutStrategy,\n\
+    \      fallbackConfig: body.fallbackConfig\n    });\n    return NextResponse.json({\n\
+    \      success: true,\n      data: {\n        experimentId: experiment.id,\n \
+    \       status: experiment.status,\n        monitoring: experiment.monitoring\n\
+    \      }\n    });\n  } catch (error) {\n    // Error handling with experiment\
+    \ safeguards\n  }\n}\n\n ```\n\n**Key Capabilities:**\n\n- AI component experimentation\n\
+    \    \n- Business logic testing\n    \n- Learning strategy validation\n    \n\
+    - Automatic safeguards\n    \n- Impact isolation\n    \n- Performance monitoring\n\
+    \    \n\nThe system tracks metrics about:\n\n- Learning effectiveness\n    \n\
+    - Business impact\n    \n- System stability\n    \n- Resource efficiency\n   \
+    \ \n- Error patterns\n    \n- User experience impact"
+- name: Nous > Adaptation
+  description: "# Adaptation\n\nThe Adaptation endpoints manage Sophra's intelligent\
+    \ system modifications, orchestrating how the platform evolves and adjusts its\
+    \ behavior based on accumulated learning and real-world performance data. These\
+    \ endpoints handle the complex process of applying learned optimizations while\
+    \ maintaining system stability and predictable behavior.\n\nThe system implements\
+    \ a sophisticated adaptation pipeline that carefully validates and applies changes\
+    \ to various system components, from ranking algorithms to business rules. Each\
+    \ adaptation is versioned and monitored, with built-in capability to roll back\
+    \ changes that don't meet performance thresholds. The endpoints support both automated\
+    \ and controlled adaptation processes, allowing for different levels of human\
+    \ oversight.\n\nAdvanced validation mechanisms ensure that adaptations improve\
+    \ system performance across multiple dimensions while preventing unexpected side\
+    \ effects. The system maintains detailed logs of all adaptations and their impacts,\
+    \ enabling comprehensive analysis of system evolution over time.\n\n``` typescript:src/app/api/nous/adaptation/route.ts\n\
+    export async function POST(req: NextRequest): Promise<NextResponse> {\n  const\
+    \ startTime = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    const body = await req.json();\n    // Process adaptation request\n    const\
+    \ adaptation = await services.adaptation.apply({\n      type: body.type,  // e.g.,\
+    \ 'ranking', 'rules', 'thresholds'\n      changes: body.changes,\n      context:\
+    \ {\n        learningSource: body.source,\n        confidence: body.confidence,\n\
+    \        impact: body.expectedImpact\n      },\n      validation: {\n        metrics:\
+    \ body.validationMetrics,\n        thresholds: body.acceptanceThresholds,\n  \
+    \      rollbackTriggers: body.rollbackTriggers\n      }\n    });\n    return NextResponse.json({\n\
+    \      success: true,\n      data: {\n        adaptationId: adaptation.id,\n \
+    \       status: adaptation.status,\n        metrics: adaptation.metrics,\n   \
+    \     rollbackPlan: adaptation.rollbackPlan\n      }\n    });\n  } catch (error)\
+    \ {\n    // Error handling with safety fallbacks\n  }\n}\n\n ```\n\n**Key Features:**\n\
+    \n- Intelligent system adaptation\n    \n- Version-controlled changes\n    \n\
+    - Performance validation\n    \n- Automatic rollback capability\n    \n- Impact\
+    \ monitoring\n    \n- Change auditing\n    \n\nThe system tracks metrics about:\n\
+    \n- Adaptation effectiveness\n    \n- System stability\n    \n- Performance impact\n\
+    \    \n- Learning convergence\n    \n- Error rates\n    \n- Business metric impacts"
+- name: Nous > Learning
+  description: "The Learning endpoints orchestrate Sophra's core intelligence acquisition\
+    \ processes, managing how the system learns from user interactions, feedback signals,\
+    \ and performance data. These endpoints handle the complex task of converting\
+    \ raw experience into actionable intelligence while maintaining learning stability\
+    \ and preventing negative feedback loops.\n\nThe system implements sophisticated\
+    \ learning pipelines that process multiple signal types simultaneously, from explicit\
+    \ user feedback to implicit behavioral patterns. Each learning cycle is carefully\
+    \ monitored and validated, ensuring that new knowledge improves system performance\
+    \ without compromising reliability. The endpoints support both real-time learning\
+    \ adjustments and batch processing of historical data.\n\nBuilt-in safeguards\
+    \ prevent the system from learning from anomalous or adversarial inputs while\
+    \ maintaining the ability to adapt to genuine changes in user behavior and content\
+    \ patterns. The system includes detailed tracking of learning effectiveness and\
+    \ model performance over time.\n\n``` typescript\nexport async function POST(req:\
+    \ NextRequest): Promise<NextResponse> {\n  const startTime = Date.now();\n  try\
+    \ {\n    const services = await serviceManager.getServices();\n    const body\
+    \ = await req.json();\n    // Process learning event\n    const learningEvent\
+    \ = await services.learning.process({\n      type: body.type,  // e.g., 'feedback',\
+    \ 'behavior', 'performance'\n      signals: body.signals,\n      context: {\n\
+    \        source: body.source,\n        confidence: body.confidence,\n        sessionData:\
+    \ body.sessionData\n      },\n      validation: {\n        qualityMetrics: body.qualityMetrics,\n\
+    \        stabilityChecks: body.stabilityChecks,\n        anomalyDetection: body.anomalyDetection\n\
+    \      }\n    });\n    return NextResponse.json({\n      success: true,\n    \
+    \  data: {\n        eventId: learningEvent.id,\n        status: learningEvent.status,\n\
+    \        impact: learningEvent.impact,\n        qualityMetrics: learningEvent.qualityMetrics\n\
+    \      }\n    });\n  } catch (error) {\n    // Error handling with learning preservation\n\
+    \  }\n}\n\n ```\n\n**Key Features:**\n\n- Multi-signal learning processing\n \
+    \   \n- Real-time knowledge acquisition\n    \n- Learning validation\n    \n-\
+    \ Anomaly detection\n    \n- Performance monitoring\n    \n- Knowledge versioning\n\
+    \    \n\nThe system tracks metrics about:\n\n- Learning effectiveness\n    \n\
+    - Signal quality\n    \n- Model performance\n    \n- System stability\n    \n\
+    - Error patterns\n    \n- Knowledge retention"
+- name: Nous > Learning > Models
+- name: Nous > Learning > Search Patterns
+- name: Nous > Learning > Feedback
+- name: Nous > Learning > Metrics and Events
+- name: Nous > Signals
+  description: "The Signals endpoints manage Sophra's comprehensive signal collection\
+    \ and processing system, serving as the primary input channel for the platform's\
+    \ learning and adaptation mechanisms. These endpoints handle the ingestion, validation,\
+    \ and initial processing of all types of signals, from user interactions to system\
+    \ performance metrics, that drive the platform's intelligent behavior.\n\nThe\
+    \ system implements sophisticated signal processing pipelines that handle real-time\
+    \ signal ingestion while maintaining data quality and processing efficiency. Each\
+    \ signal is automatically enriched with contextual information and validated against\
+    \ known patterns to ensure data integrity. The endpoints support both synchronous\
+    \ and asynchronous signal processing, with built-in buffering for high-volume\
+    \ scenarios.\n\nAdvanced signal correlation mechanisms automatically identify\
+    \ relationships between different signal types, enabling complex pattern recognition\
+    \ and trend analysis. The system includes comprehensive monitoring of signal quality\
+    \ and processing performance to maintain reliable operation at scale.\n\n``` typescript\n\
+    export async function POST(req: NextRequest): Promise<NextResponse> {\n  const\
+    \ startTime = Date.now();\n  try {\n    const services = await serviceManager.getServices();\n\
+    \    const body = await req.json();\n    // Process incoming signal\n    const\
+    \ signal = await services.signals.process({\n      type: body.type,  // e.g.,\
+    \ 'user_interaction', 'system_metric', 'feedback'\n      data: body.data,\n  \
+    \    context: {\n        source: body.source,\n        timestamp: new Date(),\n\
+    \        sessionId: body.sessionId,\n        environment: body.environment\n \
+    \     },\n      processing: {\n        priority: body.priority,\n        enrichment:\
+    \ body.enrichment,\n        validation: body.validation\n      }\n    });\n  \
+    \  return NextResponse.json({\n      success: true,\n      data: {\n        signalId:\
+    \ signal.id,\n        processed: signal.processed,\n        enriched: signal.enriched,\n\
+    \        correlations: signal.correlations\n      }\n    });\n  } catch (error)\
+    \ {\n    // Error handling with signal preservation\n  }\n}\n\n ```\n\n**Key Features:**\n\
+    \n- Real-time signal processing\n    \n- Automatic signal enrichment\n    \n-\
+    \ Quality validation\n    \n- Pattern correlation\n    \n- Priority handling\n\
+    \    \n- Signal buffering\n    \n\nThe system tracks metrics about:\n\n- Signal\
+    \ volume and types\n    \n- Processing latency\n    \n- Data quality\n    \n-\
+    \ Correlation patterns\n    \n- Error rates\n    \n- System load"
+paths:
+  /keys:
+    post:
+      tags:
+      - Administration
+      summary: Request Server Key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: test-api-key-121924
+                clientId: sophra-dev
+                description: API key for Sophra development testing.
+      parameters:
+      - name: x-admin-token
+        in: header
+        schema:
+          type: string
+        example: '{{adminToken}}'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/health:
+    get:
+      tags:
+      - Cortex > System Health
+      summary: Health Check
+      description: "# Health Check Endpoint\n\nThe Health Check endpoint offers a\
+        \ clear overview of Sophra's core service health through a single API call.\
+        \ It provides detailed operational status and performance metrics for all\
+        \ critical system components. The Health Check endpoint offers a comprehensive\
+        \ overview of the health of Sophra's core services through a unified API call.\
+        \ This endpoint is designed to provide users with clear insights into the\
+        \ operational status and performance metrics of all critical system components.\n\
+        \nWhen accessed, it returns detailed information that allows developers and\
+        \ system administrators to quickly assess the overall functionality and reliability\
+        \ of the system. Key performance indicators, such as response times, error\
+        \ rates, and resource utilization, are included in the response, enabling\
+        \ users to identify potential issues before they escalate.\n\nAdditionally,\
+        \ the Health Check endpoint can serve as an essential tool for monitoring\
+        \ system health over time, helping teams maintain optimal performance and\
+        \ ensure high availability of services. By leveraging this endpoint, organizations\
+        \ can enhance their operational efficiency and provide a better experience\
+        \ for their users.\n\n**Request**\n\n``` http\nGET /health\n\n ```\n\n**Response**\n\
+        \n``` json\n{\n  \"success\": true,\n  \"data\": {\n    \"timestamp\": \"\
+        2024-03-20T10:30:00.000Z\",\n    \"services\": {\n      \"elasticsearch\"\
+        : {\n        \"operational\": true,\n        \"latency\": 123,\n        \"\
+        metrics\": {\n          \"cluster\": {\n            \"status\": \"green\"\
+        ,\n            \"nodes\": 3,\n            \"activePrimaryShards\": 5\n   \
+        \       },\n          \"indices\": {\n            \"total\": 10,\n       \
+        \     \"healthy\": 10\n          },\n          \"performance\": {\n      \
+        \      \"queryLatency\": 45,\n            \"cpuUsage\": 0.75\n          }\n\
+        \        }\n      },\n      \"postgres\": {\n        \"operational\": true,\n\
+        \        \"latency\": 85,\n        \"metrics\": {\n          \"connections\"\
+        : {\n            \"active\": 12,\n            \"idle\": 4\n          },\n\
+        \          \"performance\": {\n            \"queryLatency\": 30,\n       \
+        \     \"cacheHitRatio\": 0.95\n          }\n        }\n      },\n      \"\
+        redis\": {\n        \"operational\": true,\n        \"latency\": 15,\n   \
+        \     \"metrics\": {\n          \"memory\": {\n            \"used\": \"1.2gb\"\
+        ,\n            \"fragmentationRatio\": 1.3\n          },\n          \"performance\"\
+        : {\n            \"opsPerSecond\": 1500\n          }\n        }\n      }\n\
+        \    },\n    \"overall\": true\n  },\n  \"meta\": {\n    \"took\": 223\n \
+        \ }\n}\n\n ```"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/sessions:
+    post:
+      tags:
+      - Cortex > Session Management
+      summary: Create Session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  type: string
+                  description: Client identifier
+                userId:
+                  type: string
+                  description: User identifier
+                metadata:
+                  type: object
+                  description: Additional session metadata
+              required:
+              - clientId
+              example:
+                clientId: client-123
+                userId: user-456
+                metadata:
+                  deviceType: mobile
+                  platform: ios
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      sessionId:
+                        type: string
+                      created:
+                        type: string
+                        format: date-time
+                      metadata:
+                        type: object
+    get:
+      tags:
+      - Cortex > Session Management
+      summary: Get Session
+      parameters:
+      - name: id
+        in: query
+        schema:
+          type: string
+        example: '{{session}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/sessions/{session}/analytics:
+    get:
+      tags:
+      - Cortex > Session Management
+      summary: Get Session Analytics
+      parameters:
+      - name: session
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/indices:
+    post:
+      tags:
+      - Cortex > Index Management
+      summary: Create Index
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: '{{test_index_name}}'
+                settings:
+                  number_of_shards: 1
+                  number_of_replicas: 1
+                  analysis:
+                    analyzer:
+                      default:
+                        type: standard
+                        stopwords: _english_
+                mappings:
+                  properties:
+                    title:
+                      type: text
+                      analyzer: standard
+                      fields:
+                        keyword:
+                          type: keyword
+                          ignore_above: 256
+                    content:
+                      type: text
+                      analyzer: standard
+                      fields:
+                        keyword:
+                          type: keyword
+                          ignore_above: 256
+                    abstract:
+                      type: text
+                      analyzer: standard
+                      fields:
+                        keyword:
+                          type: keyword
+                          ignore_above: 256
+                    embeddings:
+                      type: dense_vector
+                      dims: 3072
+                      index: true
+                      similarity: cosine
+                      index_options:
+                        type: hnsw
+                        m: 16
+                        ef_construction: 100
+                    authors:
+                      type: keyword
+                    tags:
+                      type: keyword
+                    source:
+                      type: keyword
+                    processing_status:
+                      type: keyword
+                    metadata:
+                      type: object
+                      enabled: true
+                    evaluation_score:
+                      properties:
+                        relevance:
+                          type: float
+                        credibility:
+                          type: float
+                        clarity:
+                          type: float
+                        actionability:
+                          type: float
+                        aggregate:
+                          type: float
+                    created_at:
+                      type: date
+                    updated_at:
+                      type: date
+                    vectorized_at:
+                      type: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/test/indices:
+    get:
+      tags:
+      - Cortex > Index Management
+      summary: Get Indices
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/documents:
+    post:
+      tags:
+      - Cortex > Document Operations
+      summary: Create Document
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: string
+                  description: The index name to store the document
+                document:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: Document title
+                    content:
+                      type: string
+                      description: Main document content
+                    abstract:
+                      type: string
+                      description: Document abstract or summary
+                    authors:
+                      type: array
+                      items:
+                        type: string
+                      description: List of document authors
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                      description: List of document tags
+                    source:
+                      type: string
+                      description: Document source identifier
+              required:
+              - index
+              - document
+              example:
+                index: research-papers
+                document:
+                  title: Example Research Paper
+                  content: This is the main content of the research paper...
+                  abstract: A brief summary of the research paper...
+                  authors:
+                  - John Doe
+                  - Jane Smith
+                  tags:
+                  - AI
+                  - Machine Learning
+                  source: arXiv
+      responses:
+        '201':
+          description: Document created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      index:
+                        type: string
+                      vectorized:
+                        type: boolean
+  /cortex/documents/{id}/vectorize:
+    post:
+      tags:
+      - Cortex > Document Operations
+      summary: Vectorize Document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The document identifier
+      responses:
+        '200':
+          description: Document vectorization initiated successfully
+  /cortex/documents/{test_doc_id}:
+    get:
+      tags:
+      - Cortex > Document Operations
+      summary: Get Document
+      parameters:
+      - name: index
+        in: query
+        schema:
+          type: string
+        example: '{{test_index_id}}'
+      - name: test_doc_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+      - Cortex > Document Operations
+      summary: Update Document
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\n    \"title\": \"{{updated_test_doc_title}}\",\n    \"\
+                abstract\": \"{{updated_test_doc_abstract}}\",\n    \"authors\": {{updated_test_doc_authors}},\n\
+                \    \"metadata\": {\"updated\": true},\n    \"tags\": {{updated_test_doc_tags}},\n\
+                \    \"source\": \"{{updated_test_doc_source}}\"\n}"
+      parameters:
+      - name: index
+        in: query
+        schema:
+          type: string
+        example: '{{test_index_id}}'
+      - name: test_doc_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/documents/verify:
+    get:
+      tags:
+      - Cortex > Document Operations
+      summary: Verify Document
+      parameters:
+      - name: index
+        in: query
+        schema:
+          type: string
+        example: '{{test_index_id}}'
+      - name: id
+        in: query
+        schema:
+          type: string
+        example: '{{test_doc_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/search:
+    post:
+      tags:
+      - Cortex > Search Operations
+      summary: Hybrid Search
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n    \"index\": \"{{test_index_name}}\",\n    \"searchType\":
+                \"hybrid\",\n    \"textQuery\": {\n        \"query\": \"{{search_query}}\",\n        \"fields\":
+                [\"title\", \"content\"],\n        \"operator\": \"AND\"\n    },\n    \"vectorQuery\":
+                {\n        \"vector\": [{{test_doc_embeddings}}],\n        \"field\":
+                \"embeddings\",\n        \"k\": 2\n    },\n    \"boost\": {\n        \"text\":
+                0.4,\n        \"vector\": 0.2\n    },\n    \"from\": 0,\n    \"size\":
+                10\n}"'
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/ab-test/create:
+    post:
+      tags:
+      - Cortex > A/B Testing
+      summary: Create A/B Test
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\n    \"name\": \"{{variate_test_name}}\",\n    \"description\"\
+                : \"{{variate_test_description}}\",\n    \"variants\": [\n       \
+                \ {\n            \"id\": \"{{variate_test_id}}\",\n            \"\
+                name\": \"Control Group\",\n            \"allocation\": {{variate_test_allocation}},\n\
+                \            \"weights\": {\n                \"title\": {{variate_test_weights_title}},\n\
+                \                \"content\": {{variate_test_weights_content}}\n \
+                \           }\n        },\n        {\n            \"id\": \"variant_a\"\
+                ,\n            \"name\": \"{{variate_a}}\",\n            \"allocation\"\
+                : {{variate_test_allocation}},\n            \"weights\": {\n     \
+                \           \"title\": {{variate_test_weights_title}},\n         \
+                \       \"content\": {{variate_test_weights_content}}\n          \
+                \  }\n        }\n    ]\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/ab-test/assign:
+    post:
+      tags:
+      - Cortex > A/B Testing
+      summary: Assign to A/B Test
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                sessionId: '{{session}}'
+                testName: '{{variate_test_name}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/analytics/search:
+    post:
+      tags:
+      - Cortex > Analytics
+      summary: Log Search Analytics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: The search query
+                searchType:
+                  type: string
+                  enum:
+                  - text
+                  - vector
+                  - hybrid
+                  description: Type of search performed
+                totalHits:
+                  type: integer
+                  description: Total number of search results
+                took:
+                  type: integer
+                  description: Time taken to perform the search in milliseconds
+                sessionId:
+                  type: string
+                  description: Session identifier
+                facets:
+                  type: object
+                  properties:
+                    authors:
+                      type: array
+                      items:
+                        type: string
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    yearPublished:
+                      type: object
+                      properties:
+                        min:
+                          type: integer
+                        max:
+                          type: integer
+                    source:
+                      type: array
+                      items:
+                        type: string
+                    selectedFilters:
+                      type: object
+                      properties:
+                        contentType:
+                          type: string
+                        language:
+                          type: string
+                        hasCode:
+                          type: boolean
+              required:
+              - query
+              - searchType
+              - sessionId
+              example:
+                query: machine learning optimization
+                searchType: hybrid
+                totalHits: 150
+                took: 234
+                sessionId: sess_abc123
+                facets:
+                  authors:
+                  - John Smith
+                  - Jane Doe
+                  tags:
+                  - AI
+                  - ML
+                  yearPublished:
+                    min: 2020
+                    max: 2024
+                  source:
+                  - arXiv
+                  - IEEE
+                  selectedFilters:
+                    contentType: research-paper
+                    language: en
+                    hasCode: true
+      responses:
+        '201':
+          description: Search analytics logged successfully
+  /cortex/analytics/reports:
+    get:
+      tags:
+      - Cortex > Analytics
+      summary: Get Analytics Report
+      parameters:
+      - name: timeWindow
+        in: query
+        schema:
+          type: string
+        example: '{{time_window}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/feedback:
+    post:
+      tags:
+      - Cortex > Feedback
+      summary: Record Search Feedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  description: Session identifier
+                feedback:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      queryId:
+                        type: string
+                        description: Query identifier
+                      rating:
+                        type: number
+                        minimum: 0
+                        maximum: 1
+                        description: Feedback rating between 0 and 1
+                      metadata:
+                        type: object
+                        properties:
+                          userAction:
+                            type: string
+                            enum:
+                            - click
+                            - bookmark
+                            - share
+                            - download
+                          timestamp:
+                            type: string
+                            format: date-time
+                          resultId:
+                            type: string
+                          queryHash:
+                            type: string
+                          engagementType:
+                            type: string
+                          customMetadata:
+                            type: object
+                            properties:
+                              searchType:
+                                type: string
+                              position:
+                                type: integer
+                              timeToClick:
+                                type: integer
+                              deviceType:
+                                type: string
+                              viewport:
+                                type: object
+                                properties:
+                                  width:
+                                    type: integer
+                                  height:
+                                    type: integer
+                              scrollDepth:
+                                type: number
+                              dwellTime:
+                                type: integer
+                              category:
+                                type: string
+                              language:
+                                type: string
+              required:
+              - sessionId
+              - feedback
+              example:
+                sessionId: sess_abc123
+                feedback:
+                - queryId: q_xyz789
+                  rating: 0.8
+                  metadata:
+                    userAction: click
+                    timestamp: '2024-03-25T10:30:00Z'
+                    resultId: res_456def
+                    queryHash: hash123
+                    engagementType: direct
+                    customMetadata:
+                      searchType: hybrid
+                      position: 3
+                      timeToClick: 2500
+                      deviceType: desktop
+                      viewport:
+                        width: 1920
+                        height: 1080
+                      scrollDepth: 0.75
+                      dwellTime: 45000
+                      category: documentation
+                      language: en
+      responses:
+        '201':
+          description: Feedback recorded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      feedbackId:
+                        type: string
+                      processed:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+    get:
+      tags:
+      - Cortex > Feedback
+      summary: Get Feedback Requests
+      parameters:
+      - name: timeframe
+        in: query
+        schema:
+          type: string
+          enum:
+          - 1h
+          - 24h
+          - 7d
+          - 30d
+        description: Time window for feedback retrieval
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          default: 100
+        description: Maximum number of feedback items to return
+      responses:
+        '200':
+          description: Feedback requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        feedbackId:
+                          type: string
+                        sessionId:
+                          type: string
+                        queryId:
+                          type: string
+                        rating:
+                          type: number
+                        metadata:
+                          type: object
+  /cortex/metrics:
+    get:
+      tags:
+      - Cortex > Metrics
+      summary: Get Metrics
+      parameters:
+      - name: Accept
+        in: header
+        schema:
+          type: string
+        example: text/plain
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/health:
+    get:
+      tags:
+      - Nous > Health
+      summary: Check Health
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/ab-testing/experiments:
+    post:
+      tags:
+      - Nous > A/B Testing
+      summary: Create Experiment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Experiment name
+                description:
+                  type: string
+                  description: Experiment description
+                startDate:
+                  type: string
+                  format: date-time
+                  description: Experiment start date
+                endDate:
+                  type: string
+                  format: date-time
+                  description: Experiment end date
+                configuration:
+                  type: object
+                  properties:
+                    variants:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          weight:
+                            type: number
+                          config:
+                            type: object
+                    trafficAllocation:
+                      type: number
+                    targetMetrics:
+                      type: array
+                      items:
+                        type: string
+              required:
+              - name
+              - configuration
+              example:
+                name: search-ranking-test
+                description: Testing new search ranking algorithm
+                startDate: '2024-03-25T00:00:00Z'
+                endDate: '2024-04-25T00:00:00Z'
+                configuration:
+                  variants:
+                  - id: control
+                    name: Control Group
+                    weight: 0.5
+                    config:
+                      layout: standard
+                      resultsPerPage: 10
+                      showThumbnails: true
+                  - id: variant_a
+                    name: Test Variant
+                    weight: 0.5
+                    config:
+                      layout: enhanced
+                      resultsPerPage: 15
+                      showThumbnails: true
+                  trafficAllocation: 0.2
+                  targetMetrics:
+                  - click_through_rate
+                  - conversion_rate
+      responses:
+        '201':
+          description: Experiment created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      experimentId:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                        - created
+                        - active
+                        - paused
+                        - completed
+                      variants:
+                        type: array
+                        items:
+                          type: object
+  /nous/ab-testing/experiments/activate:
+    post:
+      tags:
+      - Nous > A/B Testing
+      summary: Activate Experiment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                experimentId: '{{testId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/ab-testing/results:
+    post:
+      tags:
+      - Nous > A/B Testing
+      summary: Submit Results
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                testId: '{{testId}}'
+                variantId: control
+                metrics:
+                  click_through_rate: 0.15
+                  time_on_page: 45.2
+                  conversion_rate: 0.08
+                  bounce_rate: 0.25
+                sessionId: sess_123456
+                metadata:
+                  userAgent: Mozilla/5.0
+                  deviceType: desktop
+                  region: US-West
+                  timestamp: '2024-03-20T10:30:00Z'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/ab-testing/experiments/:
+    get:
+      tags:
+      - Nous > A/B Testing
+      summary: Get Experiments
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/ab-testing/experiments/deactivate:
+    post:
+      tags:
+      - Nous > A/B Testing
+      summary: Deactivate Experiment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                experimentId: '{{testId}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/adapt/rules:
+    post:
+      tags:
+      - Nous > Adaptation
+      summary: Create Rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"rules\": [\r\n    {\r\n      \"name\": \"{{rules_0_name}}\"\
+                ,\r\n      \"description\": \"{{rules_0_description}}\",\r\n     \
+                \ \"type\": \"{{rules_0_type}}\",\r\n      \"conditions\": {\r\n \
+                \       \"metric\": \"{{rules_0_conditions_metric}}\",\r\n       \
+                \ \"threshold\": {{rules_0_conditions_threshold}},\r\n        \"operator\"\
+                : \"{{rules_0_conditions_operator}}\",\r\n        \"windowSize\":\
+                \ \"{{rules_0_conditions_windowSize}}\"\r\n      },\r\n      \"actions\"\
+                : {\r\n        \"type\": \"{{rules_0_actions_type}}\",\r\n       \
+                \ \"parameters\": {\r\n          \"cache_ttl\": {{rules_0_actions_parameters_cache_ttl}},\r\
+                \n          \"max_results\": {{rules_0_actions_parameters_max_results}},\r\
+                \n          \"use_fallback\": {{rules_0_actions_parameters_use_fallback}}\r\
+                \n        }\r\n      },\r\n      \"priority\": \"{{rules_0_priority}}\"\
+                ,\r\n      \"enabled\": {{rules_0_enabled}}\r\n    },\r\n    {\r\n\
+                \      \"name\": \"{{rules_1_name}}\",\r\n      \"description\": \"\
+                {{rules_1_description}}\",\r\n      \"type\": \"{{rules_1_type}}\"\
+                ,\r\n      \"conditions\": {\r\n        \"metric\": \"{{rules_1_conditions_metric}}\"\
+                ,\r\n        \"threshold\": {{rules_1_conditions_threshold}},\r\n\
+                \        \"operator\": \"{{rules_1_conditions_operator}}\",\r\n  \
+                \      \"consecutive_periods\": {{rules_1_conditions_consecutive_periods}}\r\
+                \n      },\r\n      \"actions\": {\r\n        \"type\": \"{{rules_1_actions_type}}\"\
+                ,\r\n        \"parameters\": {\r\n          \"boost_recent\": {{rules_1_actions_parameters_boost_recent}},\r\
+                \n          \"diversity_weight\": {{rules_1_actions_parameters_diversity_weight}},\r\
+                \n          \"relevance_threshold\": {{rules_1_actions_parameters_relevance_threshold}}\r\
+                \n        }\r\n      },\r\n      \"priority\": \"{{rules_1_priority}}\"\
+                ,\r\n      \"enabled\": {{rules_1_enabled}}\r\n    }\r\n  ]\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+      - Nous > Adaptation
+      summary: Get Rules
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/adapt/suggest:
+    post:
+      tags:
+      - Nous > Adaptation
+      summary: Suggest New Rule
+      description: "Generated from cURL: curl -X POST http://localhost:3000/api/adapt/suggest\
+        \ \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"queryHash\"\
+        : \"hash_of_search_query\",\r\n    \"patterns\": {\r\n      \"positivePatterns\"\
+        : [\"good_result_pattern\"],\r\n      \"negativePatterns\": [\"bad_result_pattern\"\
+        ],\r\n      \"neutralPatterns\": [\"neutral_pattern\"]\r\n    },\r\n    \"\
+        confidence\": 0.85\r\n  }'"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"queryHash\": \"{{query_hash}}\",\r\n  \"patterns\"\
+                : {\r\n    \"averageRelevance\": {{query_patterns_averageRelevance}},\r\
+                \n    \"clickThroughRate\": {{query_patterns_clickThroughRate}},\r\
+                \n    \"conversionRate\": {{query_patterns_conversionRate}},\r\n \
+                \   \"requiresOptimization\": {{query_patterns_requiresOptimization}},\r\
+                \n    \"confidence\": {{query_patterns_confidence}}\r\n  },\r\n  \"\
+                confidence\": {{query_confidence}}\r\n}"
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/adapt/apply:
+    post:
+      tags:
+      - Nous > Adaptation
+      summary: Apply Rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"ruleIds\": [\r\n    \"{{ruleId}}\"\r\n  ],\r\n  \"\
+                context\": {\r\n    \"environment\": \"{{monitoring_context_environment}}\"\
+                ,\r\n    \"service\": \"{{monitoring_context_service}}\",\r\n    \"\
+                region\": \"{{monitoring_context_region}}\",\r\n    \"currentLoad\"\
+                : {{monitoring_context_currentLoad}},\r\n    \"userCount\": {{monitoring_context_userCount}},\r\
+                \n    \"resourceUtilization\": {\r\n      \"cpu\": {{monitoring_context_resourceUtilization_cpu}},\r\
+                \n      \"memory\": {{monitoring_context_resourceUtilization_memory}},\r\
+                \n      \"disk\": {{monitoring_context_resourceUtilization_disk}}\r\
+                \n    },\r\n    \"timeOfDay\": \"{{monitoring_context_timeOfDay}}\"\
+                \r\n  },\r\n  \"metrics\": {\r\n    \"response_time_ms\": {{monitoring_metrics_response_time_ms}},\r\
+                \n    \"error_rate\": {{monitoring_metrics_error_rate}},\r\n    \"\
+                success_rate\": {{monitoring_metrics_success_rate}},\r\n    \"cache_hit_ratio\"\
+                : {{monitoring_metrics_cache_hit_ratio}},\r\n    \"query_complexity\"\
+                : {{monitoring_metrics_query_complexity}},\r\n    \"concurrent_requests\"\
+                : {{monitoring_metrics_concurrent_requests}}\r\n  }\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/learn/models:
+    post:
+      tags:
+      - Nous > Learning > Models
+      summary: Create Model
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Model name
+                type:
+                  type: string
+                  enum:
+                  - ranking
+                  - classification
+                  - regression
+                  description: Type of model
+                hyperparameters:
+                  type: object
+                  properties:
+                    learning_rate:
+                      type: number
+                      description: Learning rate for model training
+                    batch_size:
+                      type: integer
+                      description: Batch size for training
+                    epochs:
+                      type: integer
+                      description: Number of training epochs
+                    optimizer:
+                      type: string
+                      enum:
+                      - adam
+                      - sgd
+                      - rmsprop
+                    hidden_layers:
+                      type: array
+                      items:
+                        type: integer
+                    dropout_rate:
+                      type: number
+                trainingParams:
+                  type: object
+                  properties:
+                    validation_split:
+                      type: number
+                    early_stopping:
+                      type: object
+                      properties:
+                        patience:
+                          type: integer
+                        min_delta:
+                          type: number
+                    class_weights:
+                      type: object
+                      additionalProperties:
+                        type: number
+              required:
+              - name
+              - type
+              - hyperparameters
+              example:
+                name: search-ranking-model-v1
+                type: ranking
+                hyperparameters:
+                  learning_rate: 0.001
+                  batch_size: 32
+                  epochs: 100
+                  optimizer: adam
+                  hidden_layers:
+                  - 128
+                  - 64
+                  - 32
+                  dropout_rate: 0.2
+                trainingParams:
+                  validation_split: 0.2
+                  early_stopping:
+                    patience: 5
+                    min_delta: 0.001
+                  class_weights:
+                    '0': 1.0
+                    '1': 2.0
+      responses:
+        '201':
+          description: Model created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      modelId:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                        - created
+                        - training
+                        - ready
+                        - failed
+                      config:
+                        type: object
+  /nous/learn/models/{modelId}:
+    get:
+      tags:
+      - Nous > Learning > Models
+      summary: Get Model by ID
+      parameters:
+      - name: modelId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The model identifier
+      responses:
+        '200':
+          description: Model retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      modelId:
+                        type: string
+                      name:
+                        type: string
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      metrics:
+                        type: object
+                      lastUpdated:
+                        type: string
+                        format: date-time
+  /nous/learn/models/sync:
+    post:
+      tags:
+      - Nous > Learning > Models
+      summary: Sync Model State
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"modelId\": \"{{modelId}}\",\r\n  \"state\": {\r\n\
+                \    \"weights\": {{modelstate_weights}},\r\n    \"bias\": {{modelstate_bias}},\r\
+                \n    \"scaler\": {\r\n      \"mean\": {{modelstate_scaler_mean}},\r\
+                \n      \"std\": {{modelstate_scaler_std}}\r\n    },\r\n    \"featureNames\"\
+                : {{modelstate_featureNames}},\r\n    \"metrics\": {\r\n      \"accuracy\"\
+                : {{modelstate_metrics_accuracy}},\r\n      \"precision\": {{modelstate_metrics_precision}},\r\
+                \n      \"recall\": {{modelstate_metrics_recall}},\r\n      \"f1Score\"\
+                : {{modelstate_metrics_f1Score}},\r\n      \"latencyMs\": {{modelstate_metrics_latencyMs}},\r\
+                \n      \"loss\": {{modelstate_metrics_loss}},\r\n      \"validationAccuracy\"\
+                : {{modelstate_metrics_validationAccuracy}}\r\n    },\r\n    \"hyperparameters\"\
+                : {\r\n      \"learning_rate\": {{modelstate_hyperparameters_learning_rate}},\r\
+                \n      \"batch_size\": {{modelstate_hyperparameters_batch_size}},\r\
+                \n      \"epochs\": {{modelstate_hyperparameters_epochs}}\r\n    },\r\
+                \n    \"currentEpoch\": {{modelstate_currentEpoch}},\r\n    \"trainingProgress\"\
+                : {{modelstate_trainingProgress}},\r\n    \"lastTrainingError\": \"\
+                {{modelstate_lastTrainingError}}\"\r\n  }\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/learn/search-patterns:
+    post:
+      tags:
+      - Nous > Learning > Search Patterns
+      summary: Search Patterns
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"patterns\": [\r\n    {\r\n      \"query\": \"{{pattern_query}}\"\
+                ,\r\n      \"timestamp\": \"{{pattern_timestamp}}\",\r\n      \"metadata\"\
+                : {\r\n        \"relevantHits\": {{pattern_metadata_relevantHits}},\r\
+                \n        \"totalHits\": {{pattern_metadata_totalHits}},\r\n     \
+                \   \"took\": {{pattern_metadata_took}},\r\n        \"adaptationRulesApplied\"\
+                : {{pattern_metadata_adaptationRulesApplied}},\r\n        \"searchType\"\
+                : \"{{pattern_metadata_searchType}}\",\r\n        \"facetsUsed\":\
+                \ {{pattern_metadata_facetsUsed}}\r\n      }\r\n    }\r\n  ]\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+      - Nous > Learning > Search Patterns
+      summary: Search Patterns
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/learn/feedback:
+    post:
+      tags:
+      - Nous > Learning > Feedback
+      summary: Submit Feedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"feedback\": [\r\n    {\r\n      \"queryId\": \"{{queryId}}\"\
+                ,\r\n      \"rating\": {{rating}},\r\n      \"metadata\": {\r\n  \
+                \      \"userAction\": \"{{userAction}}\",\r\n        \"resultId\"\
+                : \"{{resultId}}\",\r\n        \"queryHash\": \"{{queryHash}}\",\r\
+                \n        \"timestamp\": \"{{timestamp}}\",\r\n        \"customMetadata\"\
+                : {{customMetadata}}\r\n      }\r\n    }\r\n  ]\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+      - Nous > Learning > Feedback
+      summary: Get Recent Feedback
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/learn/feedback/patterns:
+    get:
+      tags:
+      - Nous > Learning > Feedback
+      summary: Get Feedback Pattern Analysis
+      parameters:
+      - name: timeframe
+        in: query
+        schema:
+          type: string
+        example: 7d
+      - name: limit
+        in: query
+        schema:
+          type: integer
+        example: '50'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/learn/metrics/:
+    get:
+      tags:
+      - Nous > Learning > Metrics and Events
+      summary: Get Learning Metrics
+      parameters:
+      - name: metrics
+        in: query
+        schema:
+          type: string
+        example: FEEDBACK_SCORE
+      - name: timeframe
+        in: query
+        schema:
+          type: string
+        example: 7d
+      - name: interval
+        in: query
+        schema:
+          type: string
+        example: 1h
+      - name: include_metadata
+        in: query
+        schema:
+          type: boolean
+        example: 'true'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/learn/events:
+    get:
+      tags:
+      - Nous > Learning > Metrics and Events
+      summary: Get Learning Events
+      parameters:
+      - name: type
+        in: query
+        schema:
+          type: string
+        example: SEARCH_PATTERN
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/signals:
+    post:
+      tags:
+      - Nous > Signals
+      summary: Create Signal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - SEARCH
+                  - CLICK
+                  - FEEDBACK
+                  - SYSTEM
+                  description: Type of signal
+                source:
+                  type: string
+                  enum:
+                  - web
+                  - api
+                  - mobile
+                  - system
+                  description: Source of the signal
+                value:
+                  type: object
+                  properties:
+                    sessionId:
+                      type: string
+                    queryId:
+                      type: string
+                    resultId:
+                      type: string
+                    position:
+                      type: integer
+                    metadata:
+                      type: object
+                      properties:
+                        documentType:
+                          type: string
+                        timeToClick:
+                          type: number
+                        deviceType:
+                          type: string
+                        viewport:
+                          type: object
+                          properties:
+                            width:
+                              type: integer
+                            height:
+                              type: integer
+                strength:
+                  type: number
+                  minimum: 0
+                  maximum: 1
+                  description: Signal strength or confidence
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  description: Processing priority
+                metadata:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - PENDING
+                      - PROCESSING
+                      - COMPLETED
+                      - FAILED
+                    attempts:
+                      type: integer
+              required:
+              - type
+              - source
+              - value
+              example:
+                type: SEARCH
+                source: web
+                value:
+                  sessionId: sess_123abc
+                  queryId: q_789xyz
+                  resultId: res_456def
+                  position: 3
+                  metadata:
+                    documentType: product
+                    timeToClick: 2.5
+                    deviceType: mobile
+                    viewport:
+                      width: 375
+                      height: 812
+                strength: 0.8
+                priority: 1
+                metadata:
+                  status: PENDING
+                  attempts: 0
+      responses:
+        '201':
+          description: Signal created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      signalId:
+                        type: string
+                      status:
+                        type: string
+                      timestamp:
+                        type: string
+                        format: date-time
+    get:
+      tags:
+      - Nous > Signals
+      summary: Get Signals
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/signals/process:
+    post:
+      tags:
+      - Nous > Signals
+      summary: Record Signal Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n    \"signalId\": \"{{signalId}}\",\r\n    \"type\":\
+                \ \"{{processing_type}}\",\r\n    \"status\": \"{{processing_status}}\"\
+                ,\r\n    \"metadata\": {\r\n        \"processingTime\": {{processing_metadata_processingTime}},\r\
+                \n        \"processor\": \"{{processing_metadata_processor}}\",\r\n\
+                \        \"attemptCount\": {{processing_metadata_attemptCount}},\r\
+                \n        \"failureReason\": \"{{processing_metadata_failureReason}}\"\
+                ,\r\n        \"processingSteps\": [\r\n            {\r\n         \
+                \       \"step\": \"{{processing_metadata_steps_0_step}}\",\r\n  \
+                \              \"status\": \"{{processing_metadata_steps_0_status}}\"\
+                ,\r\n                \"duration\": {{processing_metadata_steps_0_duration}},\r\
+                \n                \"timestamp\": \"{{processing_metadata_steps_0_timestamp}}\"\
+                \r\n            },\r\n            {\r\n                \"step\": \"\
+                {{processing_metadata_steps_1_step}}\",\r\n                \"status\"\
+                : \"{{processing_metadata_steps_1_status}}\",\r\n                \"\
+                duration\": {{processing_metadata_steps_1_duration}},\r\n        \
+                \        \"timestamp\": \"{{processing_metadata_steps_1_timestamp}}\"\
+                \r\n            }\r\n        ],\r\n        \"performance\": {\r\n\
+                \            \"cpuUsage\": {{processing_metadata_performance_cpuUsage}},\r\
+                \n            \"memoryUsage\": {{processing_metadata_performance_memoryUsage}},\r\
+                \n            \"latency\": {{processing_metadata_performance_latency}}\r\
+                \n        },\r\n        \"context\": {\r\n            \"environment\"\
+                : \"{{processing_metadata_context_environment}}\",\r\n           \
+                \ \"version\": \"{{processing_metadata_context_version}}\",\r\n  \
+                \          \"batchId\": \"{{processing_metadata_context_batchId}}\"\
+                \r\n        }\r\n    }\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /nous/signals/observe:
+    post:
+      tags:
+      - Nous > Signals
+      summary: Observe Signals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: "{\r\n  \"source\": \"{{analytics_source}}\",\r\n  \"status\"\
+                : \"{{analytics_status}}\",\r\n  \"timeRange\": {\r\n    \"start\"\
+                : \"{{analytics_timeRange_start}}\",\r\n    \"end\": \"{{analytics_timeRange_end}}\"\
+                \r\n  },\r\n  \"filters\": {\r\n    \"metadata\": {\r\n      \"environment\"\
+                : \"{{analytics_filters_metadata_environment}}\",\r\n      \"region\"\
+                : \"{{analytics_filters_metadata_region}}\",\r\n      \"clientVersion\"\
+                : \"{{analytics_filters_metadata_clientVersion}}\"\r\n    },\r\n \
+                \   \"performance\": {\r\n      \"minLatency\": {{analytics_filters_performance_minLatency}},\r\
+                \n      \"maxLatency\": {{analytics_filters_performance_maxLatency}},\r\
+                \n      \"minSuccessRate\": {{analytics_filters_performance_minSuccessRate}}\r\
+                \n    },\r\n    \"volume\": {\r\n      \"minCount\": {{analytics_filters_volume_minCount}},\r\
+                \n      \"maxCount\": {{analytics_filters_volume_maxCount}}\r\n  \
+                \  }\r\n  },\r\n  \"aggregation\": {\r\n    \"groupBy\": {{analytics_aggregation_groupBy}},\r\
+                \n    \"metrics\": {{analytics_aggregation_metrics}},\r\n    \"interval\"\
+                : \"{{analytics_aggregation_interval}}\"\r\n  }\r\n}"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+      - Nous > Signals
+      summary: Observe Signals
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /cortex/documents/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The document identifier
+      responses:
+        '200':
+          description: Document retrieved successfully
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The document identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                abstract:
+                  type: string
+                authors:
+                  type: array
+                  items:
+                    type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                source:
+                  type: string
+      responses:
+        '200':
+          description: Document updated successfully
+  /cortex/sessions/{sessionId}/analytics:
+    get:
+      parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The session identifier
+      responses:
+        '200':
+          description: Session analytics retrieved successfully
