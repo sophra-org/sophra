@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET, POST } from './route';
 import { NextRequest } from 'next/server';
-import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import logger from '@/lib/shared/logger';
+import { serviceManager } from '@lib/cortex/utils/service-manager';
+import logger from '@lib/shared/logger';
 
 // Mock dependencies
-vi.mock('@/lib/cortex/utils/service-manager', () => ({
+vi.mock('@lib/cortex/utils/service-manager', () => ({
   serviceManager: {
     getServices: vi.fn(),
   },
 }));
 
-vi.mock('@/lib/shared/logger', () => ({
+vi.mock('@lib/shared/logger', () => ({
   default: {
     error: vi.fn(),
   },

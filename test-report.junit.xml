@@ -1,77 +1,502 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="10" failures="6" errors="0" time="15.835">
-    <testsuite name="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" timestamp="2025-01-08T16:00:09.158Z" hostname="codespaces-ecc31e" tests="10" failures="6" errors="0" skipped="0" time="0.042230209">
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; Configuration &gt; should use Node.js runtime" time="0.001669384">
+<testsuites name="vitest tests" tests="83" failures="13" errors="0" time="17.936">
+    <testsuite name="src/app/api/cortex/documents/documents.route.additional.test.ts" timestamp="2025-01-08T17:31:22.588Z" hostname="codespaces-ecc31e" tests="14" failures="0" errors="0" skipped="0" time="0.088541334">
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Input Validation &gt; should handle malformed JSON" time="0.012617345">
         </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should process valid suggestion" time="0.017949119">
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Input Validation &gt; should validate required fields" time="0.006579843">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Input Validation &gt; should handle special characters in content" time="0.006968703">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Input Validation &gt; should sanitize and handle single quoted arrays" time="0.001818212">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Index Management &gt; should create index if it does not exist" time="0.005737442">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Index Management &gt; should handle index creation errors" time="0.01140331">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Index Management &gt; should handle existing index gracefully" time="0.002487019">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Document Processing &gt; should process document successfully" time="0.002759217">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Document Processing &gt; should handle document processing errors" time="0.003217421">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Document Processing &gt; should include queue stats in response" time="0.003516338">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Document Processing &gt; should handle optional embeddings field" time="0.020552786">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Error Classification &gt; should classify JSON parse errors" time="0.001725449">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Error Classification &gt; should classify mapping errors" time="0.004031189">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.additional.test.ts" name="Documents API Additional Tests &gt; Error Classification &gt; should include helpful error context" time="0.001689271">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/documents.route.test.ts" timestamp="2025-01-08T17:31:22.593Z" hostname="codespaces-ecc31e" tests="6" failures="0" errors="0" skipped="0" time="0.063564546">
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="Documents API POST Route &gt; should handle valid document creation with embeddings" time="0.037816011">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="Documents API POST Route &gt; should handle document with special characters in content" time="0.002309858">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="Documents API POST Route &gt; should create index if it does not exist" time="0.006977565">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="Documents API POST Route &gt; should handle invalid JSON input" time="0.003162988">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="Documents API POST Route &gt; should validate required fields" time="0.003122635">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="Documents API POST Route &gt; should handle service errors gracefully" time="0.00865314">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" timestamp="2025-01-08T17:31:22.596Z" hostname="codespaces-ecc31e" tests="24" failures="11" errors="0" skipped="0" time="0.082342739">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should require id parameter" time="0.018932584">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should require index parameter" time="0.002135634">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should validate update data" time="0.013637607">
             <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Stored adaptation suggestion {
-  suggestionId: &apos;mock-suggestion-id&apos;,
-  queryHash: &apos;test-hash&apos;,
-  patterns: {
-    averageRelevance: 0.8,
-    clickThroughRate: 0.6,
-    conversionRate: 0.4,
-    requiresOptimization: true,
-    confidence: 0.9
-  }
-}
+[default] Attempting document update { docId: &apos;test-id&apos;, index: &apos;test-index&apos;, fields: [] }
 
             </system-out>
-            <failure message="expected { success: true, data: { …(1) }, …(3) } to deeply equal { success: true, data: { …(1) }, …(3) }" type="AssertionError">
-AssertionError: expected { success: true, data: { …(1) }, …(3) } to deeply equal { success: true, data: { …(1) }, …(3) }
+            <system-err>
+[default] Document update failed {
+  error: TypeError: Cannot read properties of undefined (reading &apos;ok&apos;)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:159:18)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:143:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runFiles (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1262:5),
+  documentId: &apos;test-id&apos;,
+  errorDetails: &quot;Cannot read properties of undefined (reading &apos;ok&apos;)&quot;
+}
+
+            </system-err>
+            <failure message="expected 500 to be 400 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 400 // Object.is equality
 
 - Expected
 + Received
 
-  Object {
-    &quot;code&quot;: &quot;ADAPT000&quot;,
-    &quot;data&quot;: Object {
--     &quot;suggestionId&quot;: &quot;123e4567-e89b-12d3-a456-426614174000&quot;,
-+     &quot;suggestionId&quot;: &quot;mock-suggestion-id&quot;,
-    },
-    &quot;message&quot;: &quot;Rule suggestion submitted successfully&quot;,
-    &quot;metadata&quot;: ObjectContaining {
-      &quot;timestamp&quot;: Any&lt;String&gt;,
-      &quot;took&quot;: Any&lt;Number&gt;,
-    },
-    &quot;success&quot;: true,
-  }
+- 400
++ 500
 
- ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:75:20
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:146:33
             </failure>
         </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle invalid JSON" time="0.002068659">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should update document successfully" time="0.006158838">
             <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-
-            </system-out>
-        </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should validate request schema" time="0.004502949">
-            <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+[default] Attempting document update {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
 }
 
             </system-out>
             <system-err>
-[default] Invalid rule suggestion format {
-  errors: {
-    _errors: [],
-    patterns: { _errors: [], averageRelevance: [Object] }
-  }
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:170:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:170:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;test-id&apos;,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:170:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;test-id&apos;
 }
 
             </system-err>
-            <failure message="expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+            <failure message="expected 500 to be 200 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:173:33
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should format UUID-style document IDs" time="0.006410287">
+            <system-out>
+[default] Attempting document update {
+  docId: &apos;550e8400-e29b-41d4-a716-446655440000&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
+}
+
+            </system-out>
+            <system-err>
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:194:9
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:194:9
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;550e8400-e29b-41d4-a716-446655440000&apos;,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:194:9
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;550e8400-e29b-41d4-a716-446655440000&apos;
+}
+
+            </system-err>
+            <failure message="expected &quot;spy&quot; to be called with arguments: [ StringContaining{…}, Any&lt;Object&gt; ]
+
+Received: 
+
+  1st spy call:
+
+  Array [
+-   StringContaining &quot;550e8400-e29b-41d4-a716-446655440000&quot;,
+-   Any&lt;Object&gt;,
++   &quot;https://api.openai.com/v1/embeddings&quot;,
++   Object {
++     &quot;body&quot;: &quot;{\&quot;input\&quot;:\&quot;Title: Updated Title\\nAbstract: Updated abstract\\nContent: Updated content\&quot;,\&quot;model\&quot;:\&quot;text-embedding-3-large\&quot;}&quot;,
++     &quot;headers&quot;: Object {
++       &quot;Authorization&quot;: &quot;Bearer test-openai-key&quot;,
++       &quot;Content-Type&quot;: &quot;application/json&quot;,
++     },
++     &quot;method&quot;: &quot;POST&quot;,
++   },
+  ]
+
+
+Number of calls: 1
+" type="AssertionError">
+AssertionError: expected &quot;spy&quot; to be called with arguments: [ StringContaining{…}, Any&lt;Object&gt; ]
+
+Received: 
+
+  1st spy call:
+
+  Array [
+-   StringContaining &quot;550e8400-e29b-41d4-a716-446655440000&quot;,
+-   Any&lt;Object&gt;,
++   &quot;https://api.openai.com/v1/embeddings&quot;,
++   Object {
++     &quot;body&quot;: &quot;{\&quot;input\&quot;:\&quot;Title: Updated Title\\nAbstract: Updated abstract\\nContent: Updated content\&quot;,\&quot;model\&quot;:\&quot;text-embedding-3-large\&quot;}&quot;,
++     &quot;headers&quot;: Object {
++       &quot;Authorization&quot;: &quot;Bearer test-openai-key&quot;,
++       &quot;Content-Type&quot;: &quot;application/json&quot;,
++     },
++     &quot;method&quot;: &quot;POST&quot;,
++   },
+  ]
+
+
+Number of calls: 1
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:196:27
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should handle partial updates" time="0.002572498">
+            <system-out>
+[default] Attempting document update { docId: &apos;test-id&apos;, index: &apos;test-index&apos;, fields: [ &apos;title&apos; ] }
+[default] Document update result {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  result: &apos;updated&apos;,
+  updatedFields: [ &apos;title&apos; ]
+}
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle Elasticsearch errors" time="0.003854309">
+            <system-out>
+[default] Attempting document update {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
+}
+
+            </system-out>
+            <system-err>
+[default] OpenAI API error {
+  service: &apos;VectorizationService&apos;,
+  status: 404,
+  error: { error: &apos;Document not found&apos; },
+  textLength: 72
+}
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: OpenAI API error: Unknown error
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:103:3)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:245:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: OpenAI API error: Unknown error
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:103:3)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:245:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;test-id&apos;,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  error: Error: OpenAI API error: Unknown error
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:103:3)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:245:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;test-id&apos;
+}
+
+            </system-err>
+            <failure message="expected &apos;Failed to process document&apos; to be &apos;Failed to update document&apos; // Object.is equality" type="AssertionError">
+AssertionError: expected &apos;Failed to process document&apos; to be &apos;Failed to update document&apos; // Object.is equality
+
+Expected: &quot;Failed to update document&quot;
+Received: &quot;Failed to process document&quot;
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:250:28
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle network errors" time="0.002470317">
+            <system-out>
+[default] Attempting document update {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
+}
+
+            </system-out>
+            <system-err>
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: Network error
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:254:41
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:146:14
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:11
+      at runWithTimeout (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:39:7)
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:17)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: Network error
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:254:41
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:146:14
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:11
+      at runWithTimeout (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:39:7)
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:17)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;test-id&apos;,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  error: Error: Network error
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:254:41
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:146:14
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:11
+      at runWithTimeout (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:39:7)
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:17)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;test-id&apos;
+}
+
+            </system-err>
+            <failure message="expected &apos;Failed to process document&apos; to be &apos;Failed to update document&apos; // Object.is equality" type="AssertionError">
+AssertionError: expected &apos;Failed to process document&apos; to be &apos;Failed to update document&apos; // Object.is equality
+
+Expected: &quot;Failed to update document&quot;
+Received: &quot;Failed to process document&quot;
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:269:28
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should vectorize document content during update" time="0.002336187">
+            <system-out>
+[default] Attempting document update {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
+}
+
+            </system-out>
+            <system-err>
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:286:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:286:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;test-id&apos;,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:286:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;test-id&apos;
+}
+
+            </system-err>
+            <failure message="expected &quot;spy&quot; to be called with arguments: [ ObjectContaining{…} ]
 
 Received: 
 
@@ -79,7 +504,7 @@ Received:
 
 Number of calls: 0
 " type="AssertionError">
-AssertionError: expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+AssertionError: expected &quot;spy&quot; to be called with arguments: [ ObjectContaining{…} ]
 
 Received: 
 
@@ -87,167 +512,73 @@ Received:
 
 Number of calls: 0
 
- ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:152:28
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:289:53
             </failure>
         </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle database errors" time="0.00216602">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should log vectorization errors" time="0.002489864">
             <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Stored adaptation suggestion {
-  suggestionId: &apos;mock-suggestion-id&apos;,
-  queryHash: &apos;test-hash&apos;,
-  patterns: {
-    averageRelevance: 0.8,
-    clickThroughRate: 0.6,
-    conversionRate: 0.4,
-    requiresOptimization: true,
-    confidence: 0.9
-  }
-}
-
-            </system-out>
-            <failure message="expected 200 to be 500 // Object.is equality" type="AssertionError">
-AssertionError: expected 200 to be 500 // Object.is equality
-
-- Expected
-+ Received
-
-- 500
-+ 200
-
- ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:171:31
-            </failure>
-        </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle empty database response" time="0.002145201">
-            <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Stored adaptation suggestion {
-  suggestionId: &apos;mock-suggestion-id&apos;,
-  queryHash: &apos;test-hash&apos;,
-  patterns: {
-    averageRelevance: 0.8,
-    clickThroughRate: 0.6,
-    conversionRate: 0.4,
-    requiresOptimization: true,
-    confidence: 0.9
-  }
-}
-
-            </system-out>
-            <failure message="expected 200 to be 500 // Object.is equality" type="AssertionError">
-AssertionError: expected 200 to be 500 // Object.is equality
-
-- Expected
-+ Received
-
-- 500
-+ 200
-
- ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:201:31
-            </failure>
-        </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle unknown errors" time="0.002205835">
-            <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Stored adaptation suggestion {
-  suggestionId: &apos;mock-suggestion-id&apos;,
-  queryHash: &apos;test-hash&apos;,
-  patterns: {
-    averageRelevance: 0.8,
-    clickThroughRate: 0.6,
-    conversionRate: 0.4,
-    requiresOptimization: true,
-    confidence: 0.9
-  }
-}
-
-            </system-out>
-            <failure message="expected 200 to be 500 // Object.is equality" type="AssertionError">
-AssertionError: expected 200 to be 500 // Object.is equality
-
-- Expected
-+ Received
-
-- 500
-+ 200
-
- ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:228:31
-            </failure>
-        </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should validate pattern values" time="0.004764547">
-            <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+[default] Attempting document update {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
 }
 
             </system-out>
             <system-err>
-[default] Invalid rule suggestion format {
-  errors: {
-    _errors: [],
-    patterns: { _errors: [], averageRelevance: [Object] }
-  }
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:326:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
 }
-[default] Invalid rule suggestion format {
-  errors: {
-    _errors: [],
-    patterns: { _errors: [], clickThroughRate: [Object] }
-  }
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:326:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;test-id&apos;,
+  hasApiKey: true
 }
-[default] Invalid rule suggestion format {
-  errors: { _errors: [], patterns: { _errors: [], conversionRate: [Object] } }
-}
-[default] Invalid rule suggestion format {
-  errors: { _errors: [], patterns: { _errors: [], confidence: [Object] } }
+[default] Vectorization failed {
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:326:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;test-id&apos;
 }
 
             </system-err>
-        </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should log request details" time="0.001957982">
-            <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: {
-    &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos;,
-    &apos;x-test-header&apos;: &apos;test-value&apos;
-  }
-}
-[default] Stored adaptation suggestion {
-  suggestionId: &apos;mock-suggestion-id&apos;,
-  queryHash: &apos;test-hash&apos;,
-  patterns: {
-    averageRelevance: 0.8,
-    clickThroughRate: 0.6,
-    conversionRate: 0.4,
-    requiresOptimization: true,
-    confidence: 0.9
-  }
-}
-
-            </system-out>
-            <failure message="expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+            <failure message="expected &quot;spy&quot; to be called with arguments: [ &apos;Vectorization failed&apos;, …(1) ]
 
 Received: 
 
@@ -255,7 +586,7 @@ Received:
 
 Number of calls: 0
 " type="AssertionError">
-AssertionError: expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+AssertionError: expected &quot;spy&quot; to be called with arguments: [ &apos;Vectorization failed&apos;, …(1) ]
 
 Received: 
 
@@ -263,28 +594,240 @@ Received:
 
 Number of calls: 0
 
- ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:280:27
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:329:34
             </failure>
         </testcase>
-        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should include timing information" time="0.001562585">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle vectorization errors" time="0.001740045">
             <system-out>
-[default] Received adaptation suggestion request {
-  url: &apos;http://localhost/api/adapt/suggest&apos;,
-  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
-}
-[default] Stored adaptation suggestion {
-  suggestionId: &apos;mock-suggestion-id&apos;,
-  queryHash: &apos;test-hash&apos;,
-  patterns: {
-    averageRelevance: 0.8,
-    clickThroughRate: 0.6,
-    conversionRate: 0.4,
-    requiresOptimization: true,
-    confidence: 0.9
-  }
+[default] Attempting document update {
+  docId: &apos;test-id&apos;,
+  index: &apos;test-index&apos;,
+  fields: [
+    &apos;title&apos;,    &apos;content&apos;,
+    &apos;abstract&apos;, &apos;authors&apos;,
+    &apos;metadata&apos;, &apos;tags&apos;,
+    &apos;source&apos;
+  ]
 }
 
             </system-out>
+            <system-err>
+[default] Embedding generation failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:359:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  textLength: 72,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  service: &apos;VectorizationService&apos;,
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:359:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  docId: &apos;test-id&apos;,
+  hasApiKey: true
+}
+[default] Vectorization failed {
+  error: Error: No embedding returned from OpenAI API
+      at VectorizationService.generateEmbeddings (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:114:9)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at VectorizationService.vectorizeDocument (/workspaces/sophra/src/lib/cortex/services/vectorization.ts:165:5)
+      at Module.PUT (/workspaces/sophra/src/app/api/cortex/documents/[id]/route.ts:88:28)
+      at /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.additional.test.ts:359:26
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15),
+  documentId: &apos;test-id&apos;
+}
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Parameter Validation &gt; should require id parameter" time="0.001079023">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Parameter Validation &gt; should require index parameter" time="0.000707669">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Document Retrieval &gt; should retrieve document successfully" time="0.001168139">
+            <failure message="expected 404 to be 200 // Object.is equality" type="AssertionError">
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:417:33
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Document Retrieval &gt; should handle non-existent document" time="0.000939252">
+            <failure message="expected 404 to be 200 // Object.is equality" type="AssertionError">
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:438:33
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Document Retrieval &gt; should handle non-existent index" time="0.000812907">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Error Handling &gt; should handle Elasticsearch errors" time="0.005187456">
+            <failure message="expected 404 to be 500 // Object.is equality" type="AssertionError">
+AssertionError: expected 404 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 404
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:474:33
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; GET Endpoint &gt; Error Handling &gt; should handle network errors" time="0.001137492">
+            <failure message="expected 404 to be 500 // Object.is equality" type="AssertionError">
+AssertionError: expected 404 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 404
+
+ ❯ src/app/api/cortex/documents/[id]/id.route.additional.test.ts:489:33
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; DELETE Endpoint &gt; Parameter Validation &gt; should require id parameter" time="0.000840538">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; DELETE Endpoint &gt; Parameter Validation &gt; should require index parameter" time="0.000660612">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; DELETE Endpoint &gt; Document Deletion &gt; should delete document successfully" time="0.001091166">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; DELETE Endpoint &gt; Document Deletion &gt; should handle non-existent document gracefully" time="0.001543759">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; DELETE Endpoint &gt; Error Handling &gt; should handle Elasticsearch errors" time="0.000937949">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; DELETE Endpoint &gt; Error Handling &gt; should handle network errors" time="0.00086285">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/[id]/id.route.test.ts" timestamp="2025-01-08T17:31:22.620Z" hostname="codespaces-ecc31e" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.test.ts" name="src/app/api/cortex/documents/[id]/id.route.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" timestamp="2025-01-08T17:31:22.621Z" hostname="codespaces-ecc31e" tests="12" failures="0" errors="0" skipped="0" time="0.058010665">
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Input Validation &gt; should validate request schema" time="0.012729403">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Input Validation &gt; should validate document schema" time="0.002400819">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Input Validation &gt; should handle optional tableName" time="0.005272296">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Input Validation &gt; should use provided tableName when available" time="0.001417424">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Batch Processing &gt; should process documents in batches" time="0.021142406">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Batch Processing &gt; should generate unique IDs for each document" time="0.001987327">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Batch Processing &gt; should add timestamps to documents" time="0.001876039">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Error Handling &gt; should handle service initialization errors" time="0.002996329">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Error Handling &gt; should handle document processing errors" time="0.001832067">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Error Handling &gt; should handle invalid JSON" time="0.001487845">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Response Formatting &gt; should format successful response" time="0.001821117">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.additional.test.ts" name="Bulk Documents API Additional Tests &gt; Response Formatting &gt; should handle empty document array" time="0.001159432">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/bulk/bulk.route.test.ts" timestamp="2025-01-08T17:31:22.625Z" hostname="codespaces-ecc31e" tests="4" failures="0" errors="0" skipped="0" time="0.055974184">
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.test.ts" name="POST /api/cortex/documents/bulk &gt; should successfully process bulk documents with default tableName" time="0.017642799">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.test.ts" name="POST /api/cortex/documents/bulk &gt; should handle batch processing for large document sets" time="0.032922559">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.test.ts" name="POST /api/cortex/documents/bulk &gt; should reject invalid document schema" time="0.002251329">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.test.ts" name="POST /api/cortex/documents/bulk &gt; should handle sync service errors" time="0.001804135">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" timestamp="2025-01-08T17:31:22.627Z" hostname="codespaces-ecc31e" tests="15" failures="0" errors="0" skipped="0" time="0.033893028">
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Parameter Validation &gt; should require index parameter" time="0.009140679">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Parameter Validation &gt; should require id parameter" time="0.001836846">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Parameter Validation &gt; should validate both parameters are present" time="0.002362178">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Index Verification &gt; should verify index exists in Prisma" time="0.003568743">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Index Verification &gt; should handle non-existent index in Prisma" time="0.001027697">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Index Verification &gt; should check index existence in Elasticsearch" time="0.000946064">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Index Verification &gt; should handle non-existent index in Elasticsearch" time="0.000948128">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Document Verification &gt; should verify document exists" time="0.00108821">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Document Verification &gt; should handle non-existent document" time="0.001821848">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Document Verification &gt; should use correct Elasticsearch URL and authentication" time="0.002292045">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Error Handling &gt; should handle Prisma errors" time="0.001629539">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Error Handling &gt; should handle Elasticsearch errors" time="0.001071208">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Error Handling &gt; should handle fetch errors" time="0.001272744">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Response Formatting &gt; should include all required fields in success response" time="0.00112082">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.additional.test.ts" name="Document Verify API Additional Tests &gt; Response Formatting &gt; should format error responses consistently" time="0.001641051">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/verify/verify.route.test.ts" timestamp="2025-01-08T17:31:22.632Z" hostname="codespaces-ecc31e" tests="6" failures="0" errors="0" skipped="0" time="0.052440774">
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="Document Verification API Route &gt; should return 400 when index parameter is missing" time="0.030821202">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="Document Verification API Route &gt; should return 400 when id parameter is missing" time="0.004856866">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="Document Verification API Route &gt; should return 404 when index is not found in database" time="0.001449483">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="Document Verification API Route &gt; should return document verification details when document exists" time="0.006193422">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="Document Verification API Route &gt; should handle non-existent document gracefully" time="0.001522681">
+        </testcase>
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="Document Verification API Route &gt; should handle elasticsearch service errors" time="0.005613791">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" timestamp="2025-01-08T17:31:22.634Z" hostname="codespaces-ecc31e" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in /workspaces/sophra/src/app/api/cortex/documents/[id]/id.route.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
         </testcase>
     </testsuite>
 </testsuites>

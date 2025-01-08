@@ -40,10 +40,14 @@ export async function PUT(
 
     const validationResult = UpdateDocumentSchema.safeParse(body);
     if (!validationResult.success) {
+      logger.error("Validation error", {
+        error: validationResult.error.format(),
+        documentId: params.id
+      });
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid update data",
+          error: "Validation error",
           details: validationResult.error.format(),
         },
         { status: 400 }
@@ -60,6 +64,58 @@ export async function PUT(
       index,
       fields: Object.keys(updateFields),
     });
+
+    // Vectorize content if present
+    if (validationResult.data.content) {
+      try {
+        await services.vectorization.vectorizeDocument({
+          id: params.id,
+          title: validationResult.data.title || '',
+          content: validationResult.data.content,
+          abstract: validationResult.data.abstract || '',
+          authors: validationResult.data.authors || [],
+          metadata: {
+            documentId: params.id,
+            index,
+            ...validationResult.data.metadata
+          },
+          tags: validationResult.data.tags || [],
+          source: validationResult.data.source || '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          processing_status: '',
+          embeddings: [],
+          evaluationScore: {
+            actionability: 0,
+            aggregate: 0,
+            clarity: 0,
+            credibility: 0,
+            relevance: 0
+          },
+          evaluation_score: {
+            actionability: 0,
+            aggregate: 0,
+            clarity: 0,
+            credibility: 0,
+            relevance: 0
+          },
+          type: ''
+        });
+      } catch (error) {
+        logger.error("Vectorization failed", {
+          error,
+          documentId: params.id
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to process document",
+            details: error instanceof Error ? error.message : "Unknown error"
+          },
+          { status: 500 }
+        );
+      }
+    }
 
     const updateResponse = await fetch(
       `${process.env.ELASTICSEARCH_URL}/${index}/_update/${formattedDocId}`,
@@ -173,16 +229,31 @@ export async function GET(
 
     if (!response.ok) {
       if (response.status === 404) {
-        return NextResponse.json({
-          success: true,
-          data: null,
-          meta: {
-            took: Date.now() - startTime,
-            timestamp: new Date().toISOString(),
+        return NextResponse.json(
+          {
+            success: true,
+            data: null,
+            meta: {
+              took: Date.now() - startTime,
+              timestamp: new Date().toISOString(),
+            },
           },
-        });
+          { status: 200 }
+        );
       }
-      throw new Error(`Elasticsearch error: ${response.statusText}`);
+      const errorData = await response.json();
+      logger.error("Elasticsearch error", {
+        status: response.status,
+        error: errorData
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to retrieve document",
+          details: errorData
+        },
+        { status: 500 }
+      );
     }
 
     const documentData = await response.json();
