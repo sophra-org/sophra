@@ -1,11 +1,11 @@
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
 import { Prisma, ModelType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 const ModelCreateSchema = z.object({
   type: z.nativeEnum(ModelType),
@@ -31,34 +31,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
     });
 
-    if (!models) {
-      throw new Error("Failed to fetch models");
-    }
-
     logger.info("Retrieved models from database", {
-      modelCount: models.length,
+      modelCount: models?.length || 0,
       took: Date.now() - startTime,
     });
 
     return NextResponse.json({
       success: true,
-      data: models,
+      data: models || [],
       meta: {
-        total: models.length,
+        total: models?.length || 0,
         page: 1,
-        pageSize: 10
+        pageSize: 10,
+        took: Date.now() - startTime
       }
-    });
+    }, { status: 200 });
   } catch (error) {
     const latency = Date.now() - startTime;
     logger.error("Failed to fetch models", {
-      error:
-        error instanceof Error
-          ? {
-              message: error.message,
-              stack: error.stack,
-            }
-          : error,
+      error: error instanceof Error ? error : new Error(String(error)),
       took: latency,
     });
     return NextResponse.json(
@@ -66,7 +57,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         success: false,
         error: "Failed to fetch models",
         details: error instanceof Error ? error.message : "Unknown error",
-        metadata: {
+        meta: {
           took: latency,
           timestamp: new Date().toISOString(),
         },
@@ -77,6 +68,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const startTime = Date.now();
   try {
     const body = await req.json();
     const validation = ModelCreateSchema.safeParse(body);
@@ -87,6 +79,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           success: false,
           error: "Invalid request format",
           details: validation.error.format(),
+          meta: {
+            took: Date.now() - startTime
+          }
         },
         { status: 400 }
       );
@@ -94,41 +89,60 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const { type, hyperparameters, features, trainingParams } = validation.data;
 
-    const model = await prisma.modelConfig.create({
-      data: {
-        type,
-        hyperparameters: hyperparameters as Prisma.InputJsonValue,
-        features: features as string[],
-        trainingParams: trainingParams as Prisma.InputJsonValue,
-        modelVersions: {
-          create: {
-            metrics: {} as Prisma.InputJsonValue,
-            artifactPath: "",
-            parentVersion: null,
+    try {
+      const model = await prisma.modelConfig.create({
+        data: {
+          type,
+          hyperparameters: hyperparameters as Prisma.InputJsonValue,
+          features: features as string[],
+          trainingParams: trainingParams as Prisma.InputJsonValue,
+          modelVersions: {
+            create: {
+              metrics: {} as Prisma.InputJsonValue,
+              artifactPath: "",
+              parentVersion: null,
+            },
           },
         },
-      },
-      include: {
-        modelVersions: true,
-      },
-    });
+        include: {
+          modelVersions: true,
+        },
+      });
 
-    logger.info("Created new model", { modelId: model.id, type });
+      logger.info("Created new model", { modelId: model.id, type });
 
-    return NextResponse.json({
-      success: true,
-      data: model
-    });
-  } catch (error) {
-    logger.error("Failed to create model", { error });
-    if (error instanceof Error) {
+      return NextResponse.json({
+        success: true,
+        data: model,
+        meta: {
+          took: Date.now() - startTime
+        }
+      }, { status: 200 });
+    } catch (dbError) {
+      logger.error("Database error creating model", { dbError });
       return NextResponse.json(
-        { success: false, error: "Failed to create model", details: error.message },
+        {
+          success: false,
+          error: "Failed to create model",
+          details: "DB Error",
+          meta: {
+            took: Date.now() - startTime
+          }
+        },
         { status: 500 }
       );
     }
+  } catch (error) {
+    logger.error("Failed to create model", { error });
     return NextResponse.json(
-      { success: false, error: "Failed to create model" },
+      {
+        success: false,
+        error: "Failed to create model",
+        details: error instanceof Error ? error.message : "Unknown error",
+        meta: {
+          took: Date.now() - startTime
+        }
+      },
       { status: 500 }
     );
   }

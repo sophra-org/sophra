@@ -70,7 +70,25 @@ const mockPrisma = {
   $transaction: vi.fn((callback: (tx: typeof mockPrisma) => Promise<any>) => callback(mockPrisma)),
   $connect: vi.fn(),
   $disconnect: vi.fn(),
-  $queryRaw: vi.fn(),
+  $queryRaw: vi.fn().mockImplementation(() => Promise.resolve([{
+    id: 'mock-suggestion-id',
+    queryHash: 'mock-query-hash',
+    patterns: {
+      averageRelevance: 0.8,
+      clickThroughRate: 0.5,
+      conversionRate: 0.2,
+      requiresOptimization: true,
+      confidence: 0.9
+    },
+    confidence: 0.85,
+    status: 'PENDING',
+    metadata: {
+      timestamp: new Date().toISOString(),
+      source: 'API'
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }])),
   $reset: vi.fn(),
 } as unknown as jest.Mocked<PrismaClient>;
 

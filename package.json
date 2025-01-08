@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "tokenseed": "ts-node --project prisma/tsconfig.json prisma/tokenseed.ts",
-    "test": "vitest run --coverage.enabled --coverage.provider=istanbul --coverage.reporter=text --coverage.reporter=json --coverage.reporter=html --coverage.reporter=lcov --coverage.reporter=cobertura --coverage.reportsDirectory=./coverage --coverage.clean=false --coverage.cleanOnRerun=false --reporter=default --reporter=junit",
+    "test": "vitest run --coverage.enabled --coverage.provider=istanbul --coverage.reporter=json --coverage.reporter=html --coverage.reporter=lcov --coverage.reporter=cobertura --coverage.reportsDirectory=./coverage --coverage.clean=false --coverage.cleanOnRerun=false --reporter=default --reporter=junit",
     "test:watch": "vitest --coverage.enabled --coverage.clean=false --coverage.cleanOnRerun=false",
     "test:unit": "npx vitest run \"src/__tests__/unit/.*\\.test\\.[jt]sx?$\"",
     "test:integration": "npx vitest run \"src/__tests__/integration/.*\\.test\\.[jt]sx?$\"",

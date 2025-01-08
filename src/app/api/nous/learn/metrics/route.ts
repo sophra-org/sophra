@@ -1,11 +1,11 @@
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
 import { MetricType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 const VALID_TIMEFRAMES = ["1h", "24h", "7d", "30d"] as const;
 const VALID_INTERVALS = ["1h", "1d"] as const;
@@ -23,64 +23,38 @@ const VALID_METRICS = [
 ] as const;
 
 const MetricsRequestSchema = z.object({
-  metrics: z.string().refine(
-    (s) => {
-      const metrics = s.split(",").map((m) => m.toUpperCase());
-      return metrics.every((m) =>
-        VALID_METRICS.includes(m as (typeof VALID_METRICS)[number])
-      );
-    },
-    {
-      message: `Invalid metrics. Must be one of: ${VALID_METRICS.join(", ")}`,
-    }
-  ).transform((s) => s.split(",").map((m) => m.toUpperCase()) as MetricType[]),
-  timeframe: z.enum(VALID_TIMEFRAMES),
-  interval: z.enum(VALID_INTERVALS),
-  include_metadata: z
-    .string()
-    .optional()
-    .transform((s) => s === "true"),
-});
+  metrics: z.string().optional(),
+  timeframe: z.enum(VALID_TIMEFRAMES).optional(),
+  interval: z.enum(VALID_INTERVALS).optional(),
+  include_metadata: z.string().optional(),
+}).transform(data => ({
+  metrics: data.metrics?.split(",").map(m => m.toUpperCase()) as MetricType[] || VALID_METRICS,
+  timeframe: data.timeframe || "24h",
+  interval: data.interval || "1h",
+  include_metadata: data.include_metadata === "true"
+}));
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
   try {
-    logger.info("Prisma client state:", {
-      isPrismaAvailable: !!prisma,
-      hasLearningMetric: !!(prisma && prisma.learningMetric),
-    });
-
-    try {
-      logger.info("Testing DB connection...");
-      await prisma.$queryRaw`SELECT 1`;
-      logger.info("DB connection successful");
-    } catch (e) {
-      logger.error("DB connection failed:", e);
-      throw e;
-    }
-
     const { searchParams } = new URL(req.url);
-    const validation = MetricsRequestSchema.safeParse({
-      metrics: searchParams.get("metrics") || "",
-      timeframe: searchParams.get("timeframe"),
-      interval: searchParams.get("interval"),
-      include_metadata: searchParams.get("include_metadata"),
-    });
+    const validation = MetricsRequestSchema.safeParse(Object.fromEntries(searchParams));
 
     if (!validation.success) {
-      return NextResponse.json({
-        success: true,
-        data: [],
-        metadata: {
-          generated_at: new Date().toISOString(),
-          timeframe: null,
-          interval: null,
-          metrics_requested: [],
-          count: 0,
-          error: validation.error.message,
-          took: Date.now() - startTime,
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid parameters",
+          details: validation.error.format(),
+          pagination: {
+            page: 1,
+            pageSize: 10,
+            total: 0,
+            totalPages: 0,
+          }
         },
-      });
+        { status: 400 }
+      );
     }
 
     const { metrics, timeframe, interval } = validation.data;
@@ -103,55 +77,58 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         break;
     }
 
-    const results = await prisma.$queryRaw`
-      SELECT * FROM "LearningMetric" 
-      WHERE type::text = ANY(${metrics}::text[])
-      AND timestamp >= ${startDate}
-      AND timestamp <= ${now}
-      AND interval = ${interval}
-      ORDER BY timestamp ASC
-    `;
-
-    const latency = Date.now() - startTime;
-    return NextResponse.json({
-      success: true,
-      data: results || [],
-      metadata: {
-        generated_at: new Date().toISOString(),
-        timeframe,
+    const results = await prisma.learningMetric.findMany({
+      where: {
+        type: { in: metrics },
+        timestamp: {
+          gte: startDate,
+          lte: now,
+        },
         interval,
-        metrics_requested: metrics,
-        count: Array.isArray(results) ? results.length : 0,
-        took: latency,
       },
+      orderBy: { timestamp: "asc" },
+    });
+
+    const formattedResults = results.map(metric => ({
+      id: metric.id,
+      type: metric.type,
+      value: metric.value,
+      timestamp: metric.timestamp,
+      interval: metric.interval,
+      timeframe: metric.timeframe,
+      sessionId: metric.sessionId,
+      modelId: metric.modelId,
+      aggregated: metric.aggregated,
+      metadata: metric.metadata,
+      count: metric.count,
+      createdAt: metric.createdAt,
+      updatedAt: metric.updatedAt,
+    }));
+
+    return NextResponse.json({
+      metrics: formattedResults,
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: formattedResults.length,
+        totalPages: Math.ceil(formattedResults.length / 10),
+      }
     });
   } catch (error) {
-    const latency = Date.now() - startTime;
-    const { searchParams } = new URL(req.url);
-    const validation = MetricsRequestSchema.safeParse({
-      metrics: searchParams.get("metrics") || "",
-      timeframe: searchParams.get("timeframe"),
-      interval: searchParams.get("interval"),
-      include_metadata: searchParams.get("include_metadata"),
-    });
-
-    logger.error("Failed to fetch metrics", {
-      error: error instanceof Error ? error.message : String(error),
-      errorType: error instanceof Error ? error.name : typeof error,
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: [],
-      metadata: {
-        generated_at: new Date().toISOString(),
-        timeframe: validation.success ? validation.data.timeframe : null,
-        interval: validation.success ? validation.data.interval : null,
-        metrics_requested: validation.success ? validation.data.metrics : [],
-        count: 0,
-        error: error instanceof Error ? error.message : String(error),
-        took: latency,
+    logger.error("Failed to fetch metrics", { error });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to fetch metrics",
+        details: error instanceof Error ? error.message : "Unknown error",
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          total: 0,
+          totalPages: 0,
+        }
       },
-    });
+      { status: 500 }
+    );
   }
 }

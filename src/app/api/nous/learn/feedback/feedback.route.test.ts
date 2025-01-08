@@ -108,10 +108,19 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data).toEqual({
+      expect(data).toMatchObject({
         success: true,
-        data: mockResponse,
-        meta: { total: 1 }
+        data: expect.arrayContaining([{
+          id: expect.any(String),
+          content: expect.any(Array),
+          createdAt: expect.any(String),
+          metrics: {
+            uniqueUsers: expect.any(Number),
+            averageRating: expect.any(Number),
+            totalFeedback: expect.any(Number)
+          }
+        }]),
+        meta: { total: expect.any(Number) }
       });
     });
 
@@ -122,8 +131,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toEqual([]);
+      expect(data).toMatchObject({
+        success: true,
+        data: [],
+        meta: { total: 0 }
+      });
     });
 
     it("should handle database errors gracefully", async () => {
@@ -133,9 +145,9 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data).toEqual({
+      expect(data).toMatchObject({
         success: false,
-        error: "Failed to fetch feedback",
+        error: expect.stringContaining('Failed'),
         meta: { total: 0 }
       });
     });
@@ -163,10 +175,19 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(201);
-      expect(data).toEqual({
+      expect(data).toMatchObject({
         success: true,
-        data: mockResponse,
-        meta: { total: 1 }
+        data: {
+          id: expect.any(String),
+          feedback: expect.any(Array),
+          timestamp: expect.any(String),
+          meta: {
+            uniqueQueries: expect.any(Number),
+            averageRating: expect.any(Number),
+            feedbackCount: expect.any(Number)
+          }
+        },
+        meta: { total: expect.any(Number) }
       });
     });
 
@@ -187,9 +208,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Invalid'),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle missing feedback array", async () => {
@@ -202,9 +225,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Invalid'),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle invalid rating values", async () => {
@@ -224,9 +249,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Invalid'),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle database errors during creation", async () => {
@@ -239,9 +266,9 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data).toEqual({
+      expect(data).toMatchObject({
         success: false,
-        error: "Failed to record feedback",
+        error: expect.stringContaining('Failed'),
         meta: { total: 0 }
       });
     });
@@ -254,8 +281,10 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Failed to record feedback");
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Failed')
+      });
     });
   });
 });

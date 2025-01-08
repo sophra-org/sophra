@@ -1,8 +1,9 @@
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
@@ -53,7 +54,11 @@ export async function GET(): Promise<NextResponse> {
   } catch (error) {
     logger.error("Failed to fetch model states", { error });
     return NextResponse.json(
-      { success: false, error: "Failed to fetch model states" },
+      { 
+        success: false, 
+        error: "Failed to fetch model states",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }
@@ -96,7 +101,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (!model || !model.modelVersions.length) {
       logger.warn("Model not found for sync", { modelId });
       return NextResponse.json(
-        { success: false, error: "Model not found" },
+        { 
+          success: false, 
+          error: "Model not found",
+          details: "The specified model ID does not exist"
+        },
         { status: 404 }
       );
     }
@@ -120,20 +129,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           trainingProgress: state.trainingProgress || 1,
           lastTrainingError: state.lastTrainingError,
           metrics: state.metrics ? {
-                create: {
-                  modelVersionId: latestVersion.id,
-                  accuracy: (state.metrics as any).accuracy || 0,
-                  precision: (state.metrics as any).precision || 0,
-                  recall: (state.metrics as any).recall || 0,
-                  f1Score: (state.metrics as any).f1Score || 0,
-                  latencyMs: (state.metrics as any).latencyMs || 0,
-                  loss: (state.metrics as any).loss || 0,
-                  validationMetrics: state.metrics as Prisma.InputJsonValue || Prisma.JsonNull,
-                  customMetrics: Prisma.JsonNull,
-                  timestamp: new Date(),
-                },
-              }
-            : undefined,
+            create: {
+              modelVersionId: latestVersion.id,
+              accuracy: (state.metrics as any).accuracy || 0,
+              precision: (state.metrics as any).precision || 0,
+              recall: (state.metrics as any).recall || 0,
+              f1Score: (state.metrics as any).f1Score || 0,
+              latencyMs: (state.metrics as any).latencyMs || 0,
+              loss: (state.metrics as any).loss || 0,
+              validationMetrics: state.metrics as Prisma.InputJsonValue || Prisma.JsonNull,
+              customMetrics: Prisma.JsonNull,
+              timestamp: new Date(),
+            },
+          } : undefined,
         },
         update: {
           weights: state.weights,
@@ -145,23 +153,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           currentEpoch: state.currentEpoch || 0,
           trainingProgress: state.trainingProgress || 1,
           lastTrainingError: state.lastTrainingError,
-          metrics: state.metrics
-            ? {
-                deleteMany: {},
-                create: {
-                  modelVersionId: latestVersion.id,
-                  accuracy: (state.metrics as any).accuracy || 0,
-                  precision: (state.metrics as any).precision || 0,
-                  recall: (state.metrics as any).recall || 0,
-                  f1Score: (state.metrics as any).f1Score || 0,
-                  latencyMs: (state.metrics as any).latencyMs || 0,
-                  loss: (state.metrics as any).loss || 0,
-                  validationMetrics: state.metrics as Prisma.InputJsonValue,
-                  customMetrics: Prisma.JsonNull,
-                  timestamp: new Date(),
-                },
-              }
-            : undefined,
+          metrics: state.metrics ? {
+            deleteMany: {},
+            create: {
+              modelVersionId: latestVersion.id,
+              accuracy: (state.metrics as any).accuracy || 0,
+              precision: (state.metrics as any).precision || 0,
+              recall: (state.metrics as any).recall || 0,
+              f1Score: (state.metrics as any).f1Score || 0,
+              latencyMs: (state.metrics as any).latencyMs || 0,
+              loss: (state.metrics as any).loss || 0,
+              validationMetrics: state.metrics as Prisma.InputJsonValue,
+              customMetrics: Prisma.JsonNull,
+              timestamp: new Date(),
+            },
+          } : undefined,
         },
       });
 
@@ -176,28 +182,32 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({
         success: true,
         data: modelState,
-      }, { status: 200 });
+      }, { status: 201 });
     } catch (dbError) {
-      const errorMessage = dbError instanceof Error ? dbError.message : 'Unknown database error';
       logger.error("Database error during model sync", {
-        error: errorMessage,
+        error: dbError instanceof Error ? dbError : new Error(String(dbError)),
         modelId,
         versionId: latestVersion.id,
-        stack: dbError instanceof Error ? dbError.stack : undefined,
       });
       return NextResponse.json(
-        { success: false, error: "Failed to sync model state", details: errorMessage },
+        { 
+          success: false, 
+          error: "Failed to sync model state", 
+          details: "DB Error"
+        },
         { status: 500 }
       );
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error("Failed to process model sync request", {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined,
+      error: error instanceof Error ? error : new Error(String(error)),
     });
     return NextResponse.json(
-      { success: false, error: "Failed to process request", details: errorMessage },
+      { 
+        success: false, 
+        error: "Failed to process request",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }
