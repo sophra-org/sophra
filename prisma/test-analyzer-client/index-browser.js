@@ -18,11 +18,11 @@ exports.$Enums = {}
 
 /**
  * Prisma Client JS version: 6.1.0
- * Query Engine version: 11f085a2012c0f4778414c8db2651556ee0ef959
+ * Query Engine version: 4123509d24aa4dede1e864b46351bf2790323b69
  */
 Prisma.prismaVersion = {
   client: "6.1.0",
-  engine: "11f085a2012c0f4778414c8db2651556ee0ef959"
+  engine: "4123509d24aa4dede1e864b46351bf2790323b69"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -117,6 +117,16 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.AnalysisSessionScalarFieldEnum = {
+  id: 'id',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  status: 'status',
+  context: 'context',
+  decisions: 'decisions',
+  operations: 'operations'
+};
+
 exports.Prisma.TestFileScalarFieldEnum = {
   id: 'id',
   filePath: 'filePath',
@@ -136,6 +146,39 @@ exports.Prisma.TestFileScalarFieldEnum = {
   totalTests: 'totalTests',
   criticalTests: 'criticalTests',
   lastFailureReason: 'lastFailureReason'
+};
+
+exports.Prisma.TestAnalysisScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  testFileId: 'testFileId',
+  patterns: 'patterns',
+  antiPatterns: 'antiPatterns',
+  suggestions: 'suggestions',
+  context: 'context',
+  timestamp: 'timestamp'
+};
+
+exports.Prisma.TestPatternScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  pattern: 'pattern',
+  context: 'context',
+  successRate: 'successRate',
+  usageCount: 'usageCount',
+  lastUsed: 'lastUsed',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FixPatternScalarFieldEnum = {
+  id: 'id',
+  problem: 'problem',
+  solution: 'solution',
+  context: 'context',
+  successRate: 'successRate',
+  usageCount: 'usageCount',
+  lastUsed: 'lastUsed',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.TestExecutionScalarFieldEnum = {
@@ -221,12 +264,28 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.SessionStatus = exports.$Enums.SessionStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
 exports.TestHealthScore = exports.$Enums.TestHealthScore = {
   EXCELLENT: 'EXCELLENT',
   GOOD: 'GOOD',
   FAIR: 'FAIR',
   POOR: 'POOR',
   CRITICAL: 'CRITICAL'
+};
+
+exports.PatternType = exports.$Enums.PatternType = {
+  TEST_STRUCTURE: 'TEST_STRUCTURE',
+  ASSERTION_STYLE: 'ASSERTION_STYLE',
+  MOCK_USAGE: 'MOCK_USAGE',
+  SETUP_PATTERN: 'SETUP_PATTERN',
+  ERROR_HANDLING: 'ERROR_HANDLING',
+  ASYNC_PATTERN: 'ASYNC_PATTERN'
 };
 
 exports.FixType = exports.$Enums.FixType = {
@@ -249,7 +308,11 @@ exports.GenerationType = exports.$Enums.GenerationType = {
 };
 
 exports.Prisma.ModelName = {
+  AnalysisSession: 'AnalysisSession',
   TestFile: 'TestFile',
+  TestAnalysis: 'TestAnalysis',
+  TestPattern: 'TestPattern',
+  FixPattern: 'FixPattern',
   TestExecution: 'TestExecution',
   TestCoverage: 'TestCoverage',
   TestFix: 'TestFix',

@@ -35,6 +35,39 @@ enum GenerationType {
   EDGE_CASE
 }
 
+enum SessionStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  FAILED
+}
+
+enum PatternType {
+  TEST_STRUCTURE
+  ASSERTION_STYLE
+  MOCK_USAGE
+  SETUP_PATTERN
+  ERROR_HANDLING
+  ASYNC_PATTERN
+}
+
+model AnalysisSession {
+  id          String        @id @default(cuid())
+  startedAt   DateTime      @default(now())
+  endedAt     DateTime?
+  status      SessionStatus @default(ACTIVE)
+  context     Json?         // Store session context
+  decisions   Json[]        // Track decisions made
+  operations  Json[]        // Track operations performed
+  
+  // Relations
+  testFiles   TestFile[]
+  analyses    TestAnalysis[]
+
+  @@index([status])
+  @@index([startedAt])
+}
+
 model TestFile {
   id                String          @id @default(cuid())
   filePath          String          @unique
@@ -56,14 +89,62 @@ model TestFile {
   lastFailureReason String?
 
   // Relations
-  executions TestExecution[]
-  coverage   TestCoverage[]
-  fixes      TestFix[]
+  sessions    AnalysisSession[]  // Sessions that analyzed this file
+  executions  TestExecution[]
+  coverage    TestCoverage[]
+  fixes       TestFix[]
   generations TestGeneration[]
+  analyses    TestAnalysis[]     // Detailed analysis records
 
   @@index([healthScore])
   @@index([currentPassRate])
   @@index([currentCoverage])
+}
+
+model TestAnalysis {
+  id           String   @id @default(cuid())
+  session      AnalysisSession @relation(fields: [sessionId], references: [id])
+  sessionId    String
+  testFile     TestFile @relation(fields: [testFileId], references: [id])
+  testFileId   String
+  patterns     Json     // Identified patterns
+  antiPatterns Json     // Identified anti-patterns
+  suggestions  Json     // Improvement suggestions
+  context      Json     // Analysis context
+  timestamp    DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([testFileId])
+  @@index([timestamp])
+}
+
+model TestPattern {
+  id          String      @id @default(cuid())
+  type        PatternType
+  pattern     String      // The actual pattern
+  context     Json        // When to apply
+  successRate Float       @default(0)
+  usageCount  Int         @default(0)
+  lastUsed    DateTime    @updatedAt
+  createdAt   DateTime    @default(now())
+
+  @@index([type])
+  @@index([successRate])
+  @@index([usageCount])
+}
+
+model FixPattern {
+  id          String   @id @default(cuid())
+  problem     String   // Problem signature
+  solution    String   // Solution template
+  context     Json     // When to apply
+  successRate Float    @default(0)
+  usageCount  Int      @default(0)
+  lastUsed    DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([successRate])
+  @@index([usageCount])
 }
 
 model TestExecution {

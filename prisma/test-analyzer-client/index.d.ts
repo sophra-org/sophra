@@ -14,10 +14,30 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model AnalysisSession
+ * 
+ */
+export type AnalysisSession = $Result.DefaultSelection<Prisma.$AnalysisSessionPayload>
+/**
  * Model TestFile
  * 
  */
 export type TestFile = $Result.DefaultSelection<Prisma.$TestFilePayload>
+/**
+ * Model TestAnalysis
+ * 
+ */
+export type TestAnalysis = $Result.DefaultSelection<Prisma.$TestAnalysisPayload>
+/**
+ * Model TestPattern
+ * 
+ */
+export type TestPattern = $Result.DefaultSelection<Prisma.$TestPatternPayload>
+/**
+ * Model FixPattern
+ * 
+ */
+export type FixPattern = $Result.DefaultSelection<Prisma.$FixPatternPayload>
 /**
  * Model TestExecution
  * 
@@ -78,6 +98,28 @@ export const GenerationType: {
 
 export type GenerationType = (typeof GenerationType)[keyof typeof GenerationType]
 
+
+export const SessionStatus: {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus]
+
+
+export const PatternType: {
+  TEST_STRUCTURE: 'TEST_STRUCTURE',
+  ASSERTION_STYLE: 'ASSERTION_STYLE',
+  MOCK_USAGE: 'MOCK_USAGE',
+  SETUP_PATTERN: 'SETUP_PATTERN',
+  ERROR_HANDLING: 'ERROR_HANDLING',
+  ASYNC_PATTERN: 'ASYNC_PATTERN'
+};
+
+export type PatternType = (typeof PatternType)[keyof typeof PatternType]
+
 }
 
 export type TestHealthScore = $Enums.TestHealthScore
@@ -92,6 +134,14 @@ export type GenerationType = $Enums.GenerationType
 
 export const GenerationType: typeof $Enums.GenerationType
 
+export type SessionStatus = $Enums.SessionStatus
+
+export const SessionStatus: typeof $Enums.SessionStatus
+
+export type PatternType = $Enums.PatternType
+
+export const PatternType: typeof $Enums.PatternType
+
 /**
  * ##  Prisma Client ʲˢ
  * 
@@ -99,8 +149,8 @@ export const GenerationType: typeof $Enums.GenerationType
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more TestFiles
- * const testFiles = await prisma.testFile.findMany()
+ * // Fetch zero or more AnalysisSessions
+ * const analysisSessions = await prisma.analysisSession.findMany()
  * ```
  *
  * 
@@ -120,8 +170,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more TestFiles
-   * const testFiles = await prisma.testFile.findMany()
+   * // Fetch zero or more AnalysisSessions
+   * const analysisSessions = await prisma.analysisSession.findMany()
    * ```
    *
    * 
@@ -216,6 +266,16 @@ export class PrismaClient<
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb, ExtArgs>
 
       /**
+   * `prisma.analysisSession`: Exposes CRUD operations for the **AnalysisSession** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AnalysisSessions
+    * const analysisSessions = await prisma.analysisSession.findMany()
+    * ```
+    */
+  get analysisSession(): Prisma.AnalysisSessionDelegate<ExtArgs>;
+
+  /**
    * `prisma.testFile`: Exposes CRUD operations for the **TestFile** model.
     * Example usage:
     * ```ts
@@ -224,6 +284,36 @@ export class PrismaClient<
     * ```
     */
   get testFile(): Prisma.TestFileDelegate<ExtArgs>;
+
+  /**
+   * `prisma.testAnalysis`: Exposes CRUD operations for the **TestAnalysis** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TestAnalyses
+    * const testAnalyses = await prisma.testAnalysis.findMany()
+    * ```
+    */
+  get testAnalysis(): Prisma.TestAnalysisDelegate<ExtArgs>;
+
+  /**
+   * `prisma.testPattern`: Exposes CRUD operations for the **TestPattern** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TestPatterns
+    * const testPatterns = await prisma.testPattern.findMany()
+    * ```
+    */
+  get testPattern(): Prisma.TestPatternDelegate<ExtArgs>;
+
+  /**
+   * `prisma.fixPattern`: Exposes CRUD operations for the **FixPattern** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FixPatterns
+    * const fixPatterns = await prisma.fixPattern.findMany()
+    * ```
+    */
+  get fixPattern(): Prisma.FixPatternDelegate<ExtArgs>;
 
   /**
    * `prisma.testExecution`: Exposes CRUD operations for the **TestExecution** model.
@@ -323,7 +413,7 @@ export namespace Prisma {
 
   /**
    * Prisma Client JS version: 6.1.0
-   * Query Engine version: 11f085a2012c0f4778414c8db2651556ee0ef959
+   * Query Engine version: 4123509d24aa4dede1e864b46351bf2790323b69
    */
   export type PrismaVersion = {
     client: string
@@ -704,7 +794,11 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    AnalysisSession: 'AnalysisSession',
     TestFile: 'TestFile',
+    TestAnalysis: 'TestAnalysis',
+    TestPattern: 'TestPattern',
+    FixPattern: 'FixPattern',
     TestExecution: 'TestExecution',
     TestCoverage: 'TestCoverage',
     TestFix: 'TestFix',
@@ -724,10 +818,80 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "testFile" | "testExecution" | "testCoverage" | "testFix" | "testGeneration"
+      modelProps: "analysisSession" | "testFile" | "testAnalysis" | "testPattern" | "fixPattern" | "testExecution" | "testCoverage" | "testFix" | "testGeneration"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      AnalysisSession: {
+        payload: Prisma.$AnalysisSessionPayload<ExtArgs>
+        fields: Prisma.AnalysisSessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AnalysisSessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AnalysisSessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>
+          }
+          findFirst: {
+            args: Prisma.AnalysisSessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AnalysisSessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>
+          }
+          findMany: {
+            args: Prisma.AnalysisSessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>[]
+          }
+          create: {
+            args: Prisma.AnalysisSessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>
+          }
+          createMany: {
+            args: Prisma.AnalysisSessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AnalysisSessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>[]
+          }
+          delete: {
+            args: Prisma.AnalysisSessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>
+          }
+          update: {
+            args: Prisma.AnalysisSessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.AnalysisSessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AnalysisSessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AnalysisSessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnalysisSessionPayload>
+          }
+          aggregate: {
+            args: Prisma.AnalysisSessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAnalysisSession>
+          }
+          groupBy: {
+            args: Prisma.AnalysisSessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AnalysisSessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AnalysisSessionCountArgs<ExtArgs>
+            result: $Utils.Optional<AnalysisSessionCountAggregateOutputType> | number
+          }
+        }
+      }
       TestFile: {
         payload: Prisma.$TestFilePayload<ExtArgs>
         fields: Prisma.TestFileFieldRefs
@@ -795,6 +959,216 @@ export namespace Prisma {
           count: {
             args: Prisma.TestFileCountArgs<ExtArgs>
             result: $Utils.Optional<TestFileCountAggregateOutputType> | number
+          }
+        }
+      }
+      TestAnalysis: {
+        payload: Prisma.$TestAnalysisPayload<ExtArgs>
+        fields: Prisma.TestAnalysisFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TestAnalysisFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TestAnalysisFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>
+          }
+          findFirst: {
+            args: Prisma.TestAnalysisFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TestAnalysisFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>
+          }
+          findMany: {
+            args: Prisma.TestAnalysisFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>[]
+          }
+          create: {
+            args: Prisma.TestAnalysisCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>
+          }
+          createMany: {
+            args: Prisma.TestAnalysisCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TestAnalysisCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>[]
+          }
+          delete: {
+            args: Prisma.TestAnalysisDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>
+          }
+          update: {
+            args: Prisma.TestAnalysisUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>
+          }
+          deleteMany: {
+            args: Prisma.TestAnalysisDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TestAnalysisUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TestAnalysisUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestAnalysisPayload>
+          }
+          aggregate: {
+            args: Prisma.TestAnalysisAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTestAnalysis>
+          }
+          groupBy: {
+            args: Prisma.TestAnalysisGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TestAnalysisGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TestAnalysisCountArgs<ExtArgs>
+            result: $Utils.Optional<TestAnalysisCountAggregateOutputType> | number
+          }
+        }
+      }
+      TestPattern: {
+        payload: Prisma.$TestPatternPayload<ExtArgs>
+        fields: Prisma.TestPatternFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TestPatternFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TestPatternFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>
+          }
+          findFirst: {
+            args: Prisma.TestPatternFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TestPatternFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>
+          }
+          findMany: {
+            args: Prisma.TestPatternFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>[]
+          }
+          create: {
+            args: Prisma.TestPatternCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>
+          }
+          createMany: {
+            args: Prisma.TestPatternCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TestPatternCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>[]
+          }
+          delete: {
+            args: Prisma.TestPatternDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>
+          }
+          update: {
+            args: Prisma.TestPatternUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>
+          }
+          deleteMany: {
+            args: Prisma.TestPatternDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TestPatternUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TestPatternUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TestPatternPayload>
+          }
+          aggregate: {
+            args: Prisma.TestPatternAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTestPattern>
+          }
+          groupBy: {
+            args: Prisma.TestPatternGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TestPatternGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TestPatternCountArgs<ExtArgs>
+            result: $Utils.Optional<TestPatternCountAggregateOutputType> | number
+          }
+        }
+      }
+      FixPattern: {
+        payload: Prisma.$FixPatternPayload<ExtArgs>
+        fields: Prisma.FixPatternFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FixPatternFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FixPatternFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>
+          }
+          findFirst: {
+            args: Prisma.FixPatternFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FixPatternFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>
+          }
+          findMany: {
+            args: Prisma.FixPatternFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>[]
+          }
+          create: {
+            args: Prisma.FixPatternCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>
+          }
+          createMany: {
+            args: Prisma.FixPatternCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FixPatternCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>[]
+          }
+          delete: {
+            args: Prisma.FixPatternDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>
+          }
+          update: {
+            args: Prisma.FixPatternUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>
+          }
+          deleteMany: {
+            args: Prisma.FixPatternDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FixPatternUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FixPatternUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FixPatternPayload>
+          }
+          aggregate: {
+            args: Prisma.FixPatternAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFixPattern>
+          }
+          groupBy: {
+            args: Prisma.FixPatternGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FixPatternGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FixPatternCountArgs<ExtArgs>
+            result: $Utils.Optional<FixPatternCountAggregateOutputType> | number
           }
         }
       }
@@ -1235,21 +1609,65 @@ export namespace Prisma {
 
 
   /**
+   * Count Type AnalysisSessionCountOutputType
+   */
+
+  export type AnalysisSessionCountOutputType = {
+    testFiles: number
+    analyses: number
+  }
+
+  export type AnalysisSessionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    testFiles?: boolean | AnalysisSessionCountOutputTypeCountTestFilesArgs
+    analyses?: boolean | AnalysisSessionCountOutputTypeCountAnalysesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AnalysisSessionCountOutputType without action
+   */
+  export type AnalysisSessionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSessionCountOutputType
+     */
+    select?: AnalysisSessionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AnalysisSessionCountOutputType without action
+   */
+  export type AnalysisSessionCountOutputTypeCountTestFilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TestFileWhereInput
+  }
+
+  /**
+   * AnalysisSessionCountOutputType without action
+   */
+  export type AnalysisSessionCountOutputTypeCountAnalysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TestAnalysisWhereInput
+  }
+
+
+  /**
    * Count Type TestFileCountOutputType
    */
 
   export type TestFileCountOutputType = {
+    sessions: number
     executions: number
     coverage: number
     fixes: number
     generations: number
+    analyses: number
   }
 
   export type TestFileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    sessions?: boolean | TestFileCountOutputTypeCountSessionsArgs
     executions?: boolean | TestFileCountOutputTypeCountExecutionsArgs
     coverage?: boolean | TestFileCountOutputTypeCountCoverageArgs
     fixes?: boolean | TestFileCountOutputTypeCountFixesArgs
     generations?: boolean | TestFileCountOutputTypeCountGenerationsArgs
+    analyses?: boolean | TestFileCountOutputTypeCountAnalysesArgs
   }
 
   // Custom InputTypes
@@ -1261,6 +1679,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the TestFileCountOutputType
      */
     select?: TestFileCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TestFileCountOutputType without action
+   */
+  export type TestFileCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AnalysisSessionWhereInput
   }
 
   /**
@@ -1291,10 +1716,1001 @@ export namespace Prisma {
     where?: TestGenerationWhereInput
   }
 
+  /**
+   * TestFileCountOutputType without action
+   */
+  export type TestFileCountOutputTypeCountAnalysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TestAnalysisWhereInput
+  }
+
 
   /**
    * Models
    */
+
+  /**
+   * Model AnalysisSession
+   */
+
+  export type AggregateAnalysisSession = {
+    _count: AnalysisSessionCountAggregateOutputType | null
+    _min: AnalysisSessionMinAggregateOutputType | null
+    _max: AnalysisSessionMaxAggregateOutputType | null
+  }
+
+  export type AnalysisSessionMinAggregateOutputType = {
+    id: string | null
+    startedAt: Date | null
+    endedAt: Date | null
+    status: $Enums.SessionStatus | null
+  }
+
+  export type AnalysisSessionMaxAggregateOutputType = {
+    id: string | null
+    startedAt: Date | null
+    endedAt: Date | null
+    status: $Enums.SessionStatus | null
+  }
+
+  export type AnalysisSessionCountAggregateOutputType = {
+    id: number
+    startedAt: number
+    endedAt: number
+    status: number
+    context: number
+    decisions: number
+    operations: number
+    _all: number
+  }
+
+
+  export type AnalysisSessionMinAggregateInputType = {
+    id?: true
+    startedAt?: true
+    endedAt?: true
+    status?: true
+  }
+
+  export type AnalysisSessionMaxAggregateInputType = {
+    id?: true
+    startedAt?: true
+    endedAt?: true
+    status?: true
+  }
+
+  export type AnalysisSessionCountAggregateInputType = {
+    id?: true
+    startedAt?: true
+    endedAt?: true
+    status?: true
+    context?: true
+    decisions?: true
+    operations?: true
+    _all?: true
+  }
+
+  export type AnalysisSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AnalysisSession to aggregate.
+     */
+    where?: AnalysisSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AnalysisSessions to fetch.
+     */
+    orderBy?: AnalysisSessionOrderByWithRelationInput | AnalysisSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AnalysisSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AnalysisSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AnalysisSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AnalysisSessions
+    **/
+    _count?: true | AnalysisSessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AnalysisSessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AnalysisSessionMaxAggregateInputType
+  }
+
+  export type GetAnalysisSessionAggregateType<T extends AnalysisSessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateAnalysisSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAnalysisSession[P]>
+      : GetScalarType<T[P], AggregateAnalysisSession[P]>
+  }
+
+
+
+
+  export type AnalysisSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AnalysisSessionWhereInput
+    orderBy?: AnalysisSessionOrderByWithAggregationInput | AnalysisSessionOrderByWithAggregationInput[]
+    by: AnalysisSessionScalarFieldEnum[] | AnalysisSessionScalarFieldEnum
+    having?: AnalysisSessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AnalysisSessionCountAggregateInputType | true
+    _min?: AnalysisSessionMinAggregateInputType
+    _max?: AnalysisSessionMaxAggregateInputType
+  }
+
+  export type AnalysisSessionGroupByOutputType = {
+    id: string
+    startedAt: Date
+    endedAt: Date | null
+    status: $Enums.SessionStatus
+    context: JsonValue | null
+    decisions: JsonValue[]
+    operations: JsonValue[]
+    _count: AnalysisSessionCountAggregateOutputType | null
+    _min: AnalysisSessionMinAggregateOutputType | null
+    _max: AnalysisSessionMaxAggregateOutputType | null
+  }
+
+  type GetAnalysisSessionGroupByPayload<T extends AnalysisSessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AnalysisSessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AnalysisSessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AnalysisSessionGroupByOutputType[P]>
+            : GetScalarType<T[P], AnalysisSessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AnalysisSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    context?: boolean
+    decisions?: boolean
+    operations?: boolean
+    testFiles?: boolean | AnalysisSession$testFilesArgs<ExtArgs>
+    analyses?: boolean | AnalysisSession$analysesArgs<ExtArgs>
+    _count?: boolean | AnalysisSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["analysisSession"]>
+
+  export type AnalysisSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    context?: boolean
+    decisions?: boolean
+    operations?: boolean
+  }, ExtArgs["result"]["analysisSession"]>
+
+  export type AnalysisSessionSelectScalar = {
+    id?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    context?: boolean
+    decisions?: boolean
+    operations?: boolean
+  }
+
+  export type AnalysisSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    testFiles?: boolean | AnalysisSession$testFilesArgs<ExtArgs>
+    analyses?: boolean | AnalysisSession$analysesArgs<ExtArgs>
+    _count?: boolean | AnalysisSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type AnalysisSessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $AnalysisSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AnalysisSession"
+    objects: {
+      testFiles: Prisma.$TestFilePayload<ExtArgs>[]
+      analyses: Prisma.$TestAnalysisPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      startedAt: Date
+      endedAt: Date | null
+      status: $Enums.SessionStatus
+      context: Prisma.JsonValue | null
+      decisions: Prisma.JsonValue[]
+      operations: Prisma.JsonValue[]
+    }, ExtArgs["result"]["analysisSession"]>
+    composites: {}
+  }
+
+  type AnalysisSessionGetPayload<S extends boolean | null | undefined | AnalysisSessionDefaultArgs> = $Result.GetResult<Prisma.$AnalysisSessionPayload, S>
+
+  type AnalysisSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AnalysisSessionFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AnalysisSessionCountAggregateInputType | true
+    }
+
+  export interface AnalysisSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AnalysisSession'], meta: { name: 'AnalysisSession' } }
+    /**
+     * Find zero or one AnalysisSession that matches the filter.
+     * @param {AnalysisSessionFindUniqueArgs} args - Arguments to find a AnalysisSession
+     * @example
+     * // Get one AnalysisSession
+     * const analysisSession = await prisma.analysisSession.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AnalysisSessionFindUniqueArgs>(args: SelectSubset<T, AnalysisSessionFindUniqueArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AnalysisSession that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AnalysisSessionFindUniqueOrThrowArgs} args - Arguments to find a AnalysisSession
+     * @example
+     * // Get one AnalysisSession
+     * const analysisSession = await prisma.analysisSession.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AnalysisSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, AnalysisSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AnalysisSession that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionFindFirstArgs} args - Arguments to find a AnalysisSession
+     * @example
+     * // Get one AnalysisSession
+     * const analysisSession = await prisma.analysisSession.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AnalysisSessionFindFirstArgs>(args?: SelectSubset<T, AnalysisSessionFindFirstArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AnalysisSession that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionFindFirstOrThrowArgs} args - Arguments to find a AnalysisSession
+     * @example
+     * // Get one AnalysisSession
+     * const analysisSession = await prisma.analysisSession.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AnalysisSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, AnalysisSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AnalysisSessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AnalysisSessions
+     * const analysisSessions = await prisma.analysisSession.findMany()
+     * 
+     * // Get first 10 AnalysisSessions
+     * const analysisSessions = await prisma.analysisSession.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const analysisSessionWithIdOnly = await prisma.analysisSession.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AnalysisSessionFindManyArgs>(args?: SelectSubset<T, AnalysisSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AnalysisSession.
+     * @param {AnalysisSessionCreateArgs} args - Arguments to create a AnalysisSession.
+     * @example
+     * // Create one AnalysisSession
+     * const AnalysisSession = await prisma.analysisSession.create({
+     *   data: {
+     *     // ... data to create a AnalysisSession
+     *   }
+     * })
+     * 
+     */
+    create<T extends AnalysisSessionCreateArgs>(args: SelectSubset<T, AnalysisSessionCreateArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AnalysisSessions.
+     * @param {AnalysisSessionCreateManyArgs} args - Arguments to create many AnalysisSessions.
+     * @example
+     * // Create many AnalysisSessions
+     * const analysisSession = await prisma.analysisSession.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AnalysisSessionCreateManyArgs>(args?: SelectSubset<T, AnalysisSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AnalysisSessions and returns the data saved in the database.
+     * @param {AnalysisSessionCreateManyAndReturnArgs} args - Arguments to create many AnalysisSessions.
+     * @example
+     * // Create many AnalysisSessions
+     * const analysisSession = await prisma.analysisSession.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AnalysisSessions and only return the `id`
+     * const analysisSessionWithIdOnly = await prisma.analysisSession.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AnalysisSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, AnalysisSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AnalysisSession.
+     * @param {AnalysisSessionDeleteArgs} args - Arguments to delete one AnalysisSession.
+     * @example
+     * // Delete one AnalysisSession
+     * const AnalysisSession = await prisma.analysisSession.delete({
+     *   where: {
+     *     // ... filter to delete one AnalysisSession
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AnalysisSessionDeleteArgs>(args: SelectSubset<T, AnalysisSessionDeleteArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AnalysisSession.
+     * @param {AnalysisSessionUpdateArgs} args - Arguments to update one AnalysisSession.
+     * @example
+     * // Update one AnalysisSession
+     * const analysisSession = await prisma.analysisSession.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AnalysisSessionUpdateArgs>(args: SelectSubset<T, AnalysisSessionUpdateArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AnalysisSessions.
+     * @param {AnalysisSessionDeleteManyArgs} args - Arguments to filter AnalysisSessions to delete.
+     * @example
+     * // Delete a few AnalysisSessions
+     * const { count } = await prisma.analysisSession.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AnalysisSessionDeleteManyArgs>(args?: SelectSubset<T, AnalysisSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AnalysisSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AnalysisSessions
+     * const analysisSession = await prisma.analysisSession.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AnalysisSessionUpdateManyArgs>(args: SelectSubset<T, AnalysisSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AnalysisSession.
+     * @param {AnalysisSessionUpsertArgs} args - Arguments to update or create a AnalysisSession.
+     * @example
+     * // Update or create a AnalysisSession
+     * const analysisSession = await prisma.analysisSession.upsert({
+     *   create: {
+     *     // ... data to create a AnalysisSession
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AnalysisSession we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AnalysisSessionUpsertArgs>(args: SelectSubset<T, AnalysisSessionUpsertArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AnalysisSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionCountArgs} args - Arguments to filter AnalysisSessions to count.
+     * @example
+     * // Count the number of AnalysisSessions
+     * const count = await prisma.analysisSession.count({
+     *   where: {
+     *     // ... the filter for the AnalysisSessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends AnalysisSessionCountArgs>(
+      args?: Subset<T, AnalysisSessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AnalysisSessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AnalysisSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AnalysisSessionAggregateArgs>(args: Subset<T, AnalysisSessionAggregateArgs>): Prisma.PrismaPromise<GetAnalysisSessionAggregateType<T>>
+
+    /**
+     * Group by AnalysisSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnalysisSessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AnalysisSessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AnalysisSessionGroupByArgs['orderBy'] }
+        : { orderBy?: AnalysisSessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AnalysisSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAnalysisSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AnalysisSession model
+   */
+  readonly fields: AnalysisSessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AnalysisSession.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AnalysisSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    testFiles<T extends AnalysisSession$testFilesArgs<ExtArgs> = {}>(args?: Subset<T, AnalysisSession$testFilesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestFilePayload<ExtArgs>, T, "findMany"> | Null>
+    analyses<T extends AnalysisSession$analysesArgs<ExtArgs> = {}>(args?: Subset<T, AnalysisSession$analysesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AnalysisSession model
+   */ 
+  interface AnalysisSessionFieldRefs {
+    readonly id: FieldRef<"AnalysisSession", 'String'>
+    readonly startedAt: FieldRef<"AnalysisSession", 'DateTime'>
+    readonly endedAt: FieldRef<"AnalysisSession", 'DateTime'>
+    readonly status: FieldRef<"AnalysisSession", 'SessionStatus'>
+    readonly context: FieldRef<"AnalysisSession", 'Json'>
+    readonly decisions: FieldRef<"AnalysisSession", 'Json[]'>
+    readonly operations: FieldRef<"AnalysisSession", 'Json[]'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AnalysisSession findUnique
+   */
+  export type AnalysisSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AnalysisSession to fetch.
+     */
+    where: AnalysisSessionWhereUniqueInput
+  }
+
+  /**
+   * AnalysisSession findUniqueOrThrow
+   */
+  export type AnalysisSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AnalysisSession to fetch.
+     */
+    where: AnalysisSessionWhereUniqueInput
+  }
+
+  /**
+   * AnalysisSession findFirst
+   */
+  export type AnalysisSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AnalysisSession to fetch.
+     */
+    where?: AnalysisSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AnalysisSessions to fetch.
+     */
+    orderBy?: AnalysisSessionOrderByWithRelationInput | AnalysisSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AnalysisSessions.
+     */
+    cursor?: AnalysisSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AnalysisSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AnalysisSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AnalysisSessions.
+     */
+    distinct?: AnalysisSessionScalarFieldEnum | AnalysisSessionScalarFieldEnum[]
+  }
+
+  /**
+   * AnalysisSession findFirstOrThrow
+   */
+  export type AnalysisSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AnalysisSession to fetch.
+     */
+    where?: AnalysisSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AnalysisSessions to fetch.
+     */
+    orderBy?: AnalysisSessionOrderByWithRelationInput | AnalysisSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AnalysisSessions.
+     */
+    cursor?: AnalysisSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AnalysisSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AnalysisSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AnalysisSessions.
+     */
+    distinct?: AnalysisSessionScalarFieldEnum | AnalysisSessionScalarFieldEnum[]
+  }
+
+  /**
+   * AnalysisSession findMany
+   */
+  export type AnalysisSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AnalysisSessions to fetch.
+     */
+    where?: AnalysisSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AnalysisSessions to fetch.
+     */
+    orderBy?: AnalysisSessionOrderByWithRelationInput | AnalysisSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AnalysisSessions.
+     */
+    cursor?: AnalysisSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AnalysisSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AnalysisSessions.
+     */
+    skip?: number
+    distinct?: AnalysisSessionScalarFieldEnum | AnalysisSessionScalarFieldEnum[]
+  }
+
+  /**
+   * AnalysisSession create
+   */
+  export type AnalysisSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AnalysisSession.
+     */
+    data?: XOR<AnalysisSessionCreateInput, AnalysisSessionUncheckedCreateInput>
+  }
+
+  /**
+   * AnalysisSession createMany
+   */
+  export type AnalysisSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AnalysisSessions.
+     */
+    data: AnalysisSessionCreateManyInput | AnalysisSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AnalysisSession createManyAndReturn
+   */
+  export type AnalysisSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AnalysisSessions.
+     */
+    data: AnalysisSessionCreateManyInput | AnalysisSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AnalysisSession update
+   */
+  export type AnalysisSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AnalysisSession.
+     */
+    data: XOR<AnalysisSessionUpdateInput, AnalysisSessionUncheckedUpdateInput>
+    /**
+     * Choose, which AnalysisSession to update.
+     */
+    where: AnalysisSessionWhereUniqueInput
+  }
+
+  /**
+   * AnalysisSession updateMany
+   */
+  export type AnalysisSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AnalysisSessions.
+     */
+    data: XOR<AnalysisSessionUpdateManyMutationInput, AnalysisSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which AnalysisSessions to update
+     */
+    where?: AnalysisSessionWhereInput
+  }
+
+  /**
+   * AnalysisSession upsert
+   */
+  export type AnalysisSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AnalysisSession to update in case it exists.
+     */
+    where: AnalysisSessionWhereUniqueInput
+    /**
+     * In case the AnalysisSession found by the `where` argument doesn't exist, create a new AnalysisSession with this data.
+     */
+    create: XOR<AnalysisSessionCreateInput, AnalysisSessionUncheckedCreateInput>
+    /**
+     * In case the AnalysisSession was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AnalysisSessionUpdateInput, AnalysisSessionUncheckedUpdateInput>
+  }
+
+  /**
+   * AnalysisSession delete
+   */
+  export type AnalysisSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    /**
+     * Filter which AnalysisSession to delete.
+     */
+    where: AnalysisSessionWhereUniqueInput
+  }
+
+  /**
+   * AnalysisSession deleteMany
+   */
+  export type AnalysisSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AnalysisSessions to delete
+     */
+    where?: AnalysisSessionWhereInput
+  }
+
+  /**
+   * AnalysisSession.testFiles
+   */
+  export type AnalysisSession$testFilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestFile
+     */
+    select?: TestFileSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestFileInclude<ExtArgs> | null
+    where?: TestFileWhereInput
+    orderBy?: TestFileOrderByWithRelationInput | TestFileOrderByWithRelationInput[]
+    cursor?: TestFileWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TestFileScalarFieldEnum | TestFileScalarFieldEnum[]
+  }
+
+  /**
+   * AnalysisSession.analyses
+   */
+  export type AnalysisSession$analysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    where?: TestAnalysisWhereInput
+    orderBy?: TestAnalysisOrderByWithRelationInput | TestAnalysisOrderByWithRelationInput[]
+    cursor?: TestAnalysisWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TestAnalysisScalarFieldEnum | TestAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * AnalysisSession without action
+   */
+  export type AnalysisSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+  }
+
 
   /**
    * Model TestFile
@@ -1630,10 +3046,12 @@ export namespace Prisma {
     totalTests?: boolean
     criticalTests?: boolean
     lastFailureReason?: boolean
+    sessions?: boolean | TestFile$sessionsArgs<ExtArgs>
     executions?: boolean | TestFile$executionsArgs<ExtArgs>
     coverage?: boolean | TestFile$coverageArgs<ExtArgs>
     fixes?: boolean | TestFile$fixesArgs<ExtArgs>
     generations?: boolean | TestFile$generationsArgs<ExtArgs>
+    analyses?: boolean | TestFile$analysesArgs<ExtArgs>
     _count?: boolean | TestFileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["testFile"]>
 
@@ -1680,10 +3098,12 @@ export namespace Prisma {
   }
 
   export type TestFileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    sessions?: boolean | TestFile$sessionsArgs<ExtArgs>
     executions?: boolean | TestFile$executionsArgs<ExtArgs>
     coverage?: boolean | TestFile$coverageArgs<ExtArgs>
     fixes?: boolean | TestFile$fixesArgs<ExtArgs>
     generations?: boolean | TestFile$generationsArgs<ExtArgs>
+    analyses?: boolean | TestFile$analysesArgs<ExtArgs>
     _count?: boolean | TestFileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TestFileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1691,10 +3111,12 @@ export namespace Prisma {
   export type $TestFilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "TestFile"
     objects: {
+      sessions: Prisma.$AnalysisSessionPayload<ExtArgs>[]
       executions: Prisma.$TestExecutionPayload<ExtArgs>[]
       coverage: Prisma.$TestCoveragePayload<ExtArgs>[]
       fixes: Prisma.$TestFixPayload<ExtArgs>[]
       generations: Prisma.$TestGenerationPayload<ExtArgs>[]
+      analyses: Prisma.$TestAnalysisPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2079,10 +3501,12 @@ export namespace Prisma {
    */
   export interface Prisma__TestFileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    sessions<T extends TestFile$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, TestFile$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findMany"> | Null>
     executions<T extends TestFile$executionsArgs<ExtArgs> = {}>(args?: Subset<T, TestFile$executionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestExecutionPayload<ExtArgs>, T, "findMany"> | Null>
     coverage<T extends TestFile$coverageArgs<ExtArgs> = {}>(args?: Subset<T, TestFile$coverageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestCoveragePayload<ExtArgs>, T, "findMany"> | Null>
     fixes<T extends TestFile$fixesArgs<ExtArgs> = {}>(args?: Subset<T, TestFile$fixesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestFixPayload<ExtArgs>, T, "findMany"> | Null>
     generations<T extends TestFile$generationsArgs<ExtArgs> = {}>(args?: Subset<T, TestFile$generationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestGenerationPayload<ExtArgs>, T, "findMany"> | Null>
+    analyses<T extends TestFile$analysesArgs<ExtArgs> = {}>(args?: Subset<T, TestFile$analysesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2444,6 +3868,26 @@ export namespace Prisma {
   }
 
   /**
+   * TestFile.sessions
+   */
+  export type TestFile$sessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AnalysisSession
+     */
+    select?: AnalysisSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnalysisSessionInclude<ExtArgs> | null
+    where?: AnalysisSessionWhereInput
+    orderBy?: AnalysisSessionOrderByWithRelationInput | AnalysisSessionOrderByWithRelationInput[]
+    cursor?: AnalysisSessionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AnalysisSessionScalarFieldEnum | AnalysisSessionScalarFieldEnum[]
+  }
+
+  /**
    * TestFile.executions
    */
   export type TestFile$executionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2524,6 +3968,26 @@ export namespace Prisma {
   }
 
   /**
+   * TestFile.analyses
+   */
+  export type TestFile$analysesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    where?: TestAnalysisWhereInput
+    orderBy?: TestAnalysisOrderByWithRelationInput | TestAnalysisOrderByWithRelationInput[]
+    cursor?: TestAnalysisWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TestAnalysisScalarFieldEnum | TestAnalysisScalarFieldEnum[]
+  }
+
+  /**
    * TestFile without action
    */
   export type TestFileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2535,6 +3999,2861 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: TestFileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TestAnalysis
+   */
+
+  export type AggregateTestAnalysis = {
+    _count: TestAnalysisCountAggregateOutputType | null
+    _min: TestAnalysisMinAggregateOutputType | null
+    _max: TestAnalysisMaxAggregateOutputType | null
+  }
+
+  export type TestAnalysisMinAggregateOutputType = {
+    id: string | null
+    sessionId: string | null
+    testFileId: string | null
+    timestamp: Date | null
+  }
+
+  export type TestAnalysisMaxAggregateOutputType = {
+    id: string | null
+    sessionId: string | null
+    testFileId: string | null
+    timestamp: Date | null
+  }
+
+  export type TestAnalysisCountAggregateOutputType = {
+    id: number
+    sessionId: number
+    testFileId: number
+    patterns: number
+    antiPatterns: number
+    suggestions: number
+    context: number
+    timestamp: number
+    _all: number
+  }
+
+
+  export type TestAnalysisMinAggregateInputType = {
+    id?: true
+    sessionId?: true
+    testFileId?: true
+    timestamp?: true
+  }
+
+  export type TestAnalysisMaxAggregateInputType = {
+    id?: true
+    sessionId?: true
+    testFileId?: true
+    timestamp?: true
+  }
+
+  export type TestAnalysisCountAggregateInputType = {
+    id?: true
+    sessionId?: true
+    testFileId?: true
+    patterns?: true
+    antiPatterns?: true
+    suggestions?: true
+    context?: true
+    timestamp?: true
+    _all?: true
+  }
+
+  export type TestAnalysisAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TestAnalysis to aggregate.
+     */
+    where?: TestAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestAnalyses to fetch.
+     */
+    orderBy?: TestAnalysisOrderByWithRelationInput | TestAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TestAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestAnalyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TestAnalyses
+    **/
+    _count?: true | TestAnalysisCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TestAnalysisMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TestAnalysisMaxAggregateInputType
+  }
+
+  export type GetTestAnalysisAggregateType<T extends TestAnalysisAggregateArgs> = {
+        [P in keyof T & keyof AggregateTestAnalysis]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTestAnalysis[P]>
+      : GetScalarType<T[P], AggregateTestAnalysis[P]>
+  }
+
+
+
+
+  export type TestAnalysisGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TestAnalysisWhereInput
+    orderBy?: TestAnalysisOrderByWithAggregationInput | TestAnalysisOrderByWithAggregationInput[]
+    by: TestAnalysisScalarFieldEnum[] | TestAnalysisScalarFieldEnum
+    having?: TestAnalysisScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TestAnalysisCountAggregateInputType | true
+    _min?: TestAnalysisMinAggregateInputType
+    _max?: TestAnalysisMaxAggregateInputType
+  }
+
+  export type TestAnalysisGroupByOutputType = {
+    id: string
+    sessionId: string
+    testFileId: string
+    patterns: JsonValue
+    antiPatterns: JsonValue
+    suggestions: JsonValue
+    context: JsonValue
+    timestamp: Date
+    _count: TestAnalysisCountAggregateOutputType | null
+    _min: TestAnalysisMinAggregateOutputType | null
+    _max: TestAnalysisMaxAggregateOutputType | null
+  }
+
+  type GetTestAnalysisGroupByPayload<T extends TestAnalysisGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TestAnalysisGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TestAnalysisGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TestAnalysisGroupByOutputType[P]>
+            : GetScalarType<T[P], TestAnalysisGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TestAnalysisSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sessionId?: boolean
+    testFileId?: boolean
+    patterns?: boolean
+    antiPatterns?: boolean
+    suggestions?: boolean
+    context?: boolean
+    timestamp?: boolean
+    session?: boolean | AnalysisSessionDefaultArgs<ExtArgs>
+    testFile?: boolean | TestFileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["testAnalysis"]>
+
+  export type TestAnalysisSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sessionId?: boolean
+    testFileId?: boolean
+    patterns?: boolean
+    antiPatterns?: boolean
+    suggestions?: boolean
+    context?: boolean
+    timestamp?: boolean
+    session?: boolean | AnalysisSessionDefaultArgs<ExtArgs>
+    testFile?: boolean | TestFileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["testAnalysis"]>
+
+  export type TestAnalysisSelectScalar = {
+    id?: boolean
+    sessionId?: boolean
+    testFileId?: boolean
+    patterns?: boolean
+    antiPatterns?: boolean
+    suggestions?: boolean
+    context?: boolean
+    timestamp?: boolean
+  }
+
+  export type TestAnalysisInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    session?: boolean | AnalysisSessionDefaultArgs<ExtArgs>
+    testFile?: boolean | TestFileDefaultArgs<ExtArgs>
+  }
+  export type TestAnalysisIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    session?: boolean | AnalysisSessionDefaultArgs<ExtArgs>
+    testFile?: boolean | TestFileDefaultArgs<ExtArgs>
+  }
+
+  export type $TestAnalysisPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TestAnalysis"
+    objects: {
+      session: Prisma.$AnalysisSessionPayload<ExtArgs>
+      testFile: Prisma.$TestFilePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sessionId: string
+      testFileId: string
+      patterns: Prisma.JsonValue
+      antiPatterns: Prisma.JsonValue
+      suggestions: Prisma.JsonValue
+      context: Prisma.JsonValue
+      timestamp: Date
+    }, ExtArgs["result"]["testAnalysis"]>
+    composites: {}
+  }
+
+  type TestAnalysisGetPayload<S extends boolean | null | undefined | TestAnalysisDefaultArgs> = $Result.GetResult<Prisma.$TestAnalysisPayload, S>
+
+  type TestAnalysisCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<TestAnalysisFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: TestAnalysisCountAggregateInputType | true
+    }
+
+  export interface TestAnalysisDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TestAnalysis'], meta: { name: 'TestAnalysis' } }
+    /**
+     * Find zero or one TestAnalysis that matches the filter.
+     * @param {TestAnalysisFindUniqueArgs} args - Arguments to find a TestAnalysis
+     * @example
+     * // Get one TestAnalysis
+     * const testAnalysis = await prisma.testAnalysis.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TestAnalysisFindUniqueArgs>(args: SelectSubset<T, TestAnalysisFindUniqueArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one TestAnalysis that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {TestAnalysisFindUniqueOrThrowArgs} args - Arguments to find a TestAnalysis
+     * @example
+     * // Get one TestAnalysis
+     * const testAnalysis = await prisma.testAnalysis.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TestAnalysisFindUniqueOrThrowArgs>(args: SelectSubset<T, TestAnalysisFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first TestAnalysis that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisFindFirstArgs} args - Arguments to find a TestAnalysis
+     * @example
+     * // Get one TestAnalysis
+     * const testAnalysis = await prisma.testAnalysis.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TestAnalysisFindFirstArgs>(args?: SelectSubset<T, TestAnalysisFindFirstArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first TestAnalysis that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisFindFirstOrThrowArgs} args - Arguments to find a TestAnalysis
+     * @example
+     * // Get one TestAnalysis
+     * const testAnalysis = await prisma.testAnalysis.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TestAnalysisFindFirstOrThrowArgs>(args?: SelectSubset<T, TestAnalysisFindFirstOrThrowArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more TestAnalyses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TestAnalyses
+     * const testAnalyses = await prisma.testAnalysis.findMany()
+     * 
+     * // Get first 10 TestAnalyses
+     * const testAnalyses = await prisma.testAnalysis.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const testAnalysisWithIdOnly = await prisma.testAnalysis.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TestAnalysisFindManyArgs>(args?: SelectSubset<T, TestAnalysisFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a TestAnalysis.
+     * @param {TestAnalysisCreateArgs} args - Arguments to create a TestAnalysis.
+     * @example
+     * // Create one TestAnalysis
+     * const TestAnalysis = await prisma.testAnalysis.create({
+     *   data: {
+     *     // ... data to create a TestAnalysis
+     *   }
+     * })
+     * 
+     */
+    create<T extends TestAnalysisCreateArgs>(args: SelectSubset<T, TestAnalysisCreateArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many TestAnalyses.
+     * @param {TestAnalysisCreateManyArgs} args - Arguments to create many TestAnalyses.
+     * @example
+     * // Create many TestAnalyses
+     * const testAnalysis = await prisma.testAnalysis.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TestAnalysisCreateManyArgs>(args?: SelectSubset<T, TestAnalysisCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TestAnalyses and returns the data saved in the database.
+     * @param {TestAnalysisCreateManyAndReturnArgs} args - Arguments to create many TestAnalyses.
+     * @example
+     * // Create many TestAnalyses
+     * const testAnalysis = await prisma.testAnalysis.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TestAnalyses and only return the `id`
+     * const testAnalysisWithIdOnly = await prisma.testAnalysis.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TestAnalysisCreateManyAndReturnArgs>(args?: SelectSubset<T, TestAnalysisCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a TestAnalysis.
+     * @param {TestAnalysisDeleteArgs} args - Arguments to delete one TestAnalysis.
+     * @example
+     * // Delete one TestAnalysis
+     * const TestAnalysis = await prisma.testAnalysis.delete({
+     *   where: {
+     *     // ... filter to delete one TestAnalysis
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TestAnalysisDeleteArgs>(args: SelectSubset<T, TestAnalysisDeleteArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one TestAnalysis.
+     * @param {TestAnalysisUpdateArgs} args - Arguments to update one TestAnalysis.
+     * @example
+     * // Update one TestAnalysis
+     * const testAnalysis = await prisma.testAnalysis.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TestAnalysisUpdateArgs>(args: SelectSubset<T, TestAnalysisUpdateArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more TestAnalyses.
+     * @param {TestAnalysisDeleteManyArgs} args - Arguments to filter TestAnalyses to delete.
+     * @example
+     * // Delete a few TestAnalyses
+     * const { count } = await prisma.testAnalysis.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TestAnalysisDeleteManyArgs>(args?: SelectSubset<T, TestAnalysisDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TestAnalyses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TestAnalyses
+     * const testAnalysis = await prisma.testAnalysis.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TestAnalysisUpdateManyArgs>(args: SelectSubset<T, TestAnalysisUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one TestAnalysis.
+     * @param {TestAnalysisUpsertArgs} args - Arguments to update or create a TestAnalysis.
+     * @example
+     * // Update or create a TestAnalysis
+     * const testAnalysis = await prisma.testAnalysis.upsert({
+     *   create: {
+     *     // ... data to create a TestAnalysis
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TestAnalysis we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TestAnalysisUpsertArgs>(args: SelectSubset<T, TestAnalysisUpsertArgs<ExtArgs>>): Prisma__TestAnalysisClient<$Result.GetResult<Prisma.$TestAnalysisPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of TestAnalyses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisCountArgs} args - Arguments to filter TestAnalyses to count.
+     * @example
+     * // Count the number of TestAnalyses
+     * const count = await prisma.testAnalysis.count({
+     *   where: {
+     *     // ... the filter for the TestAnalyses we want to count
+     *   }
+     * })
+    **/
+    count<T extends TestAnalysisCountArgs>(
+      args?: Subset<T, TestAnalysisCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TestAnalysisCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TestAnalysis.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TestAnalysisAggregateArgs>(args: Subset<T, TestAnalysisAggregateArgs>): Prisma.PrismaPromise<GetTestAnalysisAggregateType<T>>
+
+    /**
+     * Group by TestAnalysis.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestAnalysisGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TestAnalysisGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TestAnalysisGroupByArgs['orderBy'] }
+        : { orderBy?: TestAnalysisGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TestAnalysisGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTestAnalysisGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TestAnalysis model
+   */
+  readonly fields: TestAnalysisFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TestAnalysis.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TestAnalysisClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    session<T extends AnalysisSessionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AnalysisSessionDefaultArgs<ExtArgs>>): Prisma__AnalysisSessionClient<$Result.GetResult<Prisma.$AnalysisSessionPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    testFile<T extends TestFileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TestFileDefaultArgs<ExtArgs>>): Prisma__TestFileClient<$Result.GetResult<Prisma.$TestFilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TestAnalysis model
+   */ 
+  interface TestAnalysisFieldRefs {
+    readonly id: FieldRef<"TestAnalysis", 'String'>
+    readonly sessionId: FieldRef<"TestAnalysis", 'String'>
+    readonly testFileId: FieldRef<"TestAnalysis", 'String'>
+    readonly patterns: FieldRef<"TestAnalysis", 'Json'>
+    readonly antiPatterns: FieldRef<"TestAnalysis", 'Json'>
+    readonly suggestions: FieldRef<"TestAnalysis", 'Json'>
+    readonly context: FieldRef<"TestAnalysis", 'Json'>
+    readonly timestamp: FieldRef<"TestAnalysis", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TestAnalysis findUnique
+   */
+  export type TestAnalysisFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * Filter, which TestAnalysis to fetch.
+     */
+    where: TestAnalysisWhereUniqueInput
+  }
+
+  /**
+   * TestAnalysis findUniqueOrThrow
+   */
+  export type TestAnalysisFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * Filter, which TestAnalysis to fetch.
+     */
+    where: TestAnalysisWhereUniqueInput
+  }
+
+  /**
+   * TestAnalysis findFirst
+   */
+  export type TestAnalysisFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * Filter, which TestAnalysis to fetch.
+     */
+    where?: TestAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestAnalyses to fetch.
+     */
+    orderBy?: TestAnalysisOrderByWithRelationInput | TestAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TestAnalyses.
+     */
+    cursor?: TestAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestAnalyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TestAnalyses.
+     */
+    distinct?: TestAnalysisScalarFieldEnum | TestAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * TestAnalysis findFirstOrThrow
+   */
+  export type TestAnalysisFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * Filter, which TestAnalysis to fetch.
+     */
+    where?: TestAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestAnalyses to fetch.
+     */
+    orderBy?: TestAnalysisOrderByWithRelationInput | TestAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TestAnalyses.
+     */
+    cursor?: TestAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestAnalyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TestAnalyses.
+     */
+    distinct?: TestAnalysisScalarFieldEnum | TestAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * TestAnalysis findMany
+   */
+  export type TestAnalysisFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * Filter, which TestAnalyses to fetch.
+     */
+    where?: TestAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestAnalyses to fetch.
+     */
+    orderBy?: TestAnalysisOrderByWithRelationInput | TestAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TestAnalyses.
+     */
+    cursor?: TestAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestAnalyses.
+     */
+    skip?: number
+    distinct?: TestAnalysisScalarFieldEnum | TestAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * TestAnalysis create
+   */
+  export type TestAnalysisCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TestAnalysis.
+     */
+    data: XOR<TestAnalysisCreateInput, TestAnalysisUncheckedCreateInput>
+  }
+
+  /**
+   * TestAnalysis createMany
+   */
+  export type TestAnalysisCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TestAnalyses.
+     */
+    data: TestAnalysisCreateManyInput | TestAnalysisCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TestAnalysis createManyAndReturn
+   */
+  export type TestAnalysisCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many TestAnalyses.
+     */
+    data: TestAnalysisCreateManyInput | TestAnalysisCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TestAnalysis update
+   */
+  export type TestAnalysisUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TestAnalysis.
+     */
+    data: XOR<TestAnalysisUpdateInput, TestAnalysisUncheckedUpdateInput>
+    /**
+     * Choose, which TestAnalysis to update.
+     */
+    where: TestAnalysisWhereUniqueInput
+  }
+
+  /**
+   * TestAnalysis updateMany
+   */
+  export type TestAnalysisUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TestAnalyses.
+     */
+    data: XOR<TestAnalysisUpdateManyMutationInput, TestAnalysisUncheckedUpdateManyInput>
+    /**
+     * Filter which TestAnalyses to update
+     */
+    where?: TestAnalysisWhereInput
+  }
+
+  /**
+   * TestAnalysis upsert
+   */
+  export type TestAnalysisUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TestAnalysis to update in case it exists.
+     */
+    where: TestAnalysisWhereUniqueInput
+    /**
+     * In case the TestAnalysis found by the `where` argument doesn't exist, create a new TestAnalysis with this data.
+     */
+    create: XOR<TestAnalysisCreateInput, TestAnalysisUncheckedCreateInput>
+    /**
+     * In case the TestAnalysis was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TestAnalysisUpdateInput, TestAnalysisUncheckedUpdateInput>
+  }
+
+  /**
+   * TestAnalysis delete
+   */
+  export type TestAnalysisDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+    /**
+     * Filter which TestAnalysis to delete.
+     */
+    where: TestAnalysisWhereUniqueInput
+  }
+
+  /**
+   * TestAnalysis deleteMany
+   */
+  export type TestAnalysisDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TestAnalyses to delete
+     */
+    where?: TestAnalysisWhereInput
+  }
+
+  /**
+   * TestAnalysis without action
+   */
+  export type TestAnalysisDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestAnalysis
+     */
+    select?: TestAnalysisSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TestAnalysisInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TestPattern
+   */
+
+  export type AggregateTestPattern = {
+    _count: TestPatternCountAggregateOutputType | null
+    _avg: TestPatternAvgAggregateOutputType | null
+    _sum: TestPatternSumAggregateOutputType | null
+    _min: TestPatternMinAggregateOutputType | null
+    _max: TestPatternMaxAggregateOutputType | null
+  }
+
+  export type TestPatternAvgAggregateOutputType = {
+    successRate: number | null
+    usageCount: number | null
+  }
+
+  export type TestPatternSumAggregateOutputType = {
+    successRate: number | null
+    usageCount: number | null
+  }
+
+  export type TestPatternMinAggregateOutputType = {
+    id: string | null
+    type: $Enums.PatternType | null
+    pattern: string | null
+    successRate: number | null
+    usageCount: number | null
+    lastUsed: Date | null
+    createdAt: Date | null
+  }
+
+  export type TestPatternMaxAggregateOutputType = {
+    id: string | null
+    type: $Enums.PatternType | null
+    pattern: string | null
+    successRate: number | null
+    usageCount: number | null
+    lastUsed: Date | null
+    createdAt: Date | null
+  }
+
+  export type TestPatternCountAggregateOutputType = {
+    id: number
+    type: number
+    pattern: number
+    context: number
+    successRate: number
+    usageCount: number
+    lastUsed: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type TestPatternAvgAggregateInputType = {
+    successRate?: true
+    usageCount?: true
+  }
+
+  export type TestPatternSumAggregateInputType = {
+    successRate?: true
+    usageCount?: true
+  }
+
+  export type TestPatternMinAggregateInputType = {
+    id?: true
+    type?: true
+    pattern?: true
+    successRate?: true
+    usageCount?: true
+    lastUsed?: true
+    createdAt?: true
+  }
+
+  export type TestPatternMaxAggregateInputType = {
+    id?: true
+    type?: true
+    pattern?: true
+    successRate?: true
+    usageCount?: true
+    lastUsed?: true
+    createdAt?: true
+  }
+
+  export type TestPatternCountAggregateInputType = {
+    id?: true
+    type?: true
+    pattern?: true
+    context?: true
+    successRate?: true
+    usageCount?: true
+    lastUsed?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type TestPatternAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TestPattern to aggregate.
+     */
+    where?: TestPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestPatterns to fetch.
+     */
+    orderBy?: TestPatternOrderByWithRelationInput | TestPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TestPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestPatterns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TestPatterns
+    **/
+    _count?: true | TestPatternCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TestPatternAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TestPatternSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TestPatternMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TestPatternMaxAggregateInputType
+  }
+
+  export type GetTestPatternAggregateType<T extends TestPatternAggregateArgs> = {
+        [P in keyof T & keyof AggregateTestPattern]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTestPattern[P]>
+      : GetScalarType<T[P], AggregateTestPattern[P]>
+  }
+
+
+
+
+  export type TestPatternGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TestPatternWhereInput
+    orderBy?: TestPatternOrderByWithAggregationInput | TestPatternOrderByWithAggregationInput[]
+    by: TestPatternScalarFieldEnum[] | TestPatternScalarFieldEnum
+    having?: TestPatternScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TestPatternCountAggregateInputType | true
+    _avg?: TestPatternAvgAggregateInputType
+    _sum?: TestPatternSumAggregateInputType
+    _min?: TestPatternMinAggregateInputType
+    _max?: TestPatternMaxAggregateInputType
+  }
+
+  export type TestPatternGroupByOutputType = {
+    id: string
+    type: $Enums.PatternType
+    pattern: string
+    context: JsonValue
+    successRate: number
+    usageCount: number
+    lastUsed: Date
+    createdAt: Date
+    _count: TestPatternCountAggregateOutputType | null
+    _avg: TestPatternAvgAggregateOutputType | null
+    _sum: TestPatternSumAggregateOutputType | null
+    _min: TestPatternMinAggregateOutputType | null
+    _max: TestPatternMaxAggregateOutputType | null
+  }
+
+  type GetTestPatternGroupByPayload<T extends TestPatternGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TestPatternGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TestPatternGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TestPatternGroupByOutputType[P]>
+            : GetScalarType<T[P], TestPatternGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TestPatternSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    type?: boolean
+    pattern?: boolean
+    context?: boolean
+    successRate?: boolean
+    usageCount?: boolean
+    lastUsed?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["testPattern"]>
+
+  export type TestPatternSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    type?: boolean
+    pattern?: boolean
+    context?: boolean
+    successRate?: boolean
+    usageCount?: boolean
+    lastUsed?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["testPattern"]>
+
+  export type TestPatternSelectScalar = {
+    id?: boolean
+    type?: boolean
+    pattern?: boolean
+    context?: boolean
+    successRate?: boolean
+    usageCount?: boolean
+    lastUsed?: boolean
+    createdAt?: boolean
+  }
+
+
+  export type $TestPatternPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TestPattern"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      type: $Enums.PatternType
+      pattern: string
+      context: Prisma.JsonValue
+      successRate: number
+      usageCount: number
+      lastUsed: Date
+      createdAt: Date
+    }, ExtArgs["result"]["testPattern"]>
+    composites: {}
+  }
+
+  type TestPatternGetPayload<S extends boolean | null | undefined | TestPatternDefaultArgs> = $Result.GetResult<Prisma.$TestPatternPayload, S>
+
+  type TestPatternCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<TestPatternFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: TestPatternCountAggregateInputType | true
+    }
+
+  export interface TestPatternDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TestPattern'], meta: { name: 'TestPattern' } }
+    /**
+     * Find zero or one TestPattern that matches the filter.
+     * @param {TestPatternFindUniqueArgs} args - Arguments to find a TestPattern
+     * @example
+     * // Get one TestPattern
+     * const testPattern = await prisma.testPattern.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TestPatternFindUniqueArgs>(args: SelectSubset<T, TestPatternFindUniqueArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one TestPattern that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {TestPatternFindUniqueOrThrowArgs} args - Arguments to find a TestPattern
+     * @example
+     * // Get one TestPattern
+     * const testPattern = await prisma.testPattern.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TestPatternFindUniqueOrThrowArgs>(args: SelectSubset<T, TestPatternFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first TestPattern that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternFindFirstArgs} args - Arguments to find a TestPattern
+     * @example
+     * // Get one TestPattern
+     * const testPattern = await prisma.testPattern.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TestPatternFindFirstArgs>(args?: SelectSubset<T, TestPatternFindFirstArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first TestPattern that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternFindFirstOrThrowArgs} args - Arguments to find a TestPattern
+     * @example
+     * // Get one TestPattern
+     * const testPattern = await prisma.testPattern.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TestPatternFindFirstOrThrowArgs>(args?: SelectSubset<T, TestPatternFindFirstOrThrowArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more TestPatterns that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TestPatterns
+     * const testPatterns = await prisma.testPattern.findMany()
+     * 
+     * // Get first 10 TestPatterns
+     * const testPatterns = await prisma.testPattern.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const testPatternWithIdOnly = await prisma.testPattern.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TestPatternFindManyArgs>(args?: SelectSubset<T, TestPatternFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a TestPattern.
+     * @param {TestPatternCreateArgs} args - Arguments to create a TestPattern.
+     * @example
+     * // Create one TestPattern
+     * const TestPattern = await prisma.testPattern.create({
+     *   data: {
+     *     // ... data to create a TestPattern
+     *   }
+     * })
+     * 
+     */
+    create<T extends TestPatternCreateArgs>(args: SelectSubset<T, TestPatternCreateArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many TestPatterns.
+     * @param {TestPatternCreateManyArgs} args - Arguments to create many TestPatterns.
+     * @example
+     * // Create many TestPatterns
+     * const testPattern = await prisma.testPattern.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TestPatternCreateManyArgs>(args?: SelectSubset<T, TestPatternCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TestPatterns and returns the data saved in the database.
+     * @param {TestPatternCreateManyAndReturnArgs} args - Arguments to create many TestPatterns.
+     * @example
+     * // Create many TestPatterns
+     * const testPattern = await prisma.testPattern.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TestPatterns and only return the `id`
+     * const testPatternWithIdOnly = await prisma.testPattern.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TestPatternCreateManyAndReturnArgs>(args?: SelectSubset<T, TestPatternCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a TestPattern.
+     * @param {TestPatternDeleteArgs} args - Arguments to delete one TestPattern.
+     * @example
+     * // Delete one TestPattern
+     * const TestPattern = await prisma.testPattern.delete({
+     *   where: {
+     *     // ... filter to delete one TestPattern
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TestPatternDeleteArgs>(args: SelectSubset<T, TestPatternDeleteArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one TestPattern.
+     * @param {TestPatternUpdateArgs} args - Arguments to update one TestPattern.
+     * @example
+     * // Update one TestPattern
+     * const testPattern = await prisma.testPattern.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TestPatternUpdateArgs>(args: SelectSubset<T, TestPatternUpdateArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more TestPatterns.
+     * @param {TestPatternDeleteManyArgs} args - Arguments to filter TestPatterns to delete.
+     * @example
+     * // Delete a few TestPatterns
+     * const { count } = await prisma.testPattern.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TestPatternDeleteManyArgs>(args?: SelectSubset<T, TestPatternDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TestPatterns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TestPatterns
+     * const testPattern = await prisma.testPattern.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TestPatternUpdateManyArgs>(args: SelectSubset<T, TestPatternUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one TestPattern.
+     * @param {TestPatternUpsertArgs} args - Arguments to update or create a TestPattern.
+     * @example
+     * // Update or create a TestPattern
+     * const testPattern = await prisma.testPattern.upsert({
+     *   create: {
+     *     // ... data to create a TestPattern
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TestPattern we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TestPatternUpsertArgs>(args: SelectSubset<T, TestPatternUpsertArgs<ExtArgs>>): Prisma__TestPatternClient<$Result.GetResult<Prisma.$TestPatternPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of TestPatterns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternCountArgs} args - Arguments to filter TestPatterns to count.
+     * @example
+     * // Count the number of TestPatterns
+     * const count = await prisma.testPattern.count({
+     *   where: {
+     *     // ... the filter for the TestPatterns we want to count
+     *   }
+     * })
+    **/
+    count<T extends TestPatternCountArgs>(
+      args?: Subset<T, TestPatternCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TestPatternCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TestPattern.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TestPatternAggregateArgs>(args: Subset<T, TestPatternAggregateArgs>): Prisma.PrismaPromise<GetTestPatternAggregateType<T>>
+
+    /**
+     * Group by TestPattern.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TestPatternGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TestPatternGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TestPatternGroupByArgs['orderBy'] }
+        : { orderBy?: TestPatternGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TestPatternGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTestPatternGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TestPattern model
+   */
+  readonly fields: TestPatternFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TestPattern.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TestPatternClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TestPattern model
+   */ 
+  interface TestPatternFieldRefs {
+    readonly id: FieldRef<"TestPattern", 'String'>
+    readonly type: FieldRef<"TestPattern", 'PatternType'>
+    readonly pattern: FieldRef<"TestPattern", 'String'>
+    readonly context: FieldRef<"TestPattern", 'Json'>
+    readonly successRate: FieldRef<"TestPattern", 'Float'>
+    readonly usageCount: FieldRef<"TestPattern", 'Int'>
+    readonly lastUsed: FieldRef<"TestPattern", 'DateTime'>
+    readonly createdAt: FieldRef<"TestPattern", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TestPattern findUnique
+   */
+  export type TestPatternFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which TestPattern to fetch.
+     */
+    where: TestPatternWhereUniqueInput
+  }
+
+  /**
+   * TestPattern findUniqueOrThrow
+   */
+  export type TestPatternFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which TestPattern to fetch.
+     */
+    where: TestPatternWhereUniqueInput
+  }
+
+  /**
+   * TestPattern findFirst
+   */
+  export type TestPatternFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which TestPattern to fetch.
+     */
+    where?: TestPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestPatterns to fetch.
+     */
+    orderBy?: TestPatternOrderByWithRelationInput | TestPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TestPatterns.
+     */
+    cursor?: TestPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestPatterns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TestPatterns.
+     */
+    distinct?: TestPatternScalarFieldEnum | TestPatternScalarFieldEnum[]
+  }
+
+  /**
+   * TestPattern findFirstOrThrow
+   */
+  export type TestPatternFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which TestPattern to fetch.
+     */
+    where?: TestPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestPatterns to fetch.
+     */
+    orderBy?: TestPatternOrderByWithRelationInput | TestPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TestPatterns.
+     */
+    cursor?: TestPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestPatterns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TestPatterns.
+     */
+    distinct?: TestPatternScalarFieldEnum | TestPatternScalarFieldEnum[]
+  }
+
+  /**
+   * TestPattern findMany
+   */
+  export type TestPatternFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which TestPatterns to fetch.
+     */
+    where?: TestPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TestPatterns to fetch.
+     */
+    orderBy?: TestPatternOrderByWithRelationInput | TestPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TestPatterns.
+     */
+    cursor?: TestPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TestPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TestPatterns.
+     */
+    skip?: number
+    distinct?: TestPatternScalarFieldEnum | TestPatternScalarFieldEnum[]
+  }
+
+  /**
+   * TestPattern create
+   */
+  export type TestPatternCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * The data needed to create a TestPattern.
+     */
+    data: XOR<TestPatternCreateInput, TestPatternUncheckedCreateInput>
+  }
+
+  /**
+   * TestPattern createMany
+   */
+  export type TestPatternCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TestPatterns.
+     */
+    data: TestPatternCreateManyInput | TestPatternCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TestPattern createManyAndReturn
+   */
+  export type TestPatternCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many TestPatterns.
+     */
+    data: TestPatternCreateManyInput | TestPatternCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TestPattern update
+   */
+  export type TestPatternUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * The data needed to update a TestPattern.
+     */
+    data: XOR<TestPatternUpdateInput, TestPatternUncheckedUpdateInput>
+    /**
+     * Choose, which TestPattern to update.
+     */
+    where: TestPatternWhereUniqueInput
+  }
+
+  /**
+   * TestPattern updateMany
+   */
+  export type TestPatternUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TestPatterns.
+     */
+    data: XOR<TestPatternUpdateManyMutationInput, TestPatternUncheckedUpdateManyInput>
+    /**
+     * Filter which TestPatterns to update
+     */
+    where?: TestPatternWhereInput
+  }
+
+  /**
+   * TestPattern upsert
+   */
+  export type TestPatternUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * The filter to search for the TestPattern to update in case it exists.
+     */
+    where: TestPatternWhereUniqueInput
+    /**
+     * In case the TestPattern found by the `where` argument doesn't exist, create a new TestPattern with this data.
+     */
+    create: XOR<TestPatternCreateInput, TestPatternUncheckedCreateInput>
+    /**
+     * In case the TestPattern was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TestPatternUpdateInput, TestPatternUncheckedUpdateInput>
+  }
+
+  /**
+   * TestPattern delete
+   */
+  export type TestPatternDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+    /**
+     * Filter which TestPattern to delete.
+     */
+    where: TestPatternWhereUniqueInput
+  }
+
+  /**
+   * TestPattern deleteMany
+   */
+  export type TestPatternDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TestPatterns to delete
+     */
+    where?: TestPatternWhereInput
+  }
+
+  /**
+   * TestPattern without action
+   */
+  export type TestPatternDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TestPattern
+     */
+    select?: TestPatternSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FixPattern
+   */
+
+  export type AggregateFixPattern = {
+    _count: FixPatternCountAggregateOutputType | null
+    _avg: FixPatternAvgAggregateOutputType | null
+    _sum: FixPatternSumAggregateOutputType | null
+    _min: FixPatternMinAggregateOutputType | null
+    _max: FixPatternMaxAggregateOutputType | null
+  }
+
+  export type FixPatternAvgAggregateOutputType = {
+    successRate: number | null
+    usageCount: number | null
+  }
+
+  export type FixPatternSumAggregateOutputType = {
+    successRate: number | null
+    usageCount: number | null
+  }
+
+  export type FixPatternMinAggregateOutputType = {
+    id: string | null
+    problem: string | null
+    solution: string | null
+    successRate: number | null
+    usageCount: number | null
+    lastUsed: Date | null
+    createdAt: Date | null
+  }
+
+  export type FixPatternMaxAggregateOutputType = {
+    id: string | null
+    problem: string | null
+    solution: string | null
+    successRate: number | null
+    usageCount: number | null
+    lastUsed: Date | null
+    createdAt: Date | null
+  }
+
+  export type FixPatternCountAggregateOutputType = {
+    id: number
+    problem: number
+    solution: number
+    context: number
+    successRate: number
+    usageCount: number
+    lastUsed: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type FixPatternAvgAggregateInputType = {
+    successRate?: true
+    usageCount?: true
+  }
+
+  export type FixPatternSumAggregateInputType = {
+    successRate?: true
+    usageCount?: true
+  }
+
+  export type FixPatternMinAggregateInputType = {
+    id?: true
+    problem?: true
+    solution?: true
+    successRate?: true
+    usageCount?: true
+    lastUsed?: true
+    createdAt?: true
+  }
+
+  export type FixPatternMaxAggregateInputType = {
+    id?: true
+    problem?: true
+    solution?: true
+    successRate?: true
+    usageCount?: true
+    lastUsed?: true
+    createdAt?: true
+  }
+
+  export type FixPatternCountAggregateInputType = {
+    id?: true
+    problem?: true
+    solution?: true
+    context?: true
+    successRate?: true
+    usageCount?: true
+    lastUsed?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type FixPatternAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FixPattern to aggregate.
+     */
+    where?: FixPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FixPatterns to fetch.
+     */
+    orderBy?: FixPatternOrderByWithRelationInput | FixPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FixPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FixPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FixPatterns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FixPatterns
+    **/
+    _count?: true | FixPatternCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FixPatternAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FixPatternSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FixPatternMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FixPatternMaxAggregateInputType
+  }
+
+  export type GetFixPatternAggregateType<T extends FixPatternAggregateArgs> = {
+        [P in keyof T & keyof AggregateFixPattern]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFixPattern[P]>
+      : GetScalarType<T[P], AggregateFixPattern[P]>
+  }
+
+
+
+
+  export type FixPatternGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FixPatternWhereInput
+    orderBy?: FixPatternOrderByWithAggregationInput | FixPatternOrderByWithAggregationInput[]
+    by: FixPatternScalarFieldEnum[] | FixPatternScalarFieldEnum
+    having?: FixPatternScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FixPatternCountAggregateInputType | true
+    _avg?: FixPatternAvgAggregateInputType
+    _sum?: FixPatternSumAggregateInputType
+    _min?: FixPatternMinAggregateInputType
+    _max?: FixPatternMaxAggregateInputType
+  }
+
+  export type FixPatternGroupByOutputType = {
+    id: string
+    problem: string
+    solution: string
+    context: JsonValue
+    successRate: number
+    usageCount: number
+    lastUsed: Date
+    createdAt: Date
+    _count: FixPatternCountAggregateOutputType | null
+    _avg: FixPatternAvgAggregateOutputType | null
+    _sum: FixPatternSumAggregateOutputType | null
+    _min: FixPatternMinAggregateOutputType | null
+    _max: FixPatternMaxAggregateOutputType | null
+  }
+
+  type GetFixPatternGroupByPayload<T extends FixPatternGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FixPatternGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FixPatternGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FixPatternGroupByOutputType[P]>
+            : GetScalarType<T[P], FixPatternGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FixPatternSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    problem?: boolean
+    solution?: boolean
+    context?: boolean
+    successRate?: boolean
+    usageCount?: boolean
+    lastUsed?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["fixPattern"]>
+
+  export type FixPatternSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    problem?: boolean
+    solution?: boolean
+    context?: boolean
+    successRate?: boolean
+    usageCount?: boolean
+    lastUsed?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["fixPattern"]>
+
+  export type FixPatternSelectScalar = {
+    id?: boolean
+    problem?: boolean
+    solution?: boolean
+    context?: boolean
+    successRate?: boolean
+    usageCount?: boolean
+    lastUsed?: boolean
+    createdAt?: boolean
+  }
+
+
+  export type $FixPatternPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FixPattern"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      problem: string
+      solution: string
+      context: Prisma.JsonValue
+      successRate: number
+      usageCount: number
+      lastUsed: Date
+      createdAt: Date
+    }, ExtArgs["result"]["fixPattern"]>
+    composites: {}
+  }
+
+  type FixPatternGetPayload<S extends boolean | null | undefined | FixPatternDefaultArgs> = $Result.GetResult<Prisma.$FixPatternPayload, S>
+
+  type FixPatternCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FixPatternFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FixPatternCountAggregateInputType | true
+    }
+
+  export interface FixPatternDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FixPattern'], meta: { name: 'FixPattern' } }
+    /**
+     * Find zero or one FixPattern that matches the filter.
+     * @param {FixPatternFindUniqueArgs} args - Arguments to find a FixPattern
+     * @example
+     * // Get one FixPattern
+     * const fixPattern = await prisma.fixPattern.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FixPatternFindUniqueArgs>(args: SelectSubset<T, FixPatternFindUniqueArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one FixPattern that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {FixPatternFindUniqueOrThrowArgs} args - Arguments to find a FixPattern
+     * @example
+     * // Get one FixPattern
+     * const fixPattern = await prisma.fixPattern.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FixPatternFindUniqueOrThrowArgs>(args: SelectSubset<T, FixPatternFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first FixPattern that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternFindFirstArgs} args - Arguments to find a FixPattern
+     * @example
+     * // Get one FixPattern
+     * const fixPattern = await prisma.fixPattern.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FixPatternFindFirstArgs>(args?: SelectSubset<T, FixPatternFindFirstArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first FixPattern that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternFindFirstOrThrowArgs} args - Arguments to find a FixPattern
+     * @example
+     * // Get one FixPattern
+     * const fixPattern = await prisma.fixPattern.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FixPatternFindFirstOrThrowArgs>(args?: SelectSubset<T, FixPatternFindFirstOrThrowArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more FixPatterns that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FixPatterns
+     * const fixPatterns = await prisma.fixPattern.findMany()
+     * 
+     * // Get first 10 FixPatterns
+     * const fixPatterns = await prisma.fixPattern.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fixPatternWithIdOnly = await prisma.fixPattern.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FixPatternFindManyArgs>(args?: SelectSubset<T, FixPatternFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a FixPattern.
+     * @param {FixPatternCreateArgs} args - Arguments to create a FixPattern.
+     * @example
+     * // Create one FixPattern
+     * const FixPattern = await prisma.fixPattern.create({
+     *   data: {
+     *     // ... data to create a FixPattern
+     *   }
+     * })
+     * 
+     */
+    create<T extends FixPatternCreateArgs>(args: SelectSubset<T, FixPatternCreateArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many FixPatterns.
+     * @param {FixPatternCreateManyArgs} args - Arguments to create many FixPatterns.
+     * @example
+     * // Create many FixPatterns
+     * const fixPattern = await prisma.fixPattern.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FixPatternCreateManyArgs>(args?: SelectSubset<T, FixPatternCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FixPatterns and returns the data saved in the database.
+     * @param {FixPatternCreateManyAndReturnArgs} args - Arguments to create many FixPatterns.
+     * @example
+     * // Create many FixPatterns
+     * const fixPattern = await prisma.fixPattern.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FixPatterns and only return the `id`
+     * const fixPatternWithIdOnly = await prisma.fixPattern.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FixPatternCreateManyAndReturnArgs>(args?: SelectSubset<T, FixPatternCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a FixPattern.
+     * @param {FixPatternDeleteArgs} args - Arguments to delete one FixPattern.
+     * @example
+     * // Delete one FixPattern
+     * const FixPattern = await prisma.fixPattern.delete({
+     *   where: {
+     *     // ... filter to delete one FixPattern
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FixPatternDeleteArgs>(args: SelectSubset<T, FixPatternDeleteArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one FixPattern.
+     * @param {FixPatternUpdateArgs} args - Arguments to update one FixPattern.
+     * @example
+     * // Update one FixPattern
+     * const fixPattern = await prisma.fixPattern.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FixPatternUpdateArgs>(args: SelectSubset<T, FixPatternUpdateArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more FixPatterns.
+     * @param {FixPatternDeleteManyArgs} args - Arguments to filter FixPatterns to delete.
+     * @example
+     * // Delete a few FixPatterns
+     * const { count } = await prisma.fixPattern.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FixPatternDeleteManyArgs>(args?: SelectSubset<T, FixPatternDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FixPatterns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FixPatterns
+     * const fixPattern = await prisma.fixPattern.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FixPatternUpdateManyArgs>(args: SelectSubset<T, FixPatternUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one FixPattern.
+     * @param {FixPatternUpsertArgs} args - Arguments to update or create a FixPattern.
+     * @example
+     * // Update or create a FixPattern
+     * const fixPattern = await prisma.fixPattern.upsert({
+     *   create: {
+     *     // ... data to create a FixPattern
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FixPattern we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FixPatternUpsertArgs>(args: SelectSubset<T, FixPatternUpsertArgs<ExtArgs>>): Prisma__FixPatternClient<$Result.GetResult<Prisma.$FixPatternPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of FixPatterns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternCountArgs} args - Arguments to filter FixPatterns to count.
+     * @example
+     * // Count the number of FixPatterns
+     * const count = await prisma.fixPattern.count({
+     *   where: {
+     *     // ... the filter for the FixPatterns we want to count
+     *   }
+     * })
+    **/
+    count<T extends FixPatternCountArgs>(
+      args?: Subset<T, FixPatternCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FixPatternCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FixPattern.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FixPatternAggregateArgs>(args: Subset<T, FixPatternAggregateArgs>): Prisma.PrismaPromise<GetFixPatternAggregateType<T>>
+
+    /**
+     * Group by FixPattern.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FixPatternGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FixPatternGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FixPatternGroupByArgs['orderBy'] }
+        : { orderBy?: FixPatternGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FixPatternGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFixPatternGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FixPattern model
+   */
+  readonly fields: FixPatternFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FixPattern.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FixPatternClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FixPattern model
+   */ 
+  interface FixPatternFieldRefs {
+    readonly id: FieldRef<"FixPattern", 'String'>
+    readonly problem: FieldRef<"FixPattern", 'String'>
+    readonly solution: FieldRef<"FixPattern", 'String'>
+    readonly context: FieldRef<"FixPattern", 'Json'>
+    readonly successRate: FieldRef<"FixPattern", 'Float'>
+    readonly usageCount: FieldRef<"FixPattern", 'Int'>
+    readonly lastUsed: FieldRef<"FixPattern", 'DateTime'>
+    readonly createdAt: FieldRef<"FixPattern", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FixPattern findUnique
+   */
+  export type FixPatternFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which FixPattern to fetch.
+     */
+    where: FixPatternWhereUniqueInput
+  }
+
+  /**
+   * FixPattern findUniqueOrThrow
+   */
+  export type FixPatternFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which FixPattern to fetch.
+     */
+    where: FixPatternWhereUniqueInput
+  }
+
+  /**
+   * FixPattern findFirst
+   */
+  export type FixPatternFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which FixPattern to fetch.
+     */
+    where?: FixPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FixPatterns to fetch.
+     */
+    orderBy?: FixPatternOrderByWithRelationInput | FixPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FixPatterns.
+     */
+    cursor?: FixPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FixPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FixPatterns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FixPatterns.
+     */
+    distinct?: FixPatternScalarFieldEnum | FixPatternScalarFieldEnum[]
+  }
+
+  /**
+   * FixPattern findFirstOrThrow
+   */
+  export type FixPatternFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which FixPattern to fetch.
+     */
+    where?: FixPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FixPatterns to fetch.
+     */
+    orderBy?: FixPatternOrderByWithRelationInput | FixPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FixPatterns.
+     */
+    cursor?: FixPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FixPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FixPatterns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FixPatterns.
+     */
+    distinct?: FixPatternScalarFieldEnum | FixPatternScalarFieldEnum[]
+  }
+
+  /**
+   * FixPattern findMany
+   */
+  export type FixPatternFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * Filter, which FixPatterns to fetch.
+     */
+    where?: FixPatternWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FixPatterns to fetch.
+     */
+    orderBy?: FixPatternOrderByWithRelationInput | FixPatternOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FixPatterns.
+     */
+    cursor?: FixPatternWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FixPatterns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FixPatterns.
+     */
+    skip?: number
+    distinct?: FixPatternScalarFieldEnum | FixPatternScalarFieldEnum[]
+  }
+
+  /**
+   * FixPattern create
+   */
+  export type FixPatternCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * The data needed to create a FixPattern.
+     */
+    data: XOR<FixPatternCreateInput, FixPatternUncheckedCreateInput>
+  }
+
+  /**
+   * FixPattern createMany
+   */
+  export type FixPatternCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FixPatterns.
+     */
+    data: FixPatternCreateManyInput | FixPatternCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FixPattern createManyAndReturn
+   */
+  export type FixPatternCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many FixPatterns.
+     */
+    data: FixPatternCreateManyInput | FixPatternCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FixPattern update
+   */
+  export type FixPatternUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * The data needed to update a FixPattern.
+     */
+    data: XOR<FixPatternUpdateInput, FixPatternUncheckedUpdateInput>
+    /**
+     * Choose, which FixPattern to update.
+     */
+    where: FixPatternWhereUniqueInput
+  }
+
+  /**
+   * FixPattern updateMany
+   */
+  export type FixPatternUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FixPatterns.
+     */
+    data: XOR<FixPatternUpdateManyMutationInput, FixPatternUncheckedUpdateManyInput>
+    /**
+     * Filter which FixPatterns to update
+     */
+    where?: FixPatternWhereInput
+  }
+
+  /**
+   * FixPattern upsert
+   */
+  export type FixPatternUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * The filter to search for the FixPattern to update in case it exists.
+     */
+    where: FixPatternWhereUniqueInput
+    /**
+     * In case the FixPattern found by the `where` argument doesn't exist, create a new FixPattern with this data.
+     */
+    create: XOR<FixPatternCreateInput, FixPatternUncheckedCreateInput>
+    /**
+     * In case the FixPattern was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FixPatternUpdateInput, FixPatternUncheckedUpdateInput>
+  }
+
+  /**
+   * FixPattern delete
+   */
+  export type FixPatternDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
+    /**
+     * Filter which FixPattern to delete.
+     */
+    where: FixPatternWhereUniqueInput
+  }
+
+  /**
+   * FixPattern deleteMany
+   */
+  export type FixPatternDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FixPatterns to delete
+     */
+    where?: FixPatternWhereInput
+  }
+
+  /**
+   * FixPattern without action
+   */
+  export type FixPatternDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FixPattern
+     */
+    select?: FixPatternSelect<ExtArgs> | null
   }
 
 
@@ -6644,6 +10963,19 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const AnalysisSessionScalarFieldEnum: {
+    id: 'id',
+    startedAt: 'startedAt',
+    endedAt: 'endedAt',
+    status: 'status',
+    context: 'context',
+    decisions: 'decisions',
+    operations: 'operations'
+  };
+
+  export type AnalysisSessionScalarFieldEnum = (typeof AnalysisSessionScalarFieldEnum)[keyof typeof AnalysisSessionScalarFieldEnum]
+
+
   export const TestFileScalarFieldEnum: {
     id: 'id',
     filePath: 'filePath',
@@ -6666,6 +10998,48 @@ export namespace Prisma {
   };
 
   export type TestFileScalarFieldEnum = (typeof TestFileScalarFieldEnum)[keyof typeof TestFileScalarFieldEnum]
+
+
+  export const TestAnalysisScalarFieldEnum: {
+    id: 'id',
+    sessionId: 'sessionId',
+    testFileId: 'testFileId',
+    patterns: 'patterns',
+    antiPatterns: 'antiPatterns',
+    suggestions: 'suggestions',
+    context: 'context',
+    timestamp: 'timestamp'
+  };
+
+  export type TestAnalysisScalarFieldEnum = (typeof TestAnalysisScalarFieldEnum)[keyof typeof TestAnalysisScalarFieldEnum]
+
+
+  export const TestPatternScalarFieldEnum: {
+    id: 'id',
+    type: 'type',
+    pattern: 'pattern',
+    context: 'context',
+    successRate: 'successRate',
+    usageCount: 'usageCount',
+    lastUsed: 'lastUsed',
+    createdAt: 'createdAt'
+  };
+
+  export type TestPatternScalarFieldEnum = (typeof TestPatternScalarFieldEnum)[keyof typeof TestPatternScalarFieldEnum]
+
+
+  export const FixPatternScalarFieldEnum: {
+    id: 'id',
+    problem: 'problem',
+    solution: 'solution',
+    context: 'context',
+    successRate: 'successRate',
+    usageCount: 'usageCount',
+    lastUsed: 'lastUsed',
+    createdAt: 'createdAt'
+  };
+
+  export type FixPatternScalarFieldEnum = (typeof FixPatternScalarFieldEnum)[keyof typeof FixPatternScalarFieldEnum]
 
 
   export const TestExecutionScalarFieldEnum: {
@@ -6816,6 +11190,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'SessionStatus'
+   */
+  export type EnumSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SessionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'SessionStatus[]'
+   */
+  export type ListEnumSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SessionStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json[]'
+   */
+  export type ListJsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -6844,13 +11246,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
    * Reference to a field of type 'TestHealthScore'
    */
   export type EnumTestHealthScoreFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TestHealthScore'>
@@ -6861,6 +11256,20 @@ export namespace Prisma {
    * Reference to a field of type 'TestHealthScore[]'
    */
   export type ListEnumTestHealthScoreFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TestHealthScore[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PatternType'
+   */
+  export type EnumPatternTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatternType'>
+    
+
+
+  /**
+   * Reference to a field of type 'PatternType[]'
+   */
+  export type ListEnumPatternTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatternType[]'>
     
 
 
@@ -6902,6 +11311,74 @@ export namespace Prisma {
    */
 
 
+  export type AnalysisSessionWhereInput = {
+    AND?: AnalysisSessionWhereInput | AnalysisSessionWhereInput[]
+    OR?: AnalysisSessionWhereInput[]
+    NOT?: AnalysisSessionWhereInput | AnalysisSessionWhereInput[]
+    id?: StringFilter<"AnalysisSession"> | string
+    startedAt?: DateTimeFilter<"AnalysisSession"> | Date | string
+    endedAt?: DateTimeNullableFilter<"AnalysisSession"> | Date | string | null
+    status?: EnumSessionStatusFilter<"AnalysisSession"> | $Enums.SessionStatus
+    context?: JsonNullableFilter<"AnalysisSession">
+    decisions?: JsonNullableListFilter<"AnalysisSession">
+    operations?: JsonNullableListFilter<"AnalysisSession">
+    testFiles?: TestFileListRelationFilter
+    analyses?: TestAnalysisListRelationFilter
+  }
+
+  export type AnalysisSessionOrderByWithRelationInput = {
+    id?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrderInput | SortOrder
+    status?: SortOrder
+    context?: SortOrderInput | SortOrder
+    decisions?: SortOrder
+    operations?: SortOrder
+    testFiles?: TestFileOrderByRelationAggregateInput
+    analyses?: TestAnalysisOrderByRelationAggregateInput
+  }
+
+  export type AnalysisSessionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AnalysisSessionWhereInput | AnalysisSessionWhereInput[]
+    OR?: AnalysisSessionWhereInput[]
+    NOT?: AnalysisSessionWhereInput | AnalysisSessionWhereInput[]
+    startedAt?: DateTimeFilter<"AnalysisSession"> | Date | string
+    endedAt?: DateTimeNullableFilter<"AnalysisSession"> | Date | string | null
+    status?: EnumSessionStatusFilter<"AnalysisSession"> | $Enums.SessionStatus
+    context?: JsonNullableFilter<"AnalysisSession">
+    decisions?: JsonNullableListFilter<"AnalysisSession">
+    operations?: JsonNullableListFilter<"AnalysisSession">
+    testFiles?: TestFileListRelationFilter
+    analyses?: TestAnalysisListRelationFilter
+  }, "id">
+
+  export type AnalysisSessionOrderByWithAggregationInput = {
+    id?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrderInput | SortOrder
+    status?: SortOrder
+    context?: SortOrderInput | SortOrder
+    decisions?: SortOrder
+    operations?: SortOrder
+    _count?: AnalysisSessionCountOrderByAggregateInput
+    _max?: AnalysisSessionMaxOrderByAggregateInput
+    _min?: AnalysisSessionMinOrderByAggregateInput
+  }
+
+  export type AnalysisSessionScalarWhereWithAggregatesInput = {
+    AND?: AnalysisSessionScalarWhereWithAggregatesInput | AnalysisSessionScalarWhereWithAggregatesInput[]
+    OR?: AnalysisSessionScalarWhereWithAggregatesInput[]
+    NOT?: AnalysisSessionScalarWhereWithAggregatesInput | AnalysisSessionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AnalysisSession"> | string
+    startedAt?: DateTimeWithAggregatesFilter<"AnalysisSession"> | Date | string
+    endedAt?: DateTimeNullableWithAggregatesFilter<"AnalysisSession"> | Date | string | null
+    status?: EnumSessionStatusWithAggregatesFilter<"AnalysisSession"> | $Enums.SessionStatus
+    context?: JsonNullableWithAggregatesFilter<"AnalysisSession">
+    decisions?: JsonNullableListFilter<"AnalysisSession">
+    operations?: JsonNullableListFilter<"AnalysisSession">
+  }
+
   export type TestFileWhereInput = {
     AND?: TestFileWhereInput | TestFileWhereInput[]
     OR?: TestFileWhereInput[]
@@ -6924,10 +11401,12 @@ export namespace Prisma {
     totalTests?: IntFilter<"TestFile"> | number
     criticalTests?: IntFilter<"TestFile"> | number
     lastFailureReason?: StringNullableFilter<"TestFile"> | string | null
+    sessions?: AnalysisSessionListRelationFilter
     executions?: TestExecutionListRelationFilter
     coverage?: TestCoverageListRelationFilter
     fixes?: TestFixListRelationFilter
     generations?: TestGenerationListRelationFilter
+    analyses?: TestAnalysisListRelationFilter
   }
 
   export type TestFileOrderByWithRelationInput = {
@@ -6949,10 +11428,12 @@ export namespace Prisma {
     totalTests?: SortOrder
     criticalTests?: SortOrder
     lastFailureReason?: SortOrderInput | SortOrder
+    sessions?: AnalysisSessionOrderByRelationAggregateInput
     executions?: TestExecutionOrderByRelationAggregateInput
     coverage?: TestCoverageOrderByRelationAggregateInput
     fixes?: TestFixOrderByRelationAggregateInput
     generations?: TestGenerationOrderByRelationAggregateInput
+    analyses?: TestAnalysisOrderByRelationAggregateInput
   }
 
   export type TestFileWhereUniqueInput = Prisma.AtLeast<{
@@ -6977,10 +11458,12 @@ export namespace Prisma {
     totalTests?: IntFilter<"TestFile"> | number
     criticalTests?: IntFilter<"TestFile"> | number
     lastFailureReason?: StringNullableFilter<"TestFile"> | string | null
+    sessions?: AnalysisSessionListRelationFilter
     executions?: TestExecutionListRelationFilter
     coverage?: TestCoverageListRelationFilter
     fixes?: TestFixListRelationFilter
     generations?: TestGenerationListRelationFilter
+    analyses?: TestAnalysisListRelationFilter
   }, "id" | "filePath">
 
   export type TestFileOrderByWithAggregationInput = {
@@ -7031,6 +11514,217 @@ export namespace Prisma {
     totalTests?: IntWithAggregatesFilter<"TestFile"> | number
     criticalTests?: IntWithAggregatesFilter<"TestFile"> | number
     lastFailureReason?: StringNullableWithAggregatesFilter<"TestFile"> | string | null
+  }
+
+  export type TestAnalysisWhereInput = {
+    AND?: TestAnalysisWhereInput | TestAnalysisWhereInput[]
+    OR?: TestAnalysisWhereInput[]
+    NOT?: TestAnalysisWhereInput | TestAnalysisWhereInput[]
+    id?: StringFilter<"TestAnalysis"> | string
+    sessionId?: StringFilter<"TestAnalysis"> | string
+    testFileId?: StringFilter<"TestAnalysis"> | string
+    patterns?: JsonFilter<"TestAnalysis">
+    antiPatterns?: JsonFilter<"TestAnalysis">
+    suggestions?: JsonFilter<"TestAnalysis">
+    context?: JsonFilter<"TestAnalysis">
+    timestamp?: DateTimeFilter<"TestAnalysis"> | Date | string
+    session?: XOR<AnalysisSessionScalarRelationFilter, AnalysisSessionWhereInput>
+    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+  }
+
+  export type TestAnalysisOrderByWithRelationInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    testFileId?: SortOrder
+    patterns?: SortOrder
+    antiPatterns?: SortOrder
+    suggestions?: SortOrder
+    context?: SortOrder
+    timestamp?: SortOrder
+    session?: AnalysisSessionOrderByWithRelationInput
+    testFile?: TestFileOrderByWithRelationInput
+  }
+
+  export type TestAnalysisWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TestAnalysisWhereInput | TestAnalysisWhereInput[]
+    OR?: TestAnalysisWhereInput[]
+    NOT?: TestAnalysisWhereInput | TestAnalysisWhereInput[]
+    sessionId?: StringFilter<"TestAnalysis"> | string
+    testFileId?: StringFilter<"TestAnalysis"> | string
+    patterns?: JsonFilter<"TestAnalysis">
+    antiPatterns?: JsonFilter<"TestAnalysis">
+    suggestions?: JsonFilter<"TestAnalysis">
+    context?: JsonFilter<"TestAnalysis">
+    timestamp?: DateTimeFilter<"TestAnalysis"> | Date | string
+    session?: XOR<AnalysisSessionScalarRelationFilter, AnalysisSessionWhereInput>
+    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+  }, "id">
+
+  export type TestAnalysisOrderByWithAggregationInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    testFileId?: SortOrder
+    patterns?: SortOrder
+    antiPatterns?: SortOrder
+    suggestions?: SortOrder
+    context?: SortOrder
+    timestamp?: SortOrder
+    _count?: TestAnalysisCountOrderByAggregateInput
+    _max?: TestAnalysisMaxOrderByAggregateInput
+    _min?: TestAnalysisMinOrderByAggregateInput
+  }
+
+  export type TestAnalysisScalarWhereWithAggregatesInput = {
+    AND?: TestAnalysisScalarWhereWithAggregatesInput | TestAnalysisScalarWhereWithAggregatesInput[]
+    OR?: TestAnalysisScalarWhereWithAggregatesInput[]
+    NOT?: TestAnalysisScalarWhereWithAggregatesInput | TestAnalysisScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TestAnalysis"> | string
+    sessionId?: StringWithAggregatesFilter<"TestAnalysis"> | string
+    testFileId?: StringWithAggregatesFilter<"TestAnalysis"> | string
+    patterns?: JsonWithAggregatesFilter<"TestAnalysis">
+    antiPatterns?: JsonWithAggregatesFilter<"TestAnalysis">
+    suggestions?: JsonWithAggregatesFilter<"TestAnalysis">
+    context?: JsonWithAggregatesFilter<"TestAnalysis">
+    timestamp?: DateTimeWithAggregatesFilter<"TestAnalysis"> | Date | string
+  }
+
+  export type TestPatternWhereInput = {
+    AND?: TestPatternWhereInput | TestPatternWhereInput[]
+    OR?: TestPatternWhereInput[]
+    NOT?: TestPatternWhereInput | TestPatternWhereInput[]
+    id?: StringFilter<"TestPattern"> | string
+    type?: EnumPatternTypeFilter<"TestPattern"> | $Enums.PatternType
+    pattern?: StringFilter<"TestPattern"> | string
+    context?: JsonFilter<"TestPattern">
+    successRate?: FloatFilter<"TestPattern"> | number
+    usageCount?: IntFilter<"TestPattern"> | number
+    lastUsed?: DateTimeFilter<"TestPattern"> | Date | string
+    createdAt?: DateTimeFilter<"TestPattern"> | Date | string
+  }
+
+  export type TestPatternOrderByWithRelationInput = {
+    id?: SortOrder
+    type?: SortOrder
+    pattern?: SortOrder
+    context?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TestPatternWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TestPatternWhereInput | TestPatternWhereInput[]
+    OR?: TestPatternWhereInput[]
+    NOT?: TestPatternWhereInput | TestPatternWhereInput[]
+    type?: EnumPatternTypeFilter<"TestPattern"> | $Enums.PatternType
+    pattern?: StringFilter<"TestPattern"> | string
+    context?: JsonFilter<"TestPattern">
+    successRate?: FloatFilter<"TestPattern"> | number
+    usageCount?: IntFilter<"TestPattern"> | number
+    lastUsed?: DateTimeFilter<"TestPattern"> | Date | string
+    createdAt?: DateTimeFilter<"TestPattern"> | Date | string
+  }, "id">
+
+  export type TestPatternOrderByWithAggregationInput = {
+    id?: SortOrder
+    type?: SortOrder
+    pattern?: SortOrder
+    context?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+    _count?: TestPatternCountOrderByAggregateInput
+    _avg?: TestPatternAvgOrderByAggregateInput
+    _max?: TestPatternMaxOrderByAggregateInput
+    _min?: TestPatternMinOrderByAggregateInput
+    _sum?: TestPatternSumOrderByAggregateInput
+  }
+
+  export type TestPatternScalarWhereWithAggregatesInput = {
+    AND?: TestPatternScalarWhereWithAggregatesInput | TestPatternScalarWhereWithAggregatesInput[]
+    OR?: TestPatternScalarWhereWithAggregatesInput[]
+    NOT?: TestPatternScalarWhereWithAggregatesInput | TestPatternScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TestPattern"> | string
+    type?: EnumPatternTypeWithAggregatesFilter<"TestPattern"> | $Enums.PatternType
+    pattern?: StringWithAggregatesFilter<"TestPattern"> | string
+    context?: JsonWithAggregatesFilter<"TestPattern">
+    successRate?: FloatWithAggregatesFilter<"TestPattern"> | number
+    usageCount?: IntWithAggregatesFilter<"TestPattern"> | number
+    lastUsed?: DateTimeWithAggregatesFilter<"TestPattern"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"TestPattern"> | Date | string
+  }
+
+  export type FixPatternWhereInput = {
+    AND?: FixPatternWhereInput | FixPatternWhereInput[]
+    OR?: FixPatternWhereInput[]
+    NOT?: FixPatternWhereInput | FixPatternWhereInput[]
+    id?: StringFilter<"FixPattern"> | string
+    problem?: StringFilter<"FixPattern"> | string
+    solution?: StringFilter<"FixPattern"> | string
+    context?: JsonFilter<"FixPattern">
+    successRate?: FloatFilter<"FixPattern"> | number
+    usageCount?: IntFilter<"FixPattern"> | number
+    lastUsed?: DateTimeFilter<"FixPattern"> | Date | string
+    createdAt?: DateTimeFilter<"FixPattern"> | Date | string
+  }
+
+  export type FixPatternOrderByWithRelationInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    solution?: SortOrder
+    context?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FixPatternWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FixPatternWhereInput | FixPatternWhereInput[]
+    OR?: FixPatternWhereInput[]
+    NOT?: FixPatternWhereInput | FixPatternWhereInput[]
+    problem?: StringFilter<"FixPattern"> | string
+    solution?: StringFilter<"FixPattern"> | string
+    context?: JsonFilter<"FixPattern">
+    successRate?: FloatFilter<"FixPattern"> | number
+    usageCount?: IntFilter<"FixPattern"> | number
+    lastUsed?: DateTimeFilter<"FixPattern"> | Date | string
+    createdAt?: DateTimeFilter<"FixPattern"> | Date | string
+  }, "id">
+
+  export type FixPatternOrderByWithAggregationInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    solution?: SortOrder
+    context?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+    _count?: FixPatternCountOrderByAggregateInput
+    _avg?: FixPatternAvgOrderByAggregateInput
+    _max?: FixPatternMaxOrderByAggregateInput
+    _min?: FixPatternMinOrderByAggregateInput
+    _sum?: FixPatternSumOrderByAggregateInput
+  }
+
+  export type FixPatternScalarWhereWithAggregatesInput = {
+    AND?: FixPatternScalarWhereWithAggregatesInput | FixPatternScalarWhereWithAggregatesInput[]
+    OR?: FixPatternScalarWhereWithAggregatesInput[]
+    NOT?: FixPatternScalarWhereWithAggregatesInput | FixPatternScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FixPattern"> | string
+    problem?: StringWithAggregatesFilter<"FixPattern"> | string
+    solution?: StringWithAggregatesFilter<"FixPattern"> | string
+    context?: JsonWithAggregatesFilter<"FixPattern">
+    successRate?: FloatWithAggregatesFilter<"FixPattern"> | number
+    usageCount?: IntWithAggregatesFilter<"FixPattern"> | number
+    lastUsed?: DateTimeWithAggregatesFilter<"FixPattern"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"FixPattern"> | Date | string
   }
 
   export type TestExecutionWhereInput = {
@@ -7371,6 +12065,84 @@ export namespace Prisma {
     context?: JsonWithAggregatesFilter<"TestGeneration">
   }
 
+  export type AnalysisSessionCreateInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileCreateNestedManyWithoutSessionsInput
+    analyses?: TestAnalysisCreateNestedManyWithoutSessionInput
+  }
+
+  export type AnalysisSessionUncheckedCreateInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileUncheckedCreateNestedManyWithoutSessionsInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutSessionInput
+  }
+
+  export type AnalysisSessionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileUpdateManyWithoutSessionsNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutSessionNestedInput
+  }
+
+  export type AnalysisSessionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileUncheckedUpdateManyWithoutSessionsNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutSessionNestedInput
+  }
+
+  export type AnalysisSessionCreateManyInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+  }
+
+  export type AnalysisSessionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+  }
+
+  export type AnalysisSessionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+  }
+
   export type TestFileCreateInput = {
     id?: string
     filePath: string
@@ -7390,10 +12162,12 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionCreateNestedManyWithoutTestFileInput
     coverage?: TestCoverageCreateNestedManyWithoutTestFileInput
     fixes?: TestFixCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileUncheckedCreateInput = {
@@ -7415,10 +12189,12 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionUncheckedCreateNestedManyWithoutTestFileInput
     coverage?: TestCoverageUncheckedCreateNestedManyWithoutTestFileInput
     fixes?: TestFixUncheckedCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationUncheckedCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileUpdateInput = {
@@ -7440,10 +12216,12 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUpdateManyWithoutTestFileNestedInput
     coverage?: TestCoverageUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileUncheckedUpdateInput = {
@@ -7465,10 +12243,12 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput
     coverage?: TestCoverageUncheckedUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUncheckedUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUncheckedUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileCreateManyInput = {
@@ -7532,6 +12312,235 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type TestAnalysisCreateInput = {
+    id?: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    session: AnalysisSessionCreateNestedOneWithoutAnalysesInput
+    testFile: TestFileCreateNestedOneWithoutAnalysesInput
+  }
+
+  export type TestAnalysisUncheckedCreateInput = {
+    id?: string
+    sessionId: string
+    testFileId: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+  }
+
+  export type TestAnalysisUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    session?: AnalysisSessionUpdateOneRequiredWithoutAnalysesNestedInput
+    testFile?: TestFileUpdateOneRequiredWithoutAnalysesNestedInput
+  }
+
+  export type TestAnalysisUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    testFileId?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestAnalysisCreateManyInput = {
+    id?: string
+    sessionId: string
+    testFileId: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+  }
+
+  export type TestAnalysisUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestAnalysisUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    testFileId?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestPatternCreateInput = {
+    id?: string
+    type: $Enums.PatternType
+    pattern: string
+    context: JsonNullValueInput | InputJsonValue
+    successRate?: number
+    usageCount?: number
+    lastUsed?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type TestPatternUncheckedCreateInput = {
+    id?: string
+    type: $Enums.PatternType
+    pattern: string
+    context: JsonNullValueInput | InputJsonValue
+    successRate?: number
+    usageCount?: number
+    lastUsed?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type TestPatternUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumPatternTypeFieldUpdateOperationsInput | $Enums.PatternType
+    pattern?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestPatternUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumPatternTypeFieldUpdateOperationsInput | $Enums.PatternType
+    pattern?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestPatternCreateManyInput = {
+    id?: string
+    type: $Enums.PatternType
+    pattern: string
+    context: JsonNullValueInput | InputJsonValue
+    successRate?: number
+    usageCount?: number
+    lastUsed?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type TestPatternUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumPatternTypeFieldUpdateOperationsInput | $Enums.PatternType
+    pattern?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestPatternUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumPatternTypeFieldUpdateOperationsInput | $Enums.PatternType
+    pattern?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FixPatternCreateInput = {
+    id?: string
+    problem: string
+    solution: string
+    context: JsonNullValueInput | InputJsonValue
+    successRate?: number
+    usageCount?: number
+    lastUsed?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FixPatternUncheckedCreateInput = {
+    id?: string
+    problem: string
+    solution: string
+    context: JsonNullValueInput | InputJsonValue
+    successRate?: number
+    usageCount?: number
+    lastUsed?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FixPatternUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    problem?: StringFieldUpdateOperationsInput | string
+    solution?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FixPatternUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    problem?: StringFieldUpdateOperationsInput | string
+    solution?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FixPatternCreateManyInput = {
+    id?: string
+    problem: string
+    solution: string
+    context: JsonNullValueInput | InputJsonValue
+    successRate?: number
+    usageCount?: number
+    lastUsed?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FixPatternUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    problem?: StringFieldUpdateOperationsInput | string
+    solution?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FixPatternUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    problem?: StringFieldUpdateOperationsInput | string
+    solution?: StringFieldUpdateOperationsInput | string
+    context?: JsonNullValueInput | InputJsonValue
+    successRate?: FloatFieldUpdateOperationsInput | number
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsed?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TestExecutionCreateInput = {
@@ -7934,6 +12943,190 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type EnumSessionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SessionStatus | EnumSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSessionStatusFilter<$PrismaModel> | $Enums.SessionStatus
+  }
+  export type JsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+  export type JsonNullableListFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableListFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableListFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableListFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableListFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableListFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue[] | ListJsonFieldRefInput<$PrismaModel> | null
+    has?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    hasEvery?: InputJsonValue[] | ListJsonFieldRefInput<$PrismaModel>
+    hasSome?: InputJsonValue[] | ListJsonFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type TestFileListRelationFilter = {
+    every?: TestFileWhereInput
+    some?: TestFileWhereInput
+    none?: TestFileWhereInput
+  }
+
+  export type TestAnalysisListRelationFilter = {
+    every?: TestAnalysisWhereInput
+    some?: TestAnalysisWhereInput
+    none?: TestAnalysisWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type TestFileOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TestAnalysisOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AnalysisSessionCountOrderByAggregateInput = {
+    id?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    status?: SortOrder
+    context?: SortOrder
+    decisions?: SortOrder
+    operations?: SortOrder
+  }
+
+  export type AnalysisSessionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type AnalysisSessionMinOrderByAggregateInput = {
+    id?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type EnumSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SessionStatus | EnumSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.SessionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSessionStatusFilter<$PrismaModel>
+    _max?: NestedEnumSessionStatusFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -7954,28 +13147,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
-  }
-  export type JsonNullableFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type EnumTestHealthScoreFilter<$PrismaModel = never> = {
@@ -7998,6 +13169,12 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type AnalysisSessionListRelationFilter = {
+    every?: AnalysisSessionWhereInput
+    some?: AnalysisSessionWhereInput
+    none?: AnalysisSessionWhereInput
   }
 
   export type TestExecutionListRelationFilter = {
@@ -8024,9 +13201,8 @@ export namespace Prisma {
     none?: TestGenerationWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
+  export type AnalysisSessionOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type TestExecutionOrderByRelationAggregateInput = {
@@ -8132,38 +13308,6 @@ export namespace Prisma {
     criticalTests?: SortOrder
   }
 
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -8195,31 +13339,6 @@ export namespace Prisma {
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
   }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
-  }
 
   export type EnumTestHealthScoreWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TestHealthScore | EnumTestHealthScoreFieldRefInput<$PrismaModel>
@@ -8248,11 +13367,6 @@ export namespace Prisma {
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
   export type JsonFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -8266,9 +13380,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
@@ -8276,9 +13390,168 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type AnalysisSessionScalarRelationFilter = {
+    is?: AnalysisSessionWhereInput
+    isNot?: AnalysisSessionWhereInput
+  }
+
   export type TestFileScalarRelationFilter = {
     is?: TestFileWhereInput
     isNot?: TestFileWhereInput
+  }
+
+  export type TestAnalysisCountOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    testFileId?: SortOrder
+    patterns?: SortOrder
+    antiPatterns?: SortOrder
+    suggestions?: SortOrder
+    context?: SortOrder
+    timestamp?: SortOrder
+  }
+
+  export type TestAnalysisMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    testFileId?: SortOrder
+    timestamp?: SortOrder
+  }
+
+  export type TestAnalysisMinOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    testFileId?: SortOrder
+    timestamp?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type EnumPatternTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatternType | EnumPatternTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatternTypeFilter<$PrismaModel> | $Enums.PatternType
+  }
+
+  export type TestPatternCountOrderByAggregateInput = {
+    id?: SortOrder
+    type?: SortOrder
+    pattern?: SortOrder
+    context?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TestPatternAvgOrderByAggregateInput = {
+    successRate?: SortOrder
+    usageCount?: SortOrder
+  }
+
+  export type TestPatternMaxOrderByAggregateInput = {
+    id?: SortOrder
+    type?: SortOrder
+    pattern?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TestPatternMinOrderByAggregateInput = {
+    id?: SortOrder
+    type?: SortOrder
+    pattern?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TestPatternSumOrderByAggregateInput = {
+    successRate?: SortOrder
+    usageCount?: SortOrder
+  }
+
+  export type EnumPatternTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatternType | EnumPatternTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatternTypeWithAggregatesFilter<$PrismaModel> | $Enums.PatternType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPatternTypeFilter<$PrismaModel>
+    _max?: NestedEnumPatternTypeFilter<$PrismaModel>
+  }
+
+  export type FixPatternCountOrderByAggregateInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    solution?: SortOrder
+    context?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FixPatternAvgOrderByAggregateInput = {
+    successRate?: SortOrder
+    usageCount?: SortOrder
+  }
+
+  export type FixPatternMaxOrderByAggregateInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    solution?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FixPatternMinOrderByAggregateInput = {
+    id?: SortOrder
+    problem?: SortOrder
+    solution?: SortOrder
+    successRate?: SortOrder
+    usageCount?: SortOrder
+    lastUsed?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FixPatternSumOrderByAggregateInput = {
+    successRate?: SortOrder
+    usageCount?: SortOrder
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type TestExecutionCountOrderByAggregateInput = {
@@ -8330,31 +13603,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type TestCoverageCountOrderByAggregateInput = {
@@ -8522,6 +13770,126 @@ export namespace Prisma {
     _max?: NestedEnumGenerationTypeFilter<$PrismaModel>
   }
 
+  export type AnalysisSessionCreatedecisionsInput = {
+    set: InputJsonValue[]
+  }
+
+  export type AnalysisSessionCreateoperationsInput = {
+    set: InputJsonValue[]
+  }
+
+  export type TestFileCreateNestedManyWithoutSessionsInput = {
+    create?: XOR<TestFileCreateWithoutSessionsInput, TestFileUncheckedCreateWithoutSessionsInput> | TestFileCreateWithoutSessionsInput[] | TestFileUncheckedCreateWithoutSessionsInput[]
+    connectOrCreate?: TestFileCreateOrConnectWithoutSessionsInput | TestFileCreateOrConnectWithoutSessionsInput[]
+    connect?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+  }
+
+  export type TestAnalysisCreateNestedManyWithoutSessionInput = {
+    create?: XOR<TestAnalysisCreateWithoutSessionInput, TestAnalysisUncheckedCreateWithoutSessionInput> | TestAnalysisCreateWithoutSessionInput[] | TestAnalysisUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutSessionInput | TestAnalysisCreateOrConnectWithoutSessionInput[]
+    createMany?: TestAnalysisCreateManySessionInputEnvelope
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+  }
+
+  export type TestFileUncheckedCreateNestedManyWithoutSessionsInput = {
+    create?: XOR<TestFileCreateWithoutSessionsInput, TestFileUncheckedCreateWithoutSessionsInput> | TestFileCreateWithoutSessionsInput[] | TestFileUncheckedCreateWithoutSessionsInput[]
+    connectOrCreate?: TestFileCreateOrConnectWithoutSessionsInput | TestFileCreateOrConnectWithoutSessionsInput[]
+    connect?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+  }
+
+  export type TestAnalysisUncheckedCreateNestedManyWithoutSessionInput = {
+    create?: XOR<TestAnalysisCreateWithoutSessionInput, TestAnalysisUncheckedCreateWithoutSessionInput> | TestAnalysisCreateWithoutSessionInput[] | TestAnalysisUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutSessionInput | TestAnalysisCreateOrConnectWithoutSessionInput[]
+    createMany?: TestAnalysisCreateManySessionInputEnvelope
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type EnumSessionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.SessionStatus
+  }
+
+  export type AnalysisSessionUpdatedecisionsInput = {
+    set?: InputJsonValue[]
+    push?: InputJsonValue | InputJsonValue[]
+  }
+
+  export type AnalysisSessionUpdateoperationsInput = {
+    set?: InputJsonValue[]
+    push?: InputJsonValue | InputJsonValue[]
+  }
+
+  export type TestFileUpdateManyWithoutSessionsNestedInput = {
+    create?: XOR<TestFileCreateWithoutSessionsInput, TestFileUncheckedCreateWithoutSessionsInput> | TestFileCreateWithoutSessionsInput[] | TestFileUncheckedCreateWithoutSessionsInput[]
+    connectOrCreate?: TestFileCreateOrConnectWithoutSessionsInput | TestFileCreateOrConnectWithoutSessionsInput[]
+    upsert?: TestFileUpsertWithWhereUniqueWithoutSessionsInput | TestFileUpsertWithWhereUniqueWithoutSessionsInput[]
+    set?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    disconnect?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    delete?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    connect?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    update?: TestFileUpdateWithWhereUniqueWithoutSessionsInput | TestFileUpdateWithWhereUniqueWithoutSessionsInput[]
+    updateMany?: TestFileUpdateManyWithWhereWithoutSessionsInput | TestFileUpdateManyWithWhereWithoutSessionsInput[]
+    deleteMany?: TestFileScalarWhereInput | TestFileScalarWhereInput[]
+  }
+
+  export type TestAnalysisUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<TestAnalysisCreateWithoutSessionInput, TestAnalysisUncheckedCreateWithoutSessionInput> | TestAnalysisCreateWithoutSessionInput[] | TestAnalysisUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutSessionInput | TestAnalysisCreateOrConnectWithoutSessionInput[]
+    upsert?: TestAnalysisUpsertWithWhereUniqueWithoutSessionInput | TestAnalysisUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: TestAnalysisCreateManySessionInputEnvelope
+    set?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    disconnect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    delete?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    update?: TestAnalysisUpdateWithWhereUniqueWithoutSessionInput | TestAnalysisUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: TestAnalysisUpdateManyWithWhereWithoutSessionInput | TestAnalysisUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: TestAnalysisScalarWhereInput | TestAnalysisScalarWhereInput[]
+  }
+
+  export type TestFileUncheckedUpdateManyWithoutSessionsNestedInput = {
+    create?: XOR<TestFileCreateWithoutSessionsInput, TestFileUncheckedCreateWithoutSessionsInput> | TestFileCreateWithoutSessionsInput[] | TestFileUncheckedCreateWithoutSessionsInput[]
+    connectOrCreate?: TestFileCreateOrConnectWithoutSessionsInput | TestFileCreateOrConnectWithoutSessionsInput[]
+    upsert?: TestFileUpsertWithWhereUniqueWithoutSessionsInput | TestFileUpsertWithWhereUniqueWithoutSessionsInput[]
+    set?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    disconnect?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    delete?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    connect?: TestFileWhereUniqueInput | TestFileWhereUniqueInput[]
+    update?: TestFileUpdateWithWhereUniqueWithoutSessionsInput | TestFileUpdateWithWhereUniqueWithoutSessionsInput[]
+    updateMany?: TestFileUpdateManyWithWhereWithoutSessionsInput | TestFileUpdateManyWithWhereWithoutSessionsInput[]
+    deleteMany?: TestFileScalarWhereInput | TestFileScalarWhereInput[]
+  }
+
+  export type TestAnalysisUncheckedUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<TestAnalysisCreateWithoutSessionInput, TestAnalysisUncheckedCreateWithoutSessionInput> | TestAnalysisCreateWithoutSessionInput[] | TestAnalysisUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutSessionInput | TestAnalysisCreateOrConnectWithoutSessionInput[]
+    upsert?: TestAnalysisUpsertWithWhereUniqueWithoutSessionInput | TestAnalysisUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: TestAnalysisCreateManySessionInputEnvelope
+    set?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    disconnect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    delete?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    update?: TestAnalysisUpdateWithWhereUniqueWithoutSessionInput | TestAnalysisUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: TestAnalysisUpdateManyWithWhereWithoutSessionInput | TestAnalysisUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: TestAnalysisScalarWhereInput | TestAnalysisScalarWhereInput[]
+  }
+
+  export type AnalysisSessionCreateNestedManyWithoutTestFilesInput = {
+    create?: XOR<AnalysisSessionCreateWithoutTestFilesInput, AnalysisSessionUncheckedCreateWithoutTestFilesInput> | AnalysisSessionCreateWithoutTestFilesInput[] | AnalysisSessionUncheckedCreateWithoutTestFilesInput[]
+    connectOrCreate?: AnalysisSessionCreateOrConnectWithoutTestFilesInput | AnalysisSessionCreateOrConnectWithoutTestFilesInput[]
+    connect?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+  }
+
   export type TestExecutionCreateNestedManyWithoutTestFileInput = {
     create?: XOR<TestExecutionCreateWithoutTestFileInput, TestExecutionUncheckedCreateWithoutTestFileInput> | TestExecutionCreateWithoutTestFileInput[] | TestExecutionUncheckedCreateWithoutTestFileInput[]
     connectOrCreate?: TestExecutionCreateOrConnectWithoutTestFileInput | TestExecutionCreateOrConnectWithoutTestFileInput[]
@@ -8548,6 +13916,19 @@ export namespace Prisma {
     connectOrCreate?: TestGenerationCreateOrConnectWithoutTestFileInput | TestGenerationCreateOrConnectWithoutTestFileInput[]
     createMany?: TestGenerationCreateManyTestFileInputEnvelope
     connect?: TestGenerationWhereUniqueInput | TestGenerationWhereUniqueInput[]
+  }
+
+  export type TestAnalysisCreateNestedManyWithoutTestFileInput = {
+    create?: XOR<TestAnalysisCreateWithoutTestFileInput, TestAnalysisUncheckedCreateWithoutTestFileInput> | TestAnalysisCreateWithoutTestFileInput[] | TestAnalysisUncheckedCreateWithoutTestFileInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutTestFileInput | TestAnalysisCreateOrConnectWithoutTestFileInput[]
+    createMany?: TestAnalysisCreateManyTestFileInputEnvelope
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+  }
+
+  export type AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput = {
+    create?: XOR<AnalysisSessionCreateWithoutTestFilesInput, AnalysisSessionUncheckedCreateWithoutTestFilesInput> | AnalysisSessionCreateWithoutTestFilesInput[] | AnalysisSessionUncheckedCreateWithoutTestFilesInput[]
+    connectOrCreate?: AnalysisSessionCreateOrConnectWithoutTestFilesInput | AnalysisSessionCreateOrConnectWithoutTestFilesInput[]
+    connect?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
   }
 
   export type TestExecutionUncheckedCreateNestedManyWithoutTestFileInput = {
@@ -8578,12 +13959,11 @@ export namespace Prisma {
     connect?: TestGenerationWhereUniqueInput | TestGenerationWhereUniqueInput[]
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
+  export type TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput = {
+    create?: XOR<TestAnalysisCreateWithoutTestFileInput, TestAnalysisUncheckedCreateWithoutTestFileInput> | TestAnalysisCreateWithoutTestFileInput[] | TestAnalysisUncheckedCreateWithoutTestFileInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutTestFileInput | TestAnalysisCreateOrConnectWithoutTestFileInput[]
+    createMany?: TestAnalysisCreateManyTestFileInputEnvelope
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -8608,6 +13988,19 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type AnalysisSessionUpdateManyWithoutTestFilesNestedInput = {
+    create?: XOR<AnalysisSessionCreateWithoutTestFilesInput, AnalysisSessionUncheckedCreateWithoutTestFilesInput> | AnalysisSessionCreateWithoutTestFilesInput[] | AnalysisSessionUncheckedCreateWithoutTestFilesInput[]
+    connectOrCreate?: AnalysisSessionCreateOrConnectWithoutTestFilesInput | AnalysisSessionCreateOrConnectWithoutTestFilesInput[]
+    upsert?: AnalysisSessionUpsertWithWhereUniqueWithoutTestFilesInput | AnalysisSessionUpsertWithWhereUniqueWithoutTestFilesInput[]
+    set?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    disconnect?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    delete?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    connect?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    update?: AnalysisSessionUpdateWithWhereUniqueWithoutTestFilesInput | AnalysisSessionUpdateWithWhereUniqueWithoutTestFilesInput[]
+    updateMany?: AnalysisSessionUpdateManyWithWhereWithoutTestFilesInput | AnalysisSessionUpdateManyWithWhereWithoutTestFilesInput[]
+    deleteMany?: AnalysisSessionScalarWhereInput | AnalysisSessionScalarWhereInput[]
   }
 
   export type TestExecutionUpdateManyWithoutTestFileNestedInput = {
@@ -8666,6 +14059,33 @@ export namespace Prisma {
     deleteMany?: TestGenerationScalarWhereInput | TestGenerationScalarWhereInput[]
   }
 
+  export type TestAnalysisUpdateManyWithoutTestFileNestedInput = {
+    create?: XOR<TestAnalysisCreateWithoutTestFileInput, TestAnalysisUncheckedCreateWithoutTestFileInput> | TestAnalysisCreateWithoutTestFileInput[] | TestAnalysisUncheckedCreateWithoutTestFileInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutTestFileInput | TestAnalysisCreateOrConnectWithoutTestFileInput[]
+    upsert?: TestAnalysisUpsertWithWhereUniqueWithoutTestFileInput | TestAnalysisUpsertWithWhereUniqueWithoutTestFileInput[]
+    createMany?: TestAnalysisCreateManyTestFileInputEnvelope
+    set?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    disconnect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    delete?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    update?: TestAnalysisUpdateWithWhereUniqueWithoutTestFileInput | TestAnalysisUpdateWithWhereUniqueWithoutTestFileInput[]
+    updateMany?: TestAnalysisUpdateManyWithWhereWithoutTestFileInput | TestAnalysisUpdateManyWithWhereWithoutTestFileInput[]
+    deleteMany?: TestAnalysisScalarWhereInput | TestAnalysisScalarWhereInput[]
+  }
+
+  export type AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput = {
+    create?: XOR<AnalysisSessionCreateWithoutTestFilesInput, AnalysisSessionUncheckedCreateWithoutTestFilesInput> | AnalysisSessionCreateWithoutTestFilesInput[] | AnalysisSessionUncheckedCreateWithoutTestFilesInput[]
+    connectOrCreate?: AnalysisSessionCreateOrConnectWithoutTestFilesInput | AnalysisSessionCreateOrConnectWithoutTestFilesInput[]
+    upsert?: AnalysisSessionUpsertWithWhereUniqueWithoutTestFilesInput | AnalysisSessionUpsertWithWhereUniqueWithoutTestFilesInput[]
+    set?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    disconnect?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    delete?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    connect?: AnalysisSessionWhereUniqueInput | AnalysisSessionWhereUniqueInput[]
+    update?: AnalysisSessionUpdateWithWhereUniqueWithoutTestFilesInput | AnalysisSessionUpdateWithWhereUniqueWithoutTestFilesInput[]
+    updateMany?: AnalysisSessionUpdateManyWithWhereWithoutTestFilesInput | AnalysisSessionUpdateManyWithWhereWithoutTestFilesInput[]
+    deleteMany?: AnalysisSessionScalarWhereInput | AnalysisSessionScalarWhereInput[]
+  }
+
   export type TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput = {
     create?: XOR<TestExecutionCreateWithoutTestFileInput, TestExecutionUncheckedCreateWithoutTestFileInput> | TestExecutionCreateWithoutTestFileInput[] | TestExecutionUncheckedCreateWithoutTestFileInput[]
     connectOrCreate?: TestExecutionCreateOrConnectWithoutTestFileInput | TestExecutionCreateOrConnectWithoutTestFileInput[]
@@ -8720,6 +14140,52 @@ export namespace Prisma {
     update?: TestGenerationUpdateWithWhereUniqueWithoutTestFileInput | TestGenerationUpdateWithWhereUniqueWithoutTestFileInput[]
     updateMany?: TestGenerationUpdateManyWithWhereWithoutTestFileInput | TestGenerationUpdateManyWithWhereWithoutTestFileInput[]
     deleteMany?: TestGenerationScalarWhereInput | TestGenerationScalarWhereInput[]
+  }
+
+  export type TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput = {
+    create?: XOR<TestAnalysisCreateWithoutTestFileInput, TestAnalysisUncheckedCreateWithoutTestFileInput> | TestAnalysisCreateWithoutTestFileInput[] | TestAnalysisUncheckedCreateWithoutTestFileInput[]
+    connectOrCreate?: TestAnalysisCreateOrConnectWithoutTestFileInput | TestAnalysisCreateOrConnectWithoutTestFileInput[]
+    upsert?: TestAnalysisUpsertWithWhereUniqueWithoutTestFileInput | TestAnalysisUpsertWithWhereUniqueWithoutTestFileInput[]
+    createMany?: TestAnalysisCreateManyTestFileInputEnvelope
+    set?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    disconnect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    delete?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    connect?: TestAnalysisWhereUniqueInput | TestAnalysisWhereUniqueInput[]
+    update?: TestAnalysisUpdateWithWhereUniqueWithoutTestFileInput | TestAnalysisUpdateWithWhereUniqueWithoutTestFileInput[]
+    updateMany?: TestAnalysisUpdateManyWithWhereWithoutTestFileInput | TestAnalysisUpdateManyWithWhereWithoutTestFileInput[]
+    deleteMany?: TestAnalysisScalarWhereInput | TestAnalysisScalarWhereInput[]
+  }
+
+  export type AnalysisSessionCreateNestedOneWithoutAnalysesInput = {
+    create?: XOR<AnalysisSessionCreateWithoutAnalysesInput, AnalysisSessionUncheckedCreateWithoutAnalysesInput>
+    connectOrCreate?: AnalysisSessionCreateOrConnectWithoutAnalysesInput
+    connect?: AnalysisSessionWhereUniqueInput
+  }
+
+  export type TestFileCreateNestedOneWithoutAnalysesInput = {
+    create?: XOR<TestFileCreateWithoutAnalysesInput, TestFileUncheckedCreateWithoutAnalysesInput>
+    connectOrCreate?: TestFileCreateOrConnectWithoutAnalysesInput
+    connect?: TestFileWhereUniqueInput
+  }
+
+  export type AnalysisSessionUpdateOneRequiredWithoutAnalysesNestedInput = {
+    create?: XOR<AnalysisSessionCreateWithoutAnalysesInput, AnalysisSessionUncheckedCreateWithoutAnalysesInput>
+    connectOrCreate?: AnalysisSessionCreateOrConnectWithoutAnalysesInput
+    upsert?: AnalysisSessionUpsertWithoutAnalysesInput
+    connect?: AnalysisSessionWhereUniqueInput
+    update?: XOR<XOR<AnalysisSessionUpdateToOneWithWhereWithoutAnalysesInput, AnalysisSessionUpdateWithoutAnalysesInput>, AnalysisSessionUncheckedUpdateWithoutAnalysesInput>
+  }
+
+  export type TestFileUpdateOneRequiredWithoutAnalysesNestedInput = {
+    create?: XOR<TestFileCreateWithoutAnalysesInput, TestFileUncheckedCreateWithoutAnalysesInput>
+    connectOrCreate?: TestFileCreateOrConnectWithoutAnalysesInput
+    upsert?: TestFileUpsertWithoutAnalysesInput
+    connect?: TestFileWhereUniqueInput
+    update?: XOR<XOR<TestFileUpdateToOneWithWhereWithoutAnalysesInput, TestFileUpdateWithoutAnalysesInput>, TestFileUncheckedUpdateWithoutAnalysesInput>
+  }
+
+  export type EnumPatternTypeFieldUpdateOperationsInput = {
+    set?: $Enums.PatternType
   }
 
   export type TestFileCreateNestedOneWithoutExecutionsInput = {
@@ -8815,6 +14281,41 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedEnumSessionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SessionStatus | EnumSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSessionStatusFilter<$PrismaModel> | $Enums.SessionStatus
+  }
+
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -8824,6 +14325,77 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SessionStatus | EnumSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SessionStatus[] | ListEnumSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.SessionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSessionStatusFilter<$PrismaModel>
+    _max?: NestedEnumSessionStatusFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedFloatFilter<$PrismaModel = never> = {
@@ -8858,37 +14430,6 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -8921,39 +14462,6 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
   export type NestedEnumTestHealthScoreWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TestHealthScore | EnumTestHealthScoreFieldRefInput<$PrismaModel>
     in?: $Enums.TestHealthScore[] | ListEnumTestHealthScoreFieldRefInput<$PrismaModel>
@@ -8980,19 +14488,6 @@ export namespace Prisma {
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
   export type NestedJsonFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -9006,14 +14501,44 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumPatternTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatternType | EnumPatternTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatternTypeFilter<$PrismaModel> | $Enums.PatternType
+  }
+
+  export type NestedEnumPatternTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatternType | EnumPatternTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatternType[] | ListEnumPatternTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatternTypeWithAggregatesFilter<$PrismaModel> | $Enums.PatternType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPatternTypeFilter<$PrismaModel>
+    _max?: NestedEnumPatternTypeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumFixTypeFilter<$PrismaModel = never> = {
@@ -9048,6 +14573,190 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumGenerationTypeFilter<$PrismaModel>
     _max?: NestedEnumGenerationTypeFilter<$PrismaModel>
+  }
+
+  export type TestFileCreateWithoutSessionsInput = {
+    id?: string
+    filePath: string
+    fileName: string
+    firstSeen?: Date | string
+    lastUpdated?: Date | string
+    totalRuns?: number
+    avgPassRate?: number
+    currentPassRate?: number
+    avgDuration?: number
+    currentCoverage?: number
+    avgCoverage?: number
+    totalFixes?: number
+    flakyTests?: number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: $Enums.TestHealthScore
+    totalTests?: number
+    criticalTests?: number
+    lastFailureReason?: string | null
+    executions?: TestExecutionCreateNestedManyWithoutTestFileInput
+    coverage?: TestCoverageCreateNestedManyWithoutTestFileInput
+    fixes?: TestFixCreateNestedManyWithoutTestFileInput
+    generations?: TestGenerationCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisCreateNestedManyWithoutTestFileInput
+  }
+
+  export type TestFileUncheckedCreateWithoutSessionsInput = {
+    id?: string
+    filePath: string
+    fileName: string
+    firstSeen?: Date | string
+    lastUpdated?: Date | string
+    totalRuns?: number
+    avgPassRate?: number
+    currentPassRate?: number
+    avgDuration?: number
+    currentCoverage?: number
+    avgCoverage?: number
+    totalFixes?: number
+    flakyTests?: number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: $Enums.TestHealthScore
+    totalTests?: number
+    criticalTests?: number
+    lastFailureReason?: string | null
+    executions?: TestExecutionUncheckedCreateNestedManyWithoutTestFileInput
+    coverage?: TestCoverageUncheckedCreateNestedManyWithoutTestFileInput
+    fixes?: TestFixUncheckedCreateNestedManyWithoutTestFileInput
+    generations?: TestGenerationUncheckedCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput
+  }
+
+  export type TestFileCreateOrConnectWithoutSessionsInput = {
+    where: TestFileWhereUniqueInput
+    create: XOR<TestFileCreateWithoutSessionsInput, TestFileUncheckedCreateWithoutSessionsInput>
+  }
+
+  export type TestAnalysisCreateWithoutSessionInput = {
+    id?: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    testFile: TestFileCreateNestedOneWithoutAnalysesInput
+  }
+
+  export type TestAnalysisUncheckedCreateWithoutSessionInput = {
+    id?: string
+    testFileId: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+  }
+
+  export type TestAnalysisCreateOrConnectWithoutSessionInput = {
+    where: TestAnalysisWhereUniqueInput
+    create: XOR<TestAnalysisCreateWithoutSessionInput, TestAnalysisUncheckedCreateWithoutSessionInput>
+  }
+
+  export type TestAnalysisCreateManySessionInputEnvelope = {
+    data: TestAnalysisCreateManySessionInput | TestAnalysisCreateManySessionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TestFileUpsertWithWhereUniqueWithoutSessionsInput = {
+    where: TestFileWhereUniqueInput
+    update: XOR<TestFileUpdateWithoutSessionsInput, TestFileUncheckedUpdateWithoutSessionsInput>
+    create: XOR<TestFileCreateWithoutSessionsInput, TestFileUncheckedCreateWithoutSessionsInput>
+  }
+
+  export type TestFileUpdateWithWhereUniqueWithoutSessionsInput = {
+    where: TestFileWhereUniqueInput
+    data: XOR<TestFileUpdateWithoutSessionsInput, TestFileUncheckedUpdateWithoutSessionsInput>
+  }
+
+  export type TestFileUpdateManyWithWhereWithoutSessionsInput = {
+    where: TestFileScalarWhereInput
+    data: XOR<TestFileUpdateManyMutationInput, TestFileUncheckedUpdateManyWithoutSessionsInput>
+  }
+
+  export type TestFileScalarWhereInput = {
+    AND?: TestFileScalarWhereInput | TestFileScalarWhereInput[]
+    OR?: TestFileScalarWhereInput[]
+    NOT?: TestFileScalarWhereInput | TestFileScalarWhereInput[]
+    id?: StringFilter<"TestFile"> | string
+    filePath?: StringFilter<"TestFile"> | string
+    fileName?: StringFilter<"TestFile"> | string
+    firstSeen?: DateTimeFilter<"TestFile"> | Date | string
+    lastUpdated?: DateTimeFilter<"TestFile"> | Date | string
+    totalRuns?: IntFilter<"TestFile"> | number
+    avgPassRate?: FloatFilter<"TestFile"> | number
+    currentPassRate?: FloatFilter<"TestFile"> | number
+    avgDuration?: FloatFilter<"TestFile"> | number
+    currentCoverage?: FloatFilter<"TestFile"> | number
+    avgCoverage?: FloatFilter<"TestFile"> | number
+    totalFixes?: IntFilter<"TestFile"> | number
+    flakyTests?: IntFilter<"TestFile"> | number
+    metadata?: JsonNullableFilter<"TestFile">
+    healthScore?: EnumTestHealthScoreFilter<"TestFile"> | $Enums.TestHealthScore
+    totalTests?: IntFilter<"TestFile"> | number
+    criticalTests?: IntFilter<"TestFile"> | number
+    lastFailureReason?: StringNullableFilter<"TestFile"> | string | null
+  }
+
+  export type TestAnalysisUpsertWithWhereUniqueWithoutSessionInput = {
+    where: TestAnalysisWhereUniqueInput
+    update: XOR<TestAnalysisUpdateWithoutSessionInput, TestAnalysisUncheckedUpdateWithoutSessionInput>
+    create: XOR<TestAnalysisCreateWithoutSessionInput, TestAnalysisUncheckedCreateWithoutSessionInput>
+  }
+
+  export type TestAnalysisUpdateWithWhereUniqueWithoutSessionInput = {
+    where: TestAnalysisWhereUniqueInput
+    data: XOR<TestAnalysisUpdateWithoutSessionInput, TestAnalysisUncheckedUpdateWithoutSessionInput>
+  }
+
+  export type TestAnalysisUpdateManyWithWhereWithoutSessionInput = {
+    where: TestAnalysisScalarWhereInput
+    data: XOR<TestAnalysisUpdateManyMutationInput, TestAnalysisUncheckedUpdateManyWithoutSessionInput>
+  }
+
+  export type TestAnalysisScalarWhereInput = {
+    AND?: TestAnalysisScalarWhereInput | TestAnalysisScalarWhereInput[]
+    OR?: TestAnalysisScalarWhereInput[]
+    NOT?: TestAnalysisScalarWhereInput | TestAnalysisScalarWhereInput[]
+    id?: StringFilter<"TestAnalysis"> | string
+    sessionId?: StringFilter<"TestAnalysis"> | string
+    testFileId?: StringFilter<"TestAnalysis"> | string
+    patterns?: JsonFilter<"TestAnalysis">
+    antiPatterns?: JsonFilter<"TestAnalysis">
+    suggestions?: JsonFilter<"TestAnalysis">
+    context?: JsonFilter<"TestAnalysis">
+    timestamp?: DateTimeFilter<"TestAnalysis"> | Date | string
+  }
+
+  export type AnalysisSessionCreateWithoutTestFilesInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+    analyses?: TestAnalysisCreateNestedManyWithoutSessionInput
+  }
+
+  export type AnalysisSessionUncheckedCreateWithoutTestFilesInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutSessionInput
+  }
+
+  export type AnalysisSessionCreateOrConnectWithoutTestFilesInput = {
+    where: AnalysisSessionWhereUniqueInput
+    create: XOR<AnalysisSessionCreateWithoutTestFilesInput, AnalysisSessionUncheckedCreateWithoutTestFilesInput>
   }
 
   export type TestExecutionCreateWithoutTestFileInput = {
@@ -9190,6 +14899,65 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TestAnalysisCreateWithoutTestFileInput = {
+    id?: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    session: AnalysisSessionCreateNestedOneWithoutAnalysesInput
+  }
+
+  export type TestAnalysisUncheckedCreateWithoutTestFileInput = {
+    id?: string
+    sessionId: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+  }
+
+  export type TestAnalysisCreateOrConnectWithoutTestFileInput = {
+    where: TestAnalysisWhereUniqueInput
+    create: XOR<TestAnalysisCreateWithoutTestFileInput, TestAnalysisUncheckedCreateWithoutTestFileInput>
+  }
+
+  export type TestAnalysisCreateManyTestFileInputEnvelope = {
+    data: TestAnalysisCreateManyTestFileInput | TestAnalysisCreateManyTestFileInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AnalysisSessionUpsertWithWhereUniqueWithoutTestFilesInput = {
+    where: AnalysisSessionWhereUniqueInput
+    update: XOR<AnalysisSessionUpdateWithoutTestFilesInput, AnalysisSessionUncheckedUpdateWithoutTestFilesInput>
+    create: XOR<AnalysisSessionCreateWithoutTestFilesInput, AnalysisSessionUncheckedCreateWithoutTestFilesInput>
+  }
+
+  export type AnalysisSessionUpdateWithWhereUniqueWithoutTestFilesInput = {
+    where: AnalysisSessionWhereUniqueInput
+    data: XOR<AnalysisSessionUpdateWithoutTestFilesInput, AnalysisSessionUncheckedUpdateWithoutTestFilesInput>
+  }
+
+  export type AnalysisSessionUpdateManyWithWhereWithoutTestFilesInput = {
+    where: AnalysisSessionScalarWhereInput
+    data: XOR<AnalysisSessionUpdateManyMutationInput, AnalysisSessionUncheckedUpdateManyWithoutTestFilesInput>
+  }
+
+  export type AnalysisSessionScalarWhereInput = {
+    AND?: AnalysisSessionScalarWhereInput | AnalysisSessionScalarWhereInput[]
+    OR?: AnalysisSessionScalarWhereInput[]
+    NOT?: AnalysisSessionScalarWhereInput | AnalysisSessionScalarWhereInput[]
+    id?: StringFilter<"AnalysisSession"> | string
+    startedAt?: DateTimeFilter<"AnalysisSession"> | Date | string
+    endedAt?: DateTimeNullableFilter<"AnalysisSession"> | Date | string | null
+    status?: EnumSessionStatusFilter<"AnalysisSession"> | $Enums.SessionStatus
+    context?: JsonNullableFilter<"AnalysisSession">
+    decisions?: JsonNullableListFilter<"AnalysisSession">
+    operations?: JsonNullableListFilter<"AnalysisSession">
+  }
+
   export type TestExecutionUpsertWithWhereUniqueWithoutTestFileInput = {
     where: TestExecutionWhereUniqueInput
     update: XOR<TestExecutionUpdateWithoutTestFileInput, TestExecutionUncheckedUpdateWithoutTestFileInput>
@@ -9320,6 +15088,202 @@ export namespace Prisma {
     context?: JsonFilter<"TestGeneration">
   }
 
+  export type TestAnalysisUpsertWithWhereUniqueWithoutTestFileInput = {
+    where: TestAnalysisWhereUniqueInput
+    update: XOR<TestAnalysisUpdateWithoutTestFileInput, TestAnalysisUncheckedUpdateWithoutTestFileInput>
+    create: XOR<TestAnalysisCreateWithoutTestFileInput, TestAnalysisUncheckedCreateWithoutTestFileInput>
+  }
+
+  export type TestAnalysisUpdateWithWhereUniqueWithoutTestFileInput = {
+    where: TestAnalysisWhereUniqueInput
+    data: XOR<TestAnalysisUpdateWithoutTestFileInput, TestAnalysisUncheckedUpdateWithoutTestFileInput>
+  }
+
+  export type TestAnalysisUpdateManyWithWhereWithoutTestFileInput = {
+    where: TestAnalysisScalarWhereInput
+    data: XOR<TestAnalysisUpdateManyMutationInput, TestAnalysisUncheckedUpdateManyWithoutTestFileInput>
+  }
+
+  export type AnalysisSessionCreateWithoutAnalysesInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileCreateNestedManyWithoutSessionsInput
+  }
+
+  export type AnalysisSessionUncheckedCreateWithoutAnalysesInput = {
+    id?: string
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionCreatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionCreateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileUncheckedCreateNestedManyWithoutSessionsInput
+  }
+
+  export type AnalysisSessionCreateOrConnectWithoutAnalysesInput = {
+    where: AnalysisSessionWhereUniqueInput
+    create: XOR<AnalysisSessionCreateWithoutAnalysesInput, AnalysisSessionUncheckedCreateWithoutAnalysesInput>
+  }
+
+  export type TestFileCreateWithoutAnalysesInput = {
+    id?: string
+    filePath: string
+    fileName: string
+    firstSeen?: Date | string
+    lastUpdated?: Date | string
+    totalRuns?: number
+    avgPassRate?: number
+    currentPassRate?: number
+    avgDuration?: number
+    currentCoverage?: number
+    avgCoverage?: number
+    totalFixes?: number
+    flakyTests?: number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: $Enums.TestHealthScore
+    totalTests?: number
+    criticalTests?: number
+    lastFailureReason?: string | null
+    sessions?: AnalysisSessionCreateNestedManyWithoutTestFilesInput
+    executions?: TestExecutionCreateNestedManyWithoutTestFileInput
+    coverage?: TestCoverageCreateNestedManyWithoutTestFileInput
+    fixes?: TestFixCreateNestedManyWithoutTestFileInput
+    generations?: TestGenerationCreateNestedManyWithoutTestFileInput
+  }
+
+  export type TestFileUncheckedCreateWithoutAnalysesInput = {
+    id?: string
+    filePath: string
+    fileName: string
+    firstSeen?: Date | string
+    lastUpdated?: Date | string
+    totalRuns?: number
+    avgPassRate?: number
+    currentPassRate?: number
+    avgDuration?: number
+    currentCoverage?: number
+    avgCoverage?: number
+    totalFixes?: number
+    flakyTests?: number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: $Enums.TestHealthScore
+    totalTests?: number
+    criticalTests?: number
+    lastFailureReason?: string | null
+    sessions?: AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput
+    executions?: TestExecutionUncheckedCreateNestedManyWithoutTestFileInput
+    coverage?: TestCoverageUncheckedCreateNestedManyWithoutTestFileInput
+    fixes?: TestFixUncheckedCreateNestedManyWithoutTestFileInput
+    generations?: TestGenerationUncheckedCreateNestedManyWithoutTestFileInput
+  }
+
+  export type TestFileCreateOrConnectWithoutAnalysesInput = {
+    where: TestFileWhereUniqueInput
+    create: XOR<TestFileCreateWithoutAnalysesInput, TestFileUncheckedCreateWithoutAnalysesInput>
+  }
+
+  export type AnalysisSessionUpsertWithoutAnalysesInput = {
+    update: XOR<AnalysisSessionUpdateWithoutAnalysesInput, AnalysisSessionUncheckedUpdateWithoutAnalysesInput>
+    create: XOR<AnalysisSessionCreateWithoutAnalysesInput, AnalysisSessionUncheckedCreateWithoutAnalysesInput>
+    where?: AnalysisSessionWhereInput
+  }
+
+  export type AnalysisSessionUpdateToOneWithWhereWithoutAnalysesInput = {
+    where?: AnalysisSessionWhereInput
+    data: XOR<AnalysisSessionUpdateWithoutAnalysesInput, AnalysisSessionUncheckedUpdateWithoutAnalysesInput>
+  }
+
+  export type AnalysisSessionUpdateWithoutAnalysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileUpdateManyWithoutSessionsNestedInput
+  }
+
+  export type AnalysisSessionUncheckedUpdateWithoutAnalysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+    testFiles?: TestFileUncheckedUpdateManyWithoutSessionsNestedInput
+  }
+
+  export type TestFileUpsertWithoutAnalysesInput = {
+    update: XOR<TestFileUpdateWithoutAnalysesInput, TestFileUncheckedUpdateWithoutAnalysesInput>
+    create: XOR<TestFileCreateWithoutAnalysesInput, TestFileUncheckedCreateWithoutAnalysesInput>
+    where?: TestFileWhereInput
+  }
+
+  export type TestFileUpdateToOneWithWhereWithoutAnalysesInput = {
+    where?: TestFileWhereInput
+    data: XOR<TestFileUpdateWithoutAnalysesInput, TestFileUncheckedUpdateWithoutAnalysesInput>
+  }
+
+  export type TestFileUpdateWithoutAnalysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filePath?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    firstSeen?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdated?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalRuns?: IntFieldUpdateOperationsInput | number
+    avgPassRate?: FloatFieldUpdateOperationsInput | number
+    currentPassRate?: FloatFieldUpdateOperationsInput | number
+    avgDuration?: FloatFieldUpdateOperationsInput | number
+    currentCoverage?: FloatFieldUpdateOperationsInput | number
+    avgCoverage?: FloatFieldUpdateOperationsInput | number
+    totalFixes?: IntFieldUpdateOperationsInput | number
+    flakyTests?: IntFieldUpdateOperationsInput | number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: EnumTestHealthScoreFieldUpdateOperationsInput | $Enums.TestHealthScore
+    totalTests?: IntFieldUpdateOperationsInput | number
+    criticalTests?: IntFieldUpdateOperationsInput | number
+    lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUpdateManyWithoutTestFilesNestedInput
+    executions?: TestExecutionUpdateManyWithoutTestFileNestedInput
+    coverage?: TestCoverageUpdateManyWithoutTestFileNestedInput
+    fixes?: TestFixUpdateManyWithoutTestFileNestedInput
+    generations?: TestGenerationUpdateManyWithoutTestFileNestedInput
+  }
+
+  export type TestFileUncheckedUpdateWithoutAnalysesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filePath?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    firstSeen?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdated?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalRuns?: IntFieldUpdateOperationsInput | number
+    avgPassRate?: FloatFieldUpdateOperationsInput | number
+    currentPassRate?: FloatFieldUpdateOperationsInput | number
+    avgDuration?: FloatFieldUpdateOperationsInput | number
+    currentCoverage?: FloatFieldUpdateOperationsInput | number
+    avgCoverage?: FloatFieldUpdateOperationsInput | number
+    totalFixes?: IntFieldUpdateOperationsInput | number
+    flakyTests?: IntFieldUpdateOperationsInput | number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: EnumTestHealthScoreFieldUpdateOperationsInput | $Enums.TestHealthScore
+    totalTests?: IntFieldUpdateOperationsInput | number
+    criticalTests?: IntFieldUpdateOperationsInput | number
+    lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput
+    executions?: TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput
+    coverage?: TestCoverageUncheckedUpdateManyWithoutTestFileNestedInput
+    fixes?: TestFixUncheckedUpdateManyWithoutTestFileNestedInput
+    generations?: TestGenerationUncheckedUpdateManyWithoutTestFileNestedInput
+  }
+
   export type TestFileCreateWithoutExecutionsInput = {
     id?: string
     filePath: string
@@ -9339,9 +15303,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionCreateNestedManyWithoutTestFilesInput
     coverage?: TestCoverageCreateNestedManyWithoutTestFileInput
     fixes?: TestFixCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileUncheckedCreateWithoutExecutionsInput = {
@@ -9363,9 +15329,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput
     coverage?: TestCoverageUncheckedCreateNestedManyWithoutTestFileInput
     fixes?: TestFixUncheckedCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationUncheckedCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileCreateOrConnectWithoutExecutionsInput = {
@@ -9403,9 +15371,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUpdateManyWithoutTestFilesNestedInput
     coverage?: TestCoverageUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileUncheckedUpdateWithoutExecutionsInput = {
@@ -9427,9 +15397,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput
     coverage?: TestCoverageUncheckedUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUncheckedUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUncheckedUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileCreateWithoutCoverageInput = {
@@ -9451,9 +15423,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionCreateNestedManyWithoutTestFileInput
     fixes?: TestFixCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileUncheckedCreateWithoutCoverageInput = {
@@ -9475,9 +15449,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionUncheckedCreateNestedManyWithoutTestFileInput
     fixes?: TestFixUncheckedCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationUncheckedCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileCreateOrConnectWithoutCoverageInput = {
@@ -9515,9 +15491,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileUncheckedUpdateWithoutCoverageInput = {
@@ -9539,9 +15517,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUncheckedUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUncheckedUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileCreateWithoutFixesInput = {
@@ -9563,9 +15543,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionCreateNestedManyWithoutTestFileInput
     coverage?: TestCoverageCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileUncheckedCreateWithoutFixesInput = {
@@ -9587,9 +15569,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionUncheckedCreateNestedManyWithoutTestFileInput
     coverage?: TestCoverageUncheckedCreateNestedManyWithoutTestFileInput
     generations?: TestGenerationUncheckedCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileCreateOrConnectWithoutFixesInput = {
@@ -9627,9 +15611,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUpdateManyWithoutTestFileNestedInput
     coverage?: TestCoverageUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileUncheckedUpdateWithoutFixesInput = {
@@ -9651,9 +15637,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput
     coverage?: TestCoverageUncheckedUpdateManyWithoutTestFileNestedInput
     generations?: TestGenerationUncheckedUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileCreateWithoutGenerationsInput = {
@@ -9675,9 +15663,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionCreateNestedManyWithoutTestFileInput
     coverage?: TestCoverageCreateNestedManyWithoutTestFileInput
     fixes?: TestFixCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileUncheckedCreateWithoutGenerationsInput = {
@@ -9699,9 +15689,11 @@ export namespace Prisma {
     totalTests?: number
     criticalTests?: number
     lastFailureReason?: string | null
+    sessions?: AnalysisSessionUncheckedCreateNestedManyWithoutTestFilesInput
     executions?: TestExecutionUncheckedCreateNestedManyWithoutTestFileInput
     coverage?: TestCoverageUncheckedCreateNestedManyWithoutTestFileInput
     fixes?: TestFixUncheckedCreateNestedManyWithoutTestFileInput
+    analyses?: TestAnalysisUncheckedCreateNestedManyWithoutTestFileInput
   }
 
   export type TestFileCreateOrConnectWithoutGenerationsInput = {
@@ -9739,9 +15731,11 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUpdateManyWithoutTestFileNestedInput
     coverage?: TestCoverageUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutTestFileNestedInput
   }
 
   export type TestFileUncheckedUpdateWithoutGenerationsInput = {
@@ -9763,9 +15757,124 @@ export namespace Prisma {
     totalTests?: IntFieldUpdateOperationsInput | number
     criticalTests?: IntFieldUpdateOperationsInput | number
     lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    sessions?: AnalysisSessionUncheckedUpdateManyWithoutTestFilesNestedInput
     executions?: TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput
     coverage?: TestCoverageUncheckedUpdateManyWithoutTestFileNestedInput
     fixes?: TestFixUncheckedUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput
+  }
+
+  export type TestAnalysisCreateManySessionInput = {
+    id?: string
+    testFileId: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+  }
+
+  export type TestFileUpdateWithoutSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filePath?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    firstSeen?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdated?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalRuns?: IntFieldUpdateOperationsInput | number
+    avgPassRate?: FloatFieldUpdateOperationsInput | number
+    currentPassRate?: FloatFieldUpdateOperationsInput | number
+    avgDuration?: FloatFieldUpdateOperationsInput | number
+    currentCoverage?: FloatFieldUpdateOperationsInput | number
+    avgCoverage?: FloatFieldUpdateOperationsInput | number
+    totalFixes?: IntFieldUpdateOperationsInput | number
+    flakyTests?: IntFieldUpdateOperationsInput | number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: EnumTestHealthScoreFieldUpdateOperationsInput | $Enums.TestHealthScore
+    totalTests?: IntFieldUpdateOperationsInput | number
+    criticalTests?: IntFieldUpdateOperationsInput | number
+    lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    executions?: TestExecutionUpdateManyWithoutTestFileNestedInput
+    coverage?: TestCoverageUpdateManyWithoutTestFileNestedInput
+    fixes?: TestFixUpdateManyWithoutTestFileNestedInput
+    generations?: TestGenerationUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUpdateManyWithoutTestFileNestedInput
+  }
+
+  export type TestFileUncheckedUpdateWithoutSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filePath?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    firstSeen?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdated?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalRuns?: IntFieldUpdateOperationsInput | number
+    avgPassRate?: FloatFieldUpdateOperationsInput | number
+    currentPassRate?: FloatFieldUpdateOperationsInput | number
+    avgDuration?: FloatFieldUpdateOperationsInput | number
+    currentCoverage?: FloatFieldUpdateOperationsInput | number
+    avgCoverage?: FloatFieldUpdateOperationsInput | number
+    totalFixes?: IntFieldUpdateOperationsInput | number
+    flakyTests?: IntFieldUpdateOperationsInput | number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: EnumTestHealthScoreFieldUpdateOperationsInput | $Enums.TestHealthScore
+    totalTests?: IntFieldUpdateOperationsInput | number
+    criticalTests?: IntFieldUpdateOperationsInput | number
+    lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    executions?: TestExecutionUncheckedUpdateManyWithoutTestFileNestedInput
+    coverage?: TestCoverageUncheckedUpdateManyWithoutTestFileNestedInput
+    fixes?: TestFixUncheckedUpdateManyWithoutTestFileNestedInput
+    generations?: TestGenerationUncheckedUpdateManyWithoutTestFileNestedInput
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutTestFileNestedInput
+  }
+
+  export type TestFileUncheckedUpdateManyWithoutSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filePath?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    firstSeen?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdated?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalRuns?: IntFieldUpdateOperationsInput | number
+    avgPassRate?: FloatFieldUpdateOperationsInput | number
+    currentPassRate?: FloatFieldUpdateOperationsInput | number
+    avgDuration?: FloatFieldUpdateOperationsInput | number
+    currentCoverage?: FloatFieldUpdateOperationsInput | number
+    avgCoverage?: FloatFieldUpdateOperationsInput | number
+    totalFixes?: IntFieldUpdateOperationsInput | number
+    flakyTests?: IntFieldUpdateOperationsInput | number
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    healthScore?: EnumTestHealthScoreFieldUpdateOperationsInput | $Enums.TestHealthScore
+    totalTests?: IntFieldUpdateOperationsInput | number
+    criticalTests?: IntFieldUpdateOperationsInput | number
+    lastFailureReason?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type TestAnalysisUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    testFile?: TestFileUpdateOneRequiredWithoutAnalysesNestedInput
+  }
+
+  export type TestAnalysisUncheckedUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    testFileId?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestAnalysisUncheckedUpdateManyWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    testFileId?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TestExecutionCreateManyTestFileInput = {
@@ -9816,6 +15925,48 @@ export namespace Prisma {
     coverageImprovement: number
     generationStrategy: string
     context: JsonNullValueInput | InputJsonValue
+  }
+
+  export type TestAnalysisCreateManyTestFileInput = {
+    id?: string
+    sessionId: string
+    patterns: JsonNullValueInput | InputJsonValue
+    antiPatterns: JsonNullValueInput | InputJsonValue
+    suggestions: JsonNullValueInput | InputJsonValue
+    context: JsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+  }
+
+  export type AnalysisSessionUpdateWithoutTestFilesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+    analyses?: TestAnalysisUpdateManyWithoutSessionNestedInput
+  }
+
+  export type AnalysisSessionUncheckedUpdateWithoutTestFilesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
+    analyses?: TestAnalysisUncheckedUpdateManyWithoutSessionNestedInput
+  }
+
+  export type AnalysisSessionUncheckedUpdateManyWithoutTestFilesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+    context?: NullableJsonNullValueInput | InputJsonValue
+    decisions?: AnalysisSessionUpdatedecisionsInput | InputJsonValue[]
+    operations?: AnalysisSessionUpdateoperationsInput | InputJsonValue[]
   }
 
   export type TestExecutionUpdateWithoutTestFileInput = {
@@ -9966,6 +16117,36 @@ export namespace Prisma {
     coverageImprovement?: FloatFieldUpdateOperationsInput | number
     generationStrategy?: StringFieldUpdateOperationsInput | string
     context?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type TestAnalysisUpdateWithoutTestFileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    session?: AnalysisSessionUpdateOneRequiredWithoutAnalysesNestedInput
+  }
+
+  export type TestAnalysisUncheckedUpdateWithoutTestFileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TestAnalysisUncheckedUpdateManyWithoutTestFileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    patterns?: JsonNullValueInput | InputJsonValue
+    antiPatterns?: JsonNullValueInput | InputJsonValue
+    suggestions?: JsonNullValueInput | InputJsonValue
+    context?: JsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
