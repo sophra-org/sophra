@@ -1,0 +1,492 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { GET, PUT, DELETE } from './route';
+import { NextRequest } from 'next/server';
+import { serviceManager } from '@/lib/cortex/utils/service-manager';
+import { prisma } from '@/lib/shared/database/client';
+import logger from '@/lib/shared/logger';
+
+// Mock dependencies
+vi.mock('@/lib/cortex/utils/service-manager', () => ({
+  serviceManager: {
+    getServices: vi.fn(),
+  },
+}));
+
+vi.mock('@/lib/shared/database/client', () => ({
+  prisma: {
+    index: {
+      findUnique: vi.fn(),
+    },
+  },
+}));
+
+vi.mock('@/lib/shared/logger', () => ({
+  default: {
+    debug: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+// Mock global fetch
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
+describe('Document [id] API Additional Tests', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.ELASTICSEARCH_URL = 'http://localhost:9200';
+    process.env.SOPHRA_ES_API_KEY = 'test-key';
+  });
+
+  const mockServices = {
+    elasticsearch: {
+      indexExists: vi.fn(),
+    },
+  };
+
+  const mockIndex = {
+    id: 'test-index-id',
+    name: 'test-index',
+    status: 'active',
+    settings: {},
+    mappings: {},
+    created_at: new Date(),
+    updated_at: new Date(),
+    deleted_at: null,
+    doc_count: 0,
+    size_bytes: 0,
+    health: 'green',
+  };
+
+  beforeEach(() => {
+    vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as any);
+    vi.mocked(prisma.index.findUnique).mockResolvedValue(mockIndex);
+  });
+
+  describe('PUT Endpoint', () => {
+    const validUpdateData = {
+      title: 'Updated Title',
+      content: 'Updated content',
+      abstract: 'Updated abstract',
+      authors: ['Author 1', 'Author 2'],
+      tags: ['tag1', 'tag2'],
+      source: 'updated-source',
+      metadata: {
+        field1: 'value1',
+      },
+    };
+
+    describe('Parameter Validation', () => {
+      it('should require id parameter', async () => {
+        const request = new NextRequest(
+          'http://localhost/api/documents?index=test-index',
+          {
+            method: 'PUT',
+            body: JSON.stringify(validUpdateData),
+          }
+        );
+
+        const response = await PUT(request, { params: { id: '' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Missing required parameters');
+      });
+
+      it('should require index parameter', async () => {
+        const request = new NextRequest('http://localhost/api/documents/test-id', {
+          method: 'PUT',
+          body: JSON.stringify(validUpdateData),
+        });
+
+        const response = await PUT(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Missing required parameters');
+      });
+
+      it('should validate update data', async () => {
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'PUT',
+            body: JSON.stringify({
+              invalidField: 'value',
+            }),
+          }
+        );
+
+        const response = await PUT(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Invalid update data');
+      });
+    });
+
+    describe('Document Update', () => {
+      it('should update document successfully', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ result: 'updated' }),
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'PUT',
+            body: JSON.stringify(validUpdateData),
+          }
+        );
+
+        const response = await PUT(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.data.updated).toBe(true);
+        expect(data.data.updatedFields).toEqual(Object.keys(validUpdateData));
+      });
+
+      it('should format UUID-style document IDs', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ result: 'updated' }),
+        });
+
+        const uuidStyle = '550e8400-e29b-41d4-a716-446655440000';
+        const request = new NextRequest(
+          `http://localhost/api/documents/${uuidStyle}?index=test-index`,
+          {
+            method: 'PUT',
+            body: JSON.stringify(validUpdateData),
+          }
+        );
+
+        await PUT(request, { params: { id: uuidStyle } });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.stringContaining(uuidStyle),
+          expect.any(Object)
+        );
+      });
+
+      it('should handle partial updates', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ result: 'updated' }),
+        });
+
+        const partialUpdate = {
+          title: 'Updated Title',
+        };
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'PUT',
+            body: JSON.stringify(partialUpdate),
+          }
+        );
+
+        const response = await PUT(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.data.updatedFields).toEqual(['title']);
+      });
+    });
+
+    describe('Error Handling', () => {
+      it('should handle Elasticsearch errors', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+          json: () => Promise.resolve({ error: 'Document not found' }),
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'PUT',
+            body: JSON.stringify(validUpdateData),
+          }
+        );
+
+        const response = await PUT(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Failed to update document');
+      });
+
+      it('should handle network errors', async () => {
+        mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'PUT',
+            body: JSON.stringify(validUpdateData),
+          }
+        );
+
+        const response = await PUT(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Failed to update document');
+      });
+    });
+  });
+
+  describe('GET Endpoint', () => {
+    describe('Parameter Validation', () => {
+      it('should require id parameter', async () => {
+        const request = new NextRequest(
+          'http://localhost/api/documents?index=test-index'
+        );
+
+        const response = await GET(request, { params: { id: '' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Missing required parameters');
+      });
+
+      it('should require index parameter', async () => {
+        const request = new NextRequest('http://localhost/api/documents/test-id');
+
+        const response = await GET(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Missing required parameters');
+      });
+    });
+
+    describe('Document Retrieval', () => {
+      it('should retrieve document successfully', async () => {
+        const mockDocument = {
+          _source: {
+            title: 'Test Document',
+            content: 'Test content',
+          },
+        };
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockDocument),
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index-id'
+        );
+
+        const response = await GET(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.data).toEqual({
+          ...mockDocument._source,
+          id: 'test-id',
+        });
+      });
+
+      it('should handle non-existent document', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index-id'
+        );
+
+        const response = await GET(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.data).toBeNull();
+      });
+
+      it('should handle non-existent index', async () => {
+        vi.mocked(prisma.index.findUnique).mockResolvedValue(null);
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index-id'
+        );
+
+        const response = await GET(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(404);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Index not found');
+      });
+    });
+
+    describe('Error Handling', () => {
+      it('should handle Elasticsearch errors', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          statusText: 'Internal Server Error',
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index-id'
+        );
+
+        const response = await GET(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Failed to retrieve document');
+      });
+
+      it('should handle network errors', async () => {
+        mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index-id'
+        );
+
+        const response = await GET(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Failed to retrieve document');
+      });
+    });
+  });
+
+  describe('DELETE Endpoint', () => {
+    describe('Parameter Validation', () => {
+      it('should require id parameter', async () => {
+        const request = new NextRequest(
+          'http://localhost/api/documents?index=test-index',
+          {
+            method: 'DELETE',
+          }
+        );
+
+        const response = await DELETE(request, { params: { id: '' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Missing required parameters');
+      });
+
+      it('should require index parameter', async () => {
+        const request = new NextRequest('http://localhost/api/documents/test-id', {
+          method: 'DELETE',
+        });
+
+        const response = await DELETE(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Missing required parameters');
+      });
+    });
+
+    describe('Document Deletion', () => {
+      it('should delete document successfully', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ result: 'deleted' }),
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'DELETE',
+          }
+        );
+
+        const response = await DELETE(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+      });
+
+      it('should handle non-existent document gracefully', async () => {
+        mockFetch.mockResolvedValueOnce({
+          status: 404,
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'DELETE',
+          }
+        );
+
+        const response = await DELETE(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+      });
+    });
+
+    describe('Error Handling', () => {
+      it('should handle Elasticsearch errors', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          statusText: 'Internal Server Error',
+        });
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'DELETE',
+          }
+        );
+
+        const response = await DELETE(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Failed to delete document');
+      });
+
+      it('should handle network errors', async () => {
+        mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+        const request = new NextRequest(
+          'http://localhost/api/documents/test-id?index=test-index',
+          {
+            method: 'DELETE',
+          }
+        );
+
+        const response = await DELETE(request, { params: { id: 'test-id' } });
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data.success).toBe(false);
+        expect(data.error).toBe('Failed to delete document');
+      });
+    });
+  });
+});

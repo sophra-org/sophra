@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="10" failures="6" errors="0" time="15.835">
+    <testsuite name="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" timestamp="2025-01-08T16:00:09.158Z" hostname="codespaces-ecc31e" tests="10" failures="6" errors="0" skipped="0" time="0.042230209">
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; Configuration &gt; should use Node.js runtime" time="0.001669384">
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should process valid suggestion" time="0.017949119">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Stored adaptation suggestion {
+  suggestionId: &apos;mock-suggestion-id&apos;,
+  queryHash: &apos;test-hash&apos;,
+  patterns: {
+    averageRelevance: 0.8,
+    clickThroughRate: 0.6,
+    conversionRate: 0.4,
+    requiresOptimization: true,
+    confidence: 0.9
+  }
+}
+
+            </system-out>
+            <failure message="expected { success: true, data: { …(1) }, …(3) } to deeply equal { success: true, data: { …(1) }, …(3) }" type="AssertionError">
+AssertionError: expected { success: true, data: { …(1) }, …(3) } to deeply equal { success: true, data: { …(1) }, …(3) }
+
+- Expected
++ Received
+
+  Object {
+    &quot;code&quot;: &quot;ADAPT000&quot;,
+    &quot;data&quot;: Object {
+-     &quot;suggestionId&quot;: &quot;123e4567-e89b-12d3-a456-426614174000&quot;,
++     &quot;suggestionId&quot;: &quot;mock-suggestion-id&quot;,
+    },
+    &quot;message&quot;: &quot;Rule suggestion submitted successfully&quot;,
+    &quot;metadata&quot;: ObjectContaining {
+      &quot;timestamp&quot;: Any&lt;String&gt;,
+      &quot;took&quot;: Any&lt;Number&gt;,
+    },
+    &quot;success&quot;: true,
+  }
+
+ ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:75:20
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle invalid JSON" time="0.002068659">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should validate request schema" time="0.004502949">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+
+            </system-out>
+            <system-err>
+[default] Invalid rule suggestion format {
+  errors: {
+    _errors: [],
+    patterns: { _errors: [], averageRelevance: [Object] }
+  }
+}
+
+            </system-err>
+            <failure message="expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+
+Received: 
+
+
+
+Number of calls: 0
+" type="AssertionError">
+AssertionError: expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+ ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:152:28
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle database errors" time="0.00216602">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Stored adaptation suggestion {
+  suggestionId: &apos;mock-suggestion-id&apos;,
+  queryHash: &apos;test-hash&apos;,
+  patterns: {
+    averageRelevance: 0.8,
+    clickThroughRate: 0.6,
+    conversionRate: 0.4,
+    requiresOptimization: true,
+    confidence: 0.9
+  }
+}
+
+            </system-out>
+            <failure message="expected 200 to be 500 // Object.is equality" type="AssertionError">
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:171:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle empty database response" time="0.002145201">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Stored adaptation suggestion {
+  suggestionId: &apos;mock-suggestion-id&apos;,
+  queryHash: &apos;test-hash&apos;,
+  patterns: {
+    averageRelevance: 0.8,
+    clickThroughRate: 0.6,
+    conversionRate: 0.4,
+    requiresOptimization: true,
+    confidence: 0.9
+  }
+}
+
+            </system-out>
+            <failure message="expected 200 to be 500 // Object.is equality" type="AssertionError">
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:201:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should handle unknown errors" time="0.002205835">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Stored adaptation suggestion {
+  suggestionId: &apos;mock-suggestion-id&apos;,
+  queryHash: &apos;test-hash&apos;,
+  patterns: {
+    averageRelevance: 0.8,
+    clickThroughRate: 0.6,
+    conversionRate: 0.4,
+    requiresOptimization: true,
+    confidence: 0.9
+  }
+}
+
+            </system-out>
+            <failure message="expected 200 to be 500 // Object.is equality" type="AssertionError">
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:228:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should validate pattern values" time="0.004764547">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+
+            </system-out>
+            <system-err>
+[default] Invalid rule suggestion format {
+  errors: {
+    _errors: [],
+    patterns: { _errors: [], averageRelevance: [Object] }
+  }
+}
+[default] Invalid rule suggestion format {
+  errors: {
+    _errors: [],
+    patterns: { _errors: [], clickThroughRate: [Object] }
+  }
+}
+[default] Invalid rule suggestion format {
+  errors: { _errors: [], patterns: { _errors: [], conversionRate: [Object] } }
+}
+[default] Invalid rule suggestion format {
+  errors: { _errors: [], patterns: { _errors: [], confidence: [Object] } }
+}
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should log request details" time="0.001957982">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: {
+    &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos;,
+    &apos;x-test-header&apos;: &apos;test-value&apos;
+  }
+}
+[default] Stored adaptation suggestion {
+  suggestionId: &apos;mock-suggestion-id&apos;,
+  queryHash: &apos;test-hash&apos;,
+  patterns: {
+    averageRelevance: 0.8,
+    clickThroughRate: 0.6,
+    conversionRate: 0.4,
+    requiresOptimization: true,
+    confidence: 0.9
+  }
+}
+
+            </system-out>
+            <failure message="expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+
+Received: 
+
+
+
+Number of calls: 0
+" type="AssertionError">
+AssertionError: expected &quot;spy&quot; to be called with arguments: [ …(2) ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+ ❯ src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts:280:27
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.additional.test.ts" name="Suggest Route Additional Tests &gt; POST Endpoint &gt; should include timing information" time="0.001562585">
+            <system-out>
+[default] Received adaptation suggestion request {
+  url: &apos;http://localhost/api/adapt/suggest&apos;,
+  headers: { &apos;content-type&apos;: &apos;text/plain;charset=UTF-8&apos; }
+}
+[default] Stored adaptation suggestion {
+  suggestionId: &apos;mock-suggestion-id&apos;,
+  queryHash: &apos;test-hash&apos;,
+  patterns: {
+    averageRelevance: 0.8,
+    clickThroughRate: 0.6,
+    conversionRate: 0.4,
+    requiresOptimization: true,
+    confidence: 0.9
+  }
+}
+
+            </system-out>
+        </testcase>
+    </testsuite>
+</testsuites>
