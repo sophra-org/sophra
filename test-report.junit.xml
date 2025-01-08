@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="41" failures="23" errors="0" time="12.561">
+    <testsuite name="src/app/api/nous/learn/events/events.route.test.ts" timestamp="2025-01-08T08:59:26.464Z" hostname="codespaces-ecc31e" tests="6" failures="5" errors="0" skipped="0" time="0.085457192">
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="Learning Events Route Handler &gt; GET /api/nous/learn/events &gt; should fetch events with default parameters" time="0.044078572">
+            <failure message="Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;" type="TypeError">
+TypeError: Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;
+ ❯ mockPrismaPromise src/app/api/nous/learn/events/events.route.test.ts:104:35
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:108:55
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="Learning Events Route Handler &gt; GET /api/nous/learn/events &gt; should handle filtering by type and date range" time="0.001781136">
+            <failure message="Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;" type="TypeError">
+TypeError: Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;
+ ❯ mockPrismaPromise src/app/api/nous/learn/events/events.route.test.ts:139:35
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:143:55
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="Learning Events Route Handler &gt; GET /api/nous/learn/events &gt; should handle invalid query parameters" time="0.033924316">
+            <system-out>
+[default] Prisma client state: { isPrismaAvailable: true, hasLearningEvent: true }
+[default] Testing DB connection...
+[default] DB connection successful
+
+            </system-out>
+            <system-err>
+[default] Invalid query parameters { errors: { _errors: [], type: { _errors: [Array] } } }
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="Learning Events Route Handler &gt; GET /api/nous/learn/events &gt; should handle database connection failure" time="0.001921052">
+            <failure message="Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;" type="TypeError">
+TypeError: Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;
+ ❯ mockPrismaPromise src/app/api/nous/learn/events/events.route.test.ts:185:35
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:189:55
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="Learning Events Route Handler &gt; GET /api/nous/learn/events &gt; should handle database query errors gracefully" time="0.001048628">
+            <failure message="Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;" type="TypeError">
+TypeError: Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;
+ ❯ mockPrismaPromise src/app/api/nous/learn/events/events.route.test.ts:207:35
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:217:55
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="Learning Events Route Handler &gt; GET /api/nous/learn/events &gt; should handle empty results" time="0.001185975">
+            <failure message="Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;" type="TypeError">
+TypeError: Cannot assign to read only property &apos;Symbol(Symbol.toStringTag)&apos; of object &apos;#&lt;Promise&gt;&apos;
+ ❯ mockPrismaPromise src/app/api/nous/learn/events/events.route.test.ts:239:35
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:243:55
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/feedback/feedback.route.test.ts" timestamp="2025-01-08T08:59:26.470Z" hostname="codespaces-ecc31e" tests="9" failures="2" errors="0" skipped="0" time="0.078124508">
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; GET /api/nous/learn/feedback &gt; should fetch feedback requests successfully" time="0.048341405">
+            <failure message="expected { success: true, …(2) } to match object { success: true, …(2) }" type="AssertionError">
+AssertionError: expected { success: true, …(2) } to match object { success: true, …(2) }
+
+- Expected
++ Received
+
+  Object {
+-   &quot;data&quot;: ArrayContaining [
++   &quot;data&quot;: Array [
++     Object {
++       &quot;content&quot;: Array [
+          Object {
+-       &quot;content&quot;: Any&lt;Array&gt;,
+-       &quot;createdAt&quot;: Any&lt;String&gt;,
+-       &quot;id&quot;: Any&lt;String&gt;,
++           &quot;metadata&quot;: Object {
++             &quot;engagementType&quot;: &quot;CLICK&quot;,
++             &quot;queryHash&quot;: &quot;hash1&quot;,
++             &quot;resultId&quot;: &quot;r1&quot;,
++             &quot;timestamp&quot;: &quot;2025-01-08T08:59:14.691Z&quot;,
++             &quot;userAction&quot;: &quot;SEARCH&quot;,
++           },
++           &quot;queryId&quot;: &quot;q1&quot;,
++           &quot;rating&quot;: 0.8,
++         },
++       ],
++       &quot;createdAt&quot;: 2025-01-08T08:59:14.691Z,
++       &quot;id&quot;: &quot;1&quot;,
+        &quot;metrics&quot;: Object {
+-         &quot;averageRating&quot;: Any&lt;Number&gt;,
+-         &quot;totalFeedback&quot;: Any&lt;Number&gt;,
+-         &quot;uniqueUsers&quot;: Any&lt;Number&gt;,
++         &quot;averageRating&quot;: 0.8,
++         &quot;totalFeedback&quot;: 1,
++         &quot;uniqueUsers&quot;: 1,
+        },
+      },
+    ],
+    &quot;meta&quot;: Object {
+      &quot;total&quot;: Any&lt;Number&gt;,
+    },
+    &quot;success&quot;: true,
+  }
+
+ ❯ src/app/api/nous/learn/feedback/feedback.route.test.ts:108:20
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; GET /api/nous/learn/feedback &gt; should handle empty results" time="0.001451771">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; GET /api/nous/learn/feedback &gt; should handle database errors gracefully" time="0.001545606">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; POST /api/nous/learn/feedback &gt; should create feedback successfully" time="0.018502149">
+            <failure message="expected { success: true, …(2) } to match object { success: true, data: { …(4) }, …(1) }" type="AssertionError">
+AssertionError: expected { success: true, …(2) } to match object { success: true, data: { …(4) }, …(1) }
+
+- Expected
++ Received
+
+  Object {
+    &quot;data&quot;: Object {
+      &quot;feedback&quot;: Any&lt;Array&gt;,
+      &quot;id&quot;: Any&lt;String&gt;,
+      &quot;meta&quot;: Object {
+        &quot;averageRating&quot;: Any&lt;Number&gt;,
+        &quot;feedbackCount&quot;: Any&lt;Number&gt;,
+        &quot;uniqueQueries&quot;: Any&lt;Number&gt;,
+      },
+-     &quot;timestamp&quot;: Any&lt;String&gt;,
++     &quot;timestamp&quot;: 2025-01-08T08:59:14.756Z,
+    },
+    &quot;meta&quot;: Object {
+      &quot;total&quot;: Any&lt;Number&gt;,
+    },
+    &quot;success&quot;: true,
+  }
+
+ ❯ src/app/api/nous/learn/feedback/feedback.route.test.ts:175:20
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; POST /api/nous/learn/feedback &gt; should handle invalid feedback data" time="0.001721404">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; POST /api/nous/learn/feedback &gt; should handle missing feedback array" time="0.001100805">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; POST /api/nous/learn/feedback &gt; should handle invalid rating values" time="0.001372322">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; POST /api/nous/learn/feedback &gt; should handle database errors during creation" time="0.001157661">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="Feedback Route Handler &gt; POST /api/nous/learn/feedback &gt; should handle malformed JSON in request body" time="0.001003123">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.test.ts" timestamp="2025-01-08T08:59:26.473Z" hostname="codespaces-ecc31e" tests="6" failures="2" errors="0" skipped="0" time="0.059372846">
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should fetch metrics with default parameters" time="0.027550234">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should handle filtering by type and timeframe" time="0.015938241">
+            <failure message="expected &quot;spy&quot; to be called with arguments: [ ObjectContaining{…} ]
+
+Received: 
+
+  1st spy call:
+
+  Array [
+-   ObjectContaining {
+-     &quot;where&quot;: ObjectContaining {
+-       &quot;timestamp&quot;: Any&lt;Object&gt;,
+-       &quot;type&quot;: &quot;FEEDBACK_SCORE&quot;,
++   Object {
++     &quot;orderBy&quot;: Object {
++       &quot;timestamp&quot;: &quot;asc&quot;,
++     },
++     &quot;where&quot;: Object {
++       &quot;interval&quot;: &quot;1h&quot;,
++       &quot;timestamp&quot;: Object {
++         &quot;gte&quot;: 2025-01-07T08:59:14.707Z,
++         &quot;lte&quot;: 2025-01-08T08:59:14.707Z,
++       },
++       &quot;type&quot;: Object {
++         &quot;in&quot;: Array [
++           &quot;FEEDBACK_SCORE&quot;,
++           &quot;ENGAGEMENT_RATE&quot;,
++           &quot;RELEVANCE_SCORE&quot;,
++           &quot;CLICK_THROUGH&quot;,
++           &quot;CONVERSION_RATE&quot;,
++           &quot;SEARCH_LATENCY&quot;,
++           &quot;MODEL_ACCURACY&quot;,
++           &quot;ADAPTATION_SUCCESS&quot;,
++         ],
++       },
+      },
+    },
+  ]
+
+
+Number of calls: 1
+" type="AssertionError">
+AssertionError: expected &quot;spy&quot; to be called with arguments: [ ObjectContaining{…} ]
+
+Received: 
+
+  1st spy call:
+
+  Array [
+-   ObjectContaining {
+-     &quot;where&quot;: ObjectContaining {
+-       &quot;timestamp&quot;: Any&lt;Object&gt;,
+-       &quot;type&quot;: &quot;FEEDBACK_SCORE&quot;,
++   Object {
++     &quot;orderBy&quot;: Object {
++       &quot;timestamp&quot;: &quot;asc&quot;,
++     },
++     &quot;where&quot;: Object {
++       &quot;interval&quot;: &quot;1h&quot;,
++       &quot;timestamp&quot;: Object {
++         &quot;gte&quot;: 2025-01-07T08:59:14.707Z,
++         &quot;lte&quot;: 2025-01-08T08:59:14.707Z,
++       },
++       &quot;type&quot;: Object {
++         &quot;in&quot;: Array [
++           &quot;FEEDBACK_SCORE&quot;,
++           &quot;ENGAGEMENT_RATE&quot;,
++           &quot;RELEVANCE_SCORE&quot;,
++           &quot;CLICK_THROUGH&quot;,
++           &quot;CONVERSION_RATE&quot;,
++           &quot;SEARCH_LATENCY&quot;,
++           &quot;MODEL_ACCURACY&quot;,
++           &quot;ADAPTATION_SUCCESS&quot;,
++         ],
++       },
+      },
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ src/app/api/nous/learn/metrics/metrics.route.test.ts:135:46
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should handle invalid type parameter" time="0.003333014">
+            <failure message="expected 200 to be 400 // Object.is equality" type="AssertionError">
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ src/app/api/nous/learn/metrics/metrics.route.test.ts:152:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should handle invalid timeframe parameter" time="0.002152289">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should handle database errors gracefully" time="0.004151873">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should handle empty results" time="0.004682985">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/models/models.route.test.ts" timestamp="2025-01-08T08:59:26.476Z" hostname="codespaces-ecc31e" tests="5" failures="1" errors="0" skipped="0" time="0.052685138">
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models Route Handler &gt; GET /api/nous/learn/models &gt; should fetch models successfully" time="0.026615459">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models Route Handler &gt; GET /api/nous/learn/models &gt; should handle database errors gracefully" time="0.010434954">
+            <failure message="expected undefined to be defined" type="AssertionError">
+AssertionError: expected undefined to be defined
+ ❯ src/app/api/nous/learn/models/models.route.test.ts:114:29
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models Route Handler &gt; POST /api/nous/learn/models &gt; should create model successfully" time="0.007309518">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models Route Handler &gt; POST /api/nous/learn/models &gt; should handle invalid request format" time="0.005127474">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models Route Handler &gt; POST /api/nous/learn/models &gt; should handle database errors during creation" time="0.001423628">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" timestamp="2025-01-08T08:59:26.479Z" hostname="codespaces-ecc31e" tests="4" failures="3" errors="0" skipped="0" time="0.106319347">
+        <testcase classname="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" name="Search Patterns Route Handler &gt; GET /api/nous/learn/search-patterns &gt; should fetch patterns with default parameters" time="0.090722183">
+            <system-err>
+[default] Failed to search patterns {
+  error: TypeError: Cannot read properties of undefined (reading &apos;length&apos;)
+      at Module.GET (/workspaces/sophra/src/app/api/nous/learn/search-patterns/route.ts:81:1)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at /workspaces/sophra/src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts:120:24
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runFiles (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1262:5)
+      at startTests (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1271:3)
+}
+
+            </system-err>
+            <failure message="expected 500 to be 200 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts:123:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" name="Search Patterns Route Handler &gt; GET /api/nous/learn/search-patterns &gt; should handle database errors gracefully" time="0.004221373">
+            <system-err>
+[default] Failed to search patterns {
+  error: TypeError: Cannot read properties of undefined (reading &apos;length&apos;)
+      at Module.GET (/workspaces/sophra/src/app/api/nous/learn/search-patterns/route.ts:81:1)
+      at processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at /workspaces/sophra/src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts:141:24
+      at file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:533:5
+      at runTest (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1056:11)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runSuite (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1205:15)
+      at runFiles (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1262:5)
+      at startTests (file:///workspaces/sophra/node_modules/@vitest/runner/dist/index.js:1271:3)
+}
+
+            </system-err>
+            <failure message="expected &apos;Failed to search patterns&apos; to deeply equal { …(2) }" type="AssertionError">
+AssertionError: expected &apos;Failed to search patterns&apos; to deeply equal { …(2) }
+
+- Expected: 
+Object {
+  &quot;code&quot;: &quot;INTERNAL_SERVER_ERROR&quot;,
+  &quot;message&quot;: &quot;Failed to search patterns&quot;,
+}
+
++ Received: 
+&quot;Failed to search patterns&quot;
+
+ ❯ src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts:146:26
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" name="Search Patterns Route Handler &gt; POST /api/nous/learn/search-patterns &gt; should create patterns with valid data" time="0.002087668">
+            <failure message="Cannot read properties of undefined (reading &apos;mockResolvedValue&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;mockResolvedValue&apos;)
+ ❯ src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts:201:36
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" name="Search Patterns Route Handler &gt; POST /api/nous/learn/search-patterns &gt; should reject invalid pattern data" time="0.00772745">
+            <system-out>
+[default] Received search patterns request { patternsCount: 1, timestamp: &apos;2025-01-08T08:59:14.860Z&apos; }
+
+            </system-out>
+            <system-err>
+[default] Pattern validation failed {
+  errors: { _errors: [], patterns: { &apos;0&apos;: [Object], _errors: [] } },
+  received: { patterns: [ [Object] ] }
+}
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" timestamp="2025-01-08T08:59:26.482Z" hostname="codespaces-ecc31e" tests="8" failures="7" errors="0" skipped="0" time="0.035786931">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should fetch patterns with default parameters" time="0.023116121">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle database errors gracefully" time="0.004837473">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:102:35
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle custom timeframe and limit" time="0.001228744">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:124:35
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle invalid timeframe parameter" time="0.00093692">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:147:35
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle invalid limit parameter" time="0.001914355">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:161:35
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle limit out of range" time="0.000930938">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:175:35
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should calculate confidence and metrics correctly" time="0.000765319">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:216:35
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle empty results" time="0.000802358">
+            <failure message="Cannot read properties of undefined (reading &apos;json&apos;)" type="TypeError">
+TypeError: Cannot read properties of undefined (reading &apos;json&apos;)
+ ❯ src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts:241:35
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/models/sync/sync.route.test.ts" timestamp="2025-01-08T08:59:26.487Z" hostname="codespaces-ecc31e" tests="3" failures="3" errors="0" skipped="0" time="0.054941483">
+        <testcase classname="src/app/api/nous/learn/models/sync/sync.route.test.ts" name="Model Sync Route Handler &gt; POST /api/nous/learn/models/sync &gt; should sync model state with valid data" time="0.039353734">
+            <failure message="expected 500 to be 201 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ src/app/api/nous/learn/models/sync/sync.route.test.ts:101:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/sync/sync.route.test.ts" name="Model Sync Route Handler &gt; POST /api/nous/learn/models/sync &gt; should handle invalid model ID" time="0.003164299">
+            <failure message="expected 400 to be 404 // Object.is equality" type="AssertionError">
+AssertionError: expected 400 to be 404 // Object.is equality
+
+- Expected
++ Received
+
+- 404
++ 400
+
+ ❯ src/app/api/nous/learn/models/sync/sync.route.test.ts:124:31
+            </failure>
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/sync/sync.route.test.ts" name="Model Sync Route Handler &gt; POST /api/nous/learn/models/sync &gt; should handle database errors gracefully" time="0.01077426">
+            <failure message="expected 400 to be 500 // Object.is equality" type="AssertionError">
+AssertionError: expected 400 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 400
+
+ ❯ src/app/api/nous/learn/models/sync/sync.route.test.ts:147:31
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>

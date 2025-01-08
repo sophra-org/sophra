@@ -28,7 +28,13 @@
     "test:changed": "npx vitest related --changed",
     "test:threading": "npx vitest run tests/services/nous/utils/threading.test.ts",
     "build:test-analyzer": "cd mcp/test-analyzer && npm run build",
-    "start:test-analyzer": "cd mcp/test-analyzer && npm start"
+    "start:test-analyzer": "cd mcp/test-analyzer && npm start",
+    "mcp:build": "cd mcp/test-analyzer && pnpm install && pnpm build",
+    "mcp-analyze": "pnpm mcp:build && node mcp/test-analyzer/dist/cli.js",
+    "mcp-analyze:interactive": "pnpm mcp:build && node mcp/test-analyzer/dist/cli.js -i",
+    "mcp-analyze:coverage": "pnpm mcp:build && node mcp/test-analyzer/dist/cli.js -c",
+    "mcp-analyze:watch": "pnpm mcp:build && node mcp/test-analyzer/dist/cli.js -i --watch",
+    "mcp-analyze:test": "pnpm mcp:build && node mcp/test-analyzer/dist/cli.js -t"
   },
   "prisma": {
     "seed": "ts-node prisma/tokenseed.ts"

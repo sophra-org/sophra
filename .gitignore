@@ -82,4 +82,5 @@ var/
 wheels/
 
 #testing
-./coverage
+coverage/
+coverage/lcov-report
