@@ -1,6 +1,6 @@
-import logger from "@/lib/shared/logger";
+import logger from "../../../../../lib/shared/logger";
 import { Prisma, SignalType } from "@prisma/client";
-import { prisma } from "@/lib/shared/database/client";
+import { prisma } from "../../../../../lib/shared/database/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime
@@ -38,7 +38,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       where: {
         ...(source && { source }),
         ...(type && { type: type as SignalType }),
-        ...(status && { processing: { status } }),
+        ...(status && {
+          metadata: {
+            path: ["status"],
+            equals: status,
+          },
+        }),
       },
       _count: {
         _all: true,
@@ -54,8 +59,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       data: stats.map((stat) => ({
-        source: stat.source, // Access source field directly
-        type: stat.type, // Access type field directly
+        source: stat.source,
+        type: stat.type,
         count: typeof stat._count === "object" ? (stat._count._all ?? 0) : 0,
         firstSeen: stat._min?.timestamp ?? null,
         lastSeen: stat._max?.timestamp ?? null,

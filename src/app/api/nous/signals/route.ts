@@ -1,29 +1,15 @@
 import { Prisma, SignalType } from '@prisma/client';
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "../../../../lib/shared/database/client";
+import logger from "../../../../lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { SignalTypeSchema, JsonValueSchema } from "@/lib/shared/database/validation/generated";
+import { SignalSchema } from "../../../../lib/shared/database/validation/generated";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
-// Create a custom schema for signal creation that doesn't require an ID
-const SignalCreateSchema = z.object({
-  type: SignalTypeSchema,
-  source: z.string(),
-  value: JsonValueSchema,
-  priority: z.number().int().nullable(),
-  retries: z.number().int().nullable(),
-  timestamp: z.coerce.date(),
-  processed: z.boolean(),
-  processedAt: z.coerce.date().nullable(),
-  metadata: JsonValueSchema.nullable(),
-  error: z.string().nullable(),
-  manual: z.boolean(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  strength: z.number(),
-});
+// Use the generated schema but make ID optional for creation
+const SignalCreateSchema = SignalSchema.omit({ id: true });
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {

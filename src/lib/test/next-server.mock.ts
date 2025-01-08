@@ -4,6 +4,24 @@ import { RequestCookies } from 'next/dist/server/web/spec-extension/cookies';
 import { NextURL } from 'next/dist/server/web/next-url';
 
 class MockResponse {
+    static json(data: any, init?: ResponseInit) {
+        return new MockResponse(data, init);
+    }
+
+    static redirect(url: string, init?: ResponseInit) {
+        const response = new MockResponse(null, init);
+        response.status = 302;
+        return response;
+    }
+
+    static next(init?: ResponseInit) {
+        return new MockResponse(null, init);
+    }
+
+    static rewrite(url: string, init?: ResponseInit) {
+        return new MockResponse(null, init);
+    }
+
     constructor(data: any, init?: ResponseInit) {
         this.data = data;
         this.init = init || {};
@@ -87,4 +105,4 @@ class MockRequest implements Partial<NextRequest> {
     }
 }
 
-export { MockRequest, MockResponse }; 
+export { MockRequest, MockResponse };

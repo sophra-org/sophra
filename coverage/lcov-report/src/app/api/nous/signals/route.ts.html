@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">7.69% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/26</span>
+                <span class='fraction'>0/26</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">7.69% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/26</span>
+                <span class='fraction'>0/26</span>
             </div>
         
             
@@ -223,31 +223,7 @@
 <a name='L158'></a><a href='#L158'>158</a>
 <a name='L159'></a><a href='#L159'>159</a>
 <a name='L160'></a><a href='#L160'>160</a>
-<a name='L161'></a><a href='#L161'>161</a>
-<a name='L162'></a><a href='#L162'>162</a>
-<a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a>
-<a name='L165'></a><a href='#L165'>165</a>
-<a name='L166'></a><a href='#L166'>166</a>
-<a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a>
-<a name='L169'></a><a href='#L169'>169</a>
-<a name='L170'></a><a href='#L170'>170</a>
-<a name='L171'></a><a href='#L171'>171</a>
-<a name='L172'></a><a href='#L172'>172</a>
-<a name='L173'></a><a href='#L173'>173</a>
-<a name='L174'></a><a href='#L174'>174</a>
-<a name='L175'></a><a href='#L175'>175</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L161'></a><a href='#L161'>161</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -255,14 +231,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -412,31 +384,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Prisma, SignalType } from '@prisma/client';
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "../../../../lib/shared/database/client";
+import logger from "../../../../lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { SignalTypeSchema, JsonValueSchema } from "@/lib/shared/database/validation/generated";
-// Declare Node.js runtime
-export const runtime = "nodejs";
+import { SignalSchema } from "../../../../lib/shared/database/validation/generated";
 &nbsp;
-// Create a custom schema for signal creation that doesn't require an ID
-const SignalCreateSchema = z.object({
-  type: SignalTypeSchema,
-  source: z.string(),
-  value: JsonValueSchema,
-  priority: z.number().int().nullable(),
-  retries: z.number().int().nullable(),
-  timestamp: z.coerce.date(),
-  processed: z.boolean(),
-  processedAt: z.coerce.date().nullable(),
-  metadata: JsonValueSchema.nullable(),
-  error: z.string().nullable(),
-  manual: z.boolean(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  strength: z.number(),
-});
+// Declare Node.js runtime
+export const runtime = <span class="cstat-no" title="statement not covered" >"nodejs";</span>
+&nbsp;
+// Use the generated schema but make ID optional for creation
+const SignalCreateSchema = <span class="cstat-no" title="statement not covered" >SignalSchema.omit({ id: true });</span>
 &nbsp;
 export async function <span class="fstat-no" title="function not covered" >GET(r</span>eq: NextRequest): Promise&lt;NextResponse&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
@@ -592,7 +550,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T00:55:16.704Z
+                at 2025-01-08T01:34:48.808Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

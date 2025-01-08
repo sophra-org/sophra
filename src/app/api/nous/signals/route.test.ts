@@ -1,22 +1,55 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { NextRequest } from "next/server";
+import { GET, POST } from "./route";
+import { SignalType } from "@prisma/client";
+
+// Mock modules before any other code
 vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn(() => mockPrisma),
+  PrismaClient: vi.fn(),
+  SignalType: {
+    SEARCH: 'SEARCH',
+    PERFORMANCE: 'PERFORMANCE',
+    USER_BEHAVIOR_IMPRESSION: 'USER_BEHAVIOR_IMPRESSION',
+    USER_BEHAVIOR_VIEW: 'USER_BEHAVIOR_VIEW',
+    USER_BEHAVIOR_CLICK: 'USER_BEHAVIOR_CLICK',
+    USER_BEHAVIOR_CONVERSION: 'USER_BEHAVIOR_CONVERSION',
+    MODEL_PERFORMANCE: 'MODEL_PERFORMANCE',
+    FEEDBACK: 'FEEDBACK',
+    SYSTEM_HEALTH: 'SYSTEM_HEALTH',
+    SESSION: 'SESSION'
+  },
   Prisma: {
     JsonValue: undefined,
     JsonObject: undefined,
   }
 }));
 
-vi.mock('@/lib/shared/database/client', () => ({
-  default: mockPrisma,
-  prisma: mockPrisma
+vi.mock("../../../../lib/shared/database/client", () => {
+  const mockPrisma = {
+    signal: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      count: vi.fn()
+    }
+  };
+  return { prisma: mockPrisma };
+});
+
+vi.mock("../../../../lib/shared/database/validation/generated", () => ({
+  SignalSchema: {
+    omit: () => ({
+      parse: (value: any) => value,
+      safeParse: (value: any) => ({ success: true, data: value })
+    })
+  }
 }));
 
-import { mockPrisma } from '@/lib/shared/test/prisma.mock';
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
-import { SignalType } from "@prisma/client";
-import { prisma } from "@/lib/shared/database/client";
+vi.mock("../../../../lib/shared/logger", () => ({
+  default: {
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}));
 
 vi.mock("next/server", () => {
   return {
@@ -46,12 +79,8 @@ vi.mock("next/server", () => {
   };
 });
 
-vi.mock("@/lib/shared/logger", () => ({
-  default: {
-    error: vi.fn(),
-    info: vi.fn(),
-  },
-}));
+// Import after mocks
+import { prisma } from "../../../../lib/shared/database/client";
 
 describe("Signals Route Handler", () => {
   beforeEach(() => {
@@ -257,4 +286,4 @@ describe("Signals Route Handler", () => {
       expect(data.error).toBe("Failed to create signal");
     });
   });
-}); 
+});

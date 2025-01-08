@@ -1,13 +1,49 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Registry } from './index'
-import { ModelConfig, ModelVersion } from '@/lib/shared/database/validation/generated'
 import { RegistryStore } from './store'
+import { Version, VersionManager, VersionState } from './version'
 
 // Mock dependencies
 vi.mock('./store')
 vi.mock('./metadata')
-vi.mock('./version')
-vi.mock('@/lib/shared/logger')
+vi.mock('./version', () => ({
+  Version: vi.fn(),
+  VersionState: {
+    DRAFT: "draft",
+    ACTIVE: "active",
+    DEPRECATED: "deprecated",
+    ARCHIVED: "archived"
+  },
+  VersionManager: vi.fn(() => ({
+    createVersion: vi.fn(() => new Version(0, 1, 0, VersionState.DRAFT, new Date(), new Date()))
+  }))
+}))
+
+// Mock Prisma types and validation
+vi.mock('@prisma/client', () => ({
+  ModelConfig: vi.fn(),
+  ModelVersion: vi.fn(),
+  Prisma: {
+    JsonValue: vi.fn()
+  }
+}))
+
+vi.mock('lib/shared/database/validation/generated', () => ({
+  ModelVersionSchema: {
+    parse: vi.fn(data => data)
+  }
+}))
+
+// Define types to match Prisma schema
+type ModelType = "SEARCH_RANKER" | "PATTERN_DETECTOR" | "QUERY_OPTIMIZER" | "FEEDBACK_ANALYZER" | "OPENAI_FINE_TUNED";
+
+interface ModelConfig {
+  id: string;
+  type: ModelType;
+  hyperparameters: Record<string, any>;
+  features: string[];
+  trainingParams: Record<string, any>;
+}
 
 describe('Registry', () => {
   let registry: Registry
@@ -53,7 +89,7 @@ describe('Registry', () => {
     })
 
     it('should throw error for invalid config', async () => {
-      await expect(registry.registerModel({} as ModelConfig))
+      await expect(registry.registerModel({} as any))
         .rejects.toThrow('Invalid model configuration')
     })
   })

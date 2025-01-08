@@ -146,6 +146,7 @@ export class Registry {
         ? this.store.getByTag<ModelVersion>(type)
         : this.store.listEntries<ModelVersion>();
       
+      if (!entries) return [];
       return entries.map(entry => ({
         ...entry.config as any,
         createdAt: new Date(entry.config as string)

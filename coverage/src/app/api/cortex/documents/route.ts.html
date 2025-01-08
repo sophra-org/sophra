@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">8.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/96</span>
+                <span class='fraction'>0/96</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">8.98% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/89</span>
+                <span class='fraction'>0/89</span>
             </div>
         
             
@@ -534,15 +534,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -553,7 +550,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -632,22 +632,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -655,12 +647,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -996,12 +996,12 @@ import JSON5 from "json5";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime
-export const runtime = "nodejs";
+export const runtime = <span class="cstat-no" title="statement not covered" >"nodejs";</span>
 &nbsp;
 &nbsp;
-const VECTOR_DIMENSIONS = 3072;
+const VECTOR_DIMENSIONS = <span class="cstat-no" title="statement not covered" >3072;</span>
 &nbsp;
-const DocumentSchema = z.object({
+const DocumentSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   index: z.string(),
   document: z.object({
     title: z.string(),
@@ -1015,7 +1015,7 @@ const DocumentSchema = z.object({
   }),
 });
 &nbsp;
-const DEFAULT_MAPPING = {
+const DEFAULT_MAPPING = <span class="cstat-no" title="statement not covered" >{</span>
   dynamic: false,
   properties: {
     title: { type: "text" },
@@ -1094,14 +1094,14 @@ function <span class="fstat-no" title="function not covered" >sanitizeInput(r</s
 }
 &nbsp;
 // Initialize queues
-const indexQueue = new OperationQueue({
+const indexQueue = <span class="cstat-no" title="statement not covered" >new OperationQueue({</span>
   maxConcurrent: 2,
   maxQueueSize: 20,
   timeout: 30000,
   name: "Index Operations",
 });
 &nbsp;
-const documentQueue = new OperationQueue({
+const documentQueue = <span class="cstat-no" title="statement not covered" >new OperationQueue({</span>
   maxConcurrent: 10,
   maxQueueSize: 100,
   timeout: 10000,
@@ -1109,7 +1109,7 @@ const documentQueue = new OperationQueue({
 });
 &nbsp;
 // Initialize circuit breakers
-const elasticsearchBreakers = {
+const elasticsearchBreakers = <span class="cstat-no" title="statement not covered" >{</span>
   write: new CircuitBreaker({
     failureThreshold: 5,
     resetTimeout: 30000,
@@ -1122,7 +1122,7 @@ const elasticsearchBreakers = {
   }),
 };
 &nbsp;
-const syncBreaker = new CircuitBreaker({
+const syncBreaker = <span class="cstat-no" title="statement not covered" >new CircuitBreaker({</span>
   failureThreshold: 3,
   resetTimeout: 20000,
   name: "Sync Service",
@@ -1456,7 +1456,7 @@ function <span class="fstat-no" title="function not covered" >extractProblematic
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T00:55:16.228Z
+                at 2025-01-08T01:34:48.337Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

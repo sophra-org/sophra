@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
-import { SignalType } from "@prisma/client";
-import { mockPrisma } from "~/vitest.setup";
+import { mockPrisma } from "../../../../../../vitest.setup";
 
+// Mocks must be defined before imports
 vi.mock("@prisma/client", () => ({
   SignalType: {
     SEARCH: "SEARCH",
@@ -14,16 +12,12 @@ vi.mock("@prisma/client", () => ({
   },
 }));
 
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    signal: {
-      update: vi.fn(),
-      findMany: vi.fn(),
-    },
-  },
+vi.mock("../../../../../lib/shared/database/client", () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
 }));
 
-vi.mock("@/lib/shared/logger", () => ({
+vi.mock("../../../../../lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
@@ -60,6 +54,11 @@ vi.mock("next/server", () => ({
     }
   },
 }));
+
+// Imports after mocks
+import { NextRequest } from "next/server";
+import { GET, POST } from "./route";
+import { SignalType } from "@prisma/client";
 
 describe("Signals Process Route Handler", () => {
   beforeEach(() => {
@@ -340,4 +339,4 @@ describe("Signals Process Route Handler", () => {
       expect(data.data.metadata).toMatchObject(mockSignal.metadata);
     });
   });
-}); 
+});

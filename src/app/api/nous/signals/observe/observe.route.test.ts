@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
-import { mockPrisma } from "~/vitest.setup";
+import { mockPrisma } from "../../../../../../vitest.setup";
 
+// Mocks must be defined before imports
 vi.mock("@prisma/client", () => ({
   SignalType: {
     SEARCH: "SEARCH",
@@ -10,14 +9,21 @@ vi.mock("@prisma/client", () => ({
     FEEDBACK: "FEEDBACK",
     CONVERSION: "CONVERSION",
     CUSTOM: "CUSTOM",
-  }
+  },
+  Prisma: {
+    SignalScalarFieldEnum: {
+      source: "source",
+      type: "type",
+    },
+  },
 }));
 
-vi.mock("@/lib/shared/database/client", () => ({
-  default: mockPrisma
+vi.mock("../../../../../lib/shared/database/client", () => ({
+  default: mockPrisma,
+  prisma: mockPrisma
 }));
 
-vi.mock("@/lib/shared/logger", () => ({
+vi.mock("../../../../../lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
   },
@@ -54,6 +60,10 @@ vi.mock("next/server", () => ({
   },
 }));
 
+// Imports after mocks
+import { NextRequest } from "next/server";
+import { GET, POST } from "./route";
+
 describe("Signals Observe Route Handler", () => {
   const SignalType = {
     SEARCH: "SEARCH",
@@ -66,6 +76,8 @@ describe("Signals Observe Route Handler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(mockPrisma.signal.groupBy).mockReset();
+    // Set up default successful mock implementation
+    vi.mocked(mockPrisma.signal.groupBy).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -284,4 +296,4 @@ describe("Signals Observe Route Handler", () => {
       expect(data.error).toBe("Failed to observe signals");
     });
   });
-}); 
+});
