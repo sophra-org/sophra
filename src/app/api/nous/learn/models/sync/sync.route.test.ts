@@ -1,27 +1,53 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
-import { mockPrisma } from "~/vitest.setup";
-import { ModelType, ModelState, ModelConfig, ModelMetrics, Prisma } from "@prisma/client";
+import logger from '@lib/shared/logger';
+import { ModelType, ModelState, ModelConfig } from "@prisma/client";
 
-vi.mock("@/lib/shared/database/client", () => ({
-  default: mockPrisma
-}));
-
-vi.mock("@/lib/shared/logger", () => ({
+// Mock modules
+vi.mock('@lib/shared/logger', () => ({
   default: {
     error: vi.fn(),
-    info: vi.fn(),
-  },
+    info: vi.fn()
+  }
 }));
+
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    json: vi.fn()
+  })),
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data
+    }))
+  }
+}));
+
+vi.mock('@lib/shared/database/client', () => {
+  const mockPrisma = {
+    modelConfig: {
+      findUnique: vi.fn()
+    },
+    modelState: {
+      create: vi.fn()
+    },
+    $queryRaw: vi.fn()
+  };
+  return { prisma: mockPrisma };
+});
+
+// Import after mocks
+import { prisma } from '@lib/shared/database/client';
+import { POST } from './route';
 
 describe("Model Sync Route Handler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
   });
 
   describe("POST /api/nous/learn/models/sync", () => {
@@ -34,17 +60,9 @@ describe("Model Sync Route Handler", () => {
         trainingParams: { epochs: 100 }
       } satisfies Partial<ModelConfig>;
 
-      const mockVersion = {
-        id: "v1", 
-        metrics: {},
-        artifactPath: "",
-        parentVersion: null,
-        createdAt: new Date()
-      };
-
       const mockState = {
         id: "test-state-1",
-        versionId: mockVersion.id,
+        versionId: mockModel.id, // Changed from modelId to versionId based on type error
         weights: [0.1, 0.2],
         bias: 0.5,
         scaler: { mean: [0], std: [1] },
@@ -59,43 +77,83 @@ describe("Model Sync Route Handler", () => {
         updatedAt: new Date(),
       } satisfies Partial<ModelState>;
 
-      // Define metrics separately for the request body
-      const mockMetrics = {
-        accuracy: 0.9,
-        precision: 0.85,
-        recall: 0.88,
-        f1Score: 0.86,
-        latencyMs: 100,
-        loss: 0.1,
-      };
+      vi.mocked(prisma.modelConfig.findUnique).mockResolvedValue(mockModel as ModelConfig);
+      vi.mocked(prisma.modelState.create).mockResolvedValue(mockState as unknown as ModelState);
 
-      vi.mocked(mockPrisma.modelConfig.findUnique).mockResolvedValue(mockModel as ModelConfig);
-      vi.mocked(mockPrisma.modelState.create).mockResolvedValue(mockState as unknown as ModelState);
-
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/models/sync", {
-        method: "POST",
-        body: JSON.stringify({
-          modelId: mockModel.id,
-          state: {
-            weights: mockState.weights,
-            bias: mockState.bias,
-            scaler: mockState.scaler,
-            featureNames: mockState.featureNames,
-            metrics: mockMetrics,
-            hyperparameters: mockState.hyperparameters,
-            currentEpoch: mockState.currentEpoch,
-            trainingProgress: mockState.trainingProgress,
-            lastTrainingError: mockState.lastTrainingError,
-          },
-        }),
+      const request = new NextRequest("http://localhost:3000/api/nous/learn/models/sync");
+      request.json = vi.fn().mockResolvedValue({
+        modelId: mockModel.id,
+        state: {
+          weights: mockState.weights,
+          bias: mockState.bias,
+          scaler: mockState.scaler,
+          featureNames: mockState.featureNames,
+          hyperparameters: mockState.hyperparameters,
+          currentEpoch: mockState.currentEpoch,
+          trainingProgress: mockState.trainingProgress,
+          lastTrainingError: mockState.lastTrainingError,
+        },
       });
 
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toEqual(mockState);
+      expect(response.status).toBe(201);
+      expect(data).toEqual({
+        success: true,
+        data: mockState,
+        meta: {
+          timestamp: expect.any(String),
+          request: expect.any(Object)
+        }
+      });
+    });
+
+    it("should handle invalid model ID", async () => {
+      vi.mocked(prisma.modelConfig.findUnique).mockResolvedValue(null);
+
+      const request = new NextRequest("http://localhost:3000/api/nous/learn/models/sync");
+      request.json = vi.fn().mockResolvedValue({
+        modelId: "invalid-id",
+        state: {}
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data).toEqual({
+        success: false,
+        error: "Model not found",
+        meta: {
+          timestamp: expect.any(String),
+          request: expect.any(Object)
+        }
+      });
+    });
+
+    it("should handle database errors gracefully", async () => {
+      vi.mocked(prisma.modelConfig.findUnique).mockRejectedValue(new Error("DB Error"));
+
+      const request = new NextRequest("http://localhost:3000/api/nous/learn/models/sync");
+      request.json = vi.fn().mockResolvedValue({
+        modelId: "test-id",
+        state: {}
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data).toEqual({
+        success: false,
+        error: "Failed to sync model state",
+        meta: {
+          timestamp: expect.any(String),
+          request: expect.any(Object)
+        }
+      });
+      expect(logger.error).toHaveBeenCalled();
     });
   });
-}); 
+});

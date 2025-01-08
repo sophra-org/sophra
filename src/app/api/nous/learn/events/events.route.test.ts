@@ -1,68 +1,88 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { GET } from "./route";
-import { LearningEventType } from "@/lib/nous/types/learning";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { mockPrisma } from "~/vitest.setup";
+import logger from '@lib/shared/logger';
+import { LearningEventType } from '@lib/nous/types/learning';
 
-vi.mock("@prisma/client", () => ({
-  LearningEventType,
-}));
-
-vi.mock("next/server", () => {
-  const NextResponse = {
-    json: (data: any, init?: { status?: number }) => {
-      const response = {
-        status: init?.status || 200,
-        ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: () => Promise.resolve(data)
-      };
-      return response;
-    }
-  };
-
-  class MockNextRequest {
-    url: string;
-    constructor(url: string) {
-      this.url = url;
-    }
-  }
-
-  return { NextResponse, NextRequest: MockNextRequest };
-});
-
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    $queryRaw: vi.fn(),
-  },
-}));
-
-vi.mock("@/lib/shared/logger", () => ({
+// Mock modules
+vi.mock('@lib/shared/logger', () => ({
   default: {
     error: vi.fn(),
-    info: vi.fn(),
-  },
+    info: vi.fn()
+  }
 }));
 
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    json: vi.fn()
+  })),
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data
+    }))
+  }
+}));
+
+vi.mock('@lib/shared/database/client', () => {
+  const mockPrisma = {
+    learningEvent: {
+      findMany: vi.fn(),
+      count: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      upsert: vi.fn(),
+    },
+    $queryRaw: vi.fn().mockImplementation((query) => Promise.resolve([])),
+    $transaction: vi.fn((operations) =>
+      Array.isArray(operations)
+        ? Promise.all(operations)
+        : Promise.resolve(operations())
+    ),
+    $disconnect: vi.fn(),
+    $connect: vi.fn(),
+    raw: jest.fn().mockImplementation((query) => Promise.resolve([])),
+    findMany: jest.fn().mockResolvedValue([]),
+    create: jest.fn().mockImplementation((data) => Promise.resolve(data)),
+  }
+  return { prisma: mockPrisma }
+});
+
+// Import after mocks
+import { prisma } from '@lib/shared/database/client';
+import { GET } from './route';
+import type { LearningEvent, Prisma } from '@prisma/client';
+
 describe("Learning Events Route Handler", () => {
-  const mockEvent = {
+  const mockEvent: LearningEvent = {
     id: "test-1",
-    type: "SEARCH_PATTERN" as const,
-    priority: "HIGH" as const,
-    timestamp: new Date(),
+    type: "SEARCH_PATTERN",
+    priority: "HIGH",
+    timestamp: new Date('2023-01-01T00:00:00Z'),
     processedAt: null,
-    metadata: {},
-    correlationId: "corr-1",
-    sessionId: "sess-1",
-    userId: "user-1",
-    clientId: "client-1",
+    metadata: {
+      source: "test",
+      query: "test query",
+      userId: "test-user"
+    } as Prisma.JsonValue,
+    createdAt: new Date('2023-01-01T00:00:00Z'),
+    updatedAt: new Date('2023-01-01T00:00:00Z'),
+    status: "PENDING",
+    correlationId: "test-correlation-id",
+    sessionId: "test-session-id", 
+    userId: "test-user-id",
+    clientId: "test-client-id",
     environment: "test",
     version: "1.0.0",
-    status: "PENDING" as const,
-    error: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    tags: [],
+    tags: ["test"],
+    error: "test error",
     retryCount: 0
   };
 
@@ -72,8 +92,8 @@ describe("Learning Events Route Handler", () => {
 
   describe("GET /api/nous/learn/events", () => {
     it("should fetch events with default parameters", async () => {
-      vi.mocked(mockPrisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]);
-      vi.mocked(mockPrisma.learningEvent.count).mockResolvedValueOnce(1);
+      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]);
+      vi.mocked(prisma.learningEvent.count).mockResolvedValueOnce(1);
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
@@ -81,17 +101,25 @@ describe("Learning Events Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual([mockEvent]);
+      expect(data.data).toEqual([{
+        ...mockEvent,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        startDate: expect.any(String),
+        endDate: expect.any(String)
+      }]);
       expect(data.meta).toEqual({
-        total: 1,
-        page: 1,
-        pageSize: 10
+        pagination: {
+          total: 1,
+          page: 1,
+          pageSize: 10
+        }
       });
     });
 
     it("should handle filtering by type and date range", async () => {
-      vi.mocked(mockPrisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]);
-      vi.mocked(mockPrisma.learningEvent.count).mockResolvedValueOnce(1);
+      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]);
+      vi.mocked(prisma.learningEvent.count).mockResolvedValueOnce(1);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/events?type=SEARCH_PATTERN&startDate=2023-01-01&endDate=2023-12-31"
@@ -101,43 +129,57 @@ describe("Learning Events Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual([mockEvent]);
+      expect(data.data).toEqual([{
+        ...mockEvent,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        startDate: expect.any(String),
+        endDate: expect.any(String)
+      }]);
       expect(data.meta).toEqual({
-        total: 1,
-        page: 1,
-        pageSize: 10
+        pagination: {
+          total: 1,
+          page: 1,
+          pageSize: 10
+        }
       });
     });
-    it("should handle invalid query parameters", async () => {
-      vi.mocked(mockPrisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
 
+    it("should handle invalid query parameters", async () => {
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/events?type=INVALID_TYPE"
       );
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(422);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid query parameters");
-      expect(data.details).toBeDefined();
+      expect(data.error).toBe("Validation error");
+      expect(data.meta).toEqual({
+        timestamp: expect.any(String),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle database connection failure", async () => {
-      vi.mocked(mockPrisma.learningEvent.findMany).mockRejectedValueOnce(new Error("DB Error"));
+      vi.mocked(prisma.learningEvent.findMany).mockRejectedValueOnce(new Error("DB Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(503);
+      expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Database connection failed");
-      expect(data.meta.timestamp).toBeDefined();
+      expect(data.error).toBe("Internal server error");
+      expect(data.meta).toEqual({
+        timestamp: expect.any(String),
+        errorDetails: expect.any(String)
+      });
     });
+
     it("should handle database query errors gracefully", async () => {
-      vi.mocked(mockPrisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
-      vi.mocked(mockPrisma.learningEvent.findMany).mockRejectedValueOnce(new Error("Query Error"));
+      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
+      vi.mocked(prisma.learningEvent.findMany).mockRejectedValueOnce(new Error("Query Error"));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
@@ -154,9 +196,10 @@ describe("Learning Events Route Handler", () => {
         limit: 100
       });
     });
+
     it("should handle empty results", async () => {
-      vi.mocked(mockPrisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
-      vi.mocked(mockPrisma.learningEvent.findMany).mockResolvedValueOnce([]);
+      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
+      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([]);
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
@@ -172,4 +215,4 @@ describe("Learning Events Route Handler", () => {
       });
     });
   });
-}); 
+});

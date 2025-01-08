@@ -1,34 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from './route';
-import logger from "@/lib/shared/logger";
-import { NextRequest, NextResponse } from 'next/server';
-import { mockPrisma } from '~/vitest.setup';
+import { NextRequest } from 'next/server';
+import logger from '../../../../../../lib/shared/logger';
+import { ExperimentStatus } from '@prisma/client';
 
-// Mock ExperimentStatus enum
-const ExperimentStatus = {
-  PENDING: 'PENDING',
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE'
-} as const;
-
-vi.mock('@prisma/client', () => ({
-  ExperimentStatus: {
-    PENDING: 'PENDING',
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE'
-  }
-}));
-
-vi.mock('@/lib/shared/database/client', () => ({
-  default: {
-    aBTest: {
-      findUnique: vi.fn(),
-      update: vi.fn()
-    }
-  }
-}));
-
-vi.mock('@/lib/shared/logger', () => ({
+// Mock modules
+vi.mock('../../../../../../lib/shared/logger', () => ({
   default: {
     info: vi.fn(),
     error: vi.fn()
@@ -52,6 +28,28 @@ vi.mock('next/server', () => ({
   }
 }));
 
+vi.mock('@prisma/client', () => ({
+  ExperimentStatus: {
+    PENDING: 'PENDING',
+    ACTIVE: 'ACTIVE',
+    INACTIVE: 'INACTIVE'
+  }
+}));
+
+vi.mock('../../../../../../lib/shared/database/client', () => {
+  const mockPrisma = {
+    aBTest: {
+      findUnique: vi.fn(),
+      update: vi.fn()
+    }
+  };
+  return { prisma: mockPrisma };
+});
+
+// Import after mocks
+import { prisma } from '../../../../../../lib/shared/database/client';
+import { POST } from './route';
+
 describe('Activate Experiment Route Handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -72,7 +70,7 @@ describe('Activate Experiment Route Handler', () => {
   it('should return 404 when experiment is not found', async () => {
     const request = new NextRequest('http://localhost');
     request.json = vi.fn().mockResolvedValue({ experimentId: 'test-id' });
-    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue(null);
+    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue(null);
 
     const response = await POST(request);
     const data = await response.json();
@@ -85,9 +83,9 @@ describe('Activate Experiment Route Handler', () => {
   it('should return 400 when experiment is already active', async () => {
     const request = new NextRequest('http://localhost');
     request.json = vi.fn().mockResolvedValue({ experimentId: 'test-id' });
-    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue({
+    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue({
       id: 'test-id',
-      status: 'ACTIVE',
+      status: ExperimentStatus.ACTIVE,
       name: 'Test Experiment',
       description: null,
       startDate: new Date(),
@@ -121,8 +119,8 @@ describe('Activate Experiment Route Handler', () => {
       updatedAt: new Date()
     };
 
-    vi.mocked(mockPrisma.aBTest.findUnique).mockResolvedValue(mockExperiment);
-    vi.mocked(mockPrisma.aBTest.update).mockResolvedValue({
+    vi.mocked(prisma.aBTest.findUnique).mockResolvedValue(mockExperiment);
+    vi.mocked(prisma.aBTest.update).mockResolvedValue({
       ...mockExperiment,
       status: ExperimentStatus.ACTIVE
     });
@@ -142,7 +140,7 @@ describe('Activate Experiment Route Handler', () => {
   it('should return 500 when database operation fails', async () => {
     const request = new NextRequest('http://localhost');
     request.json = vi.fn().mockResolvedValue({ experimentId: 'test-id' });
-    vi.mocked(mockPrisma.aBTest.findUnique).mockRejectedValue(new Error('Database error'));
+    vi.mocked(prisma.aBTest.findUnique).mockRejectedValue(new Error('Database error'));
 
     const response = await POST(request);
     const data = await response.json();

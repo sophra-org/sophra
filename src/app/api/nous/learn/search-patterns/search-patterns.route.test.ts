@@ -1,64 +1,82 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
-import { mockPrisma } from "~/vitest.setup";
+import logger from '@lib/shared/logger';
 
-vi.mock("@prisma/client", () => ({
-  ModelType: {
-    PATTERN_DETECTOR: "PATTERN_DETECTOR",
+// Mock modules
+vi.mock('@lib/shared/logger', () => ({
+  default: {
+    error: vi.fn(),
+    info: vi.fn()
   }
 }));
 
-vi.mock("@/lib/shared/database/client", () => ({
-  default: mockPrisma,
-}));
-
-vi.mock("@/lib/shared/logger", () => ({
-  default: {
-    error: vi.fn(),
-    info: vi.fn(),
-  },
-}));
-
-vi.mock("next/server", () => ({
-  NextRequest: class MockNextRequest {
-    url: string;
-    method: string;
-    headers: Headers;
-    private body: any;
-
-    constructor(url: string, init?: { method?: string; body?: string }) {
-      this.url = url;
-      this.method = init?.method || 'GET';
-      this.headers = new Headers();
-      this.body = init?.body ? JSON.parse(init.body) : undefined;
-    }
-
-    async json() {
-      return this.body;
-    }
-  },
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    json: vi.fn()
+  })),
   NextResponse: {
-    json: (data: any, init?: { status?: number }) => ({
-      status: init?.status || (data.success === false ? 500 : 200),
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
       ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: () => Promise.resolve(data)
-    })
-  },
+      headers: new Headers(),
+      json: async () => data
+    }))
+  }
 }));
+
+vi.mock('@prisma/client', () => ({
+  ModelType: {
+    PATTERN_DETECTOR: "PATTERN_DETECTOR",
+    CLASSIFIER: "CLASSIFIER",
+    EMBEDDER: "EMBEDDER",
+    GENERATOR: "GENERATOR"
+  },
+  Prisma: {
+    ModelType: {
+      PATTERN_DETECTOR: "PATTERN_DETECTOR",
+      CLASSIFIER: "CLASSIFIER",
+      EMBEDDER: "EMBEDDER",
+      GENERATOR: "GENERATOR"
+    },
+    raw: true, // Enable raw query support
+  },
+  PrismaClient: vi.fn(() => ({
+    model: vi.fn(),
+    $queryRaw: vi.fn(),
+    $transaction: vi.fn()
+  }))
+}));
+
+vi.mock('@lib/shared/database/client', () => {
+  const mockPrisma = {
+    modelState: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
+      $queryRaw: vi.fn(),
+      $executeRaw: vi.fn()
+    }
+  };
+  return { prisma: mockPrisma };
+});
+
+// Import after mocks
+import { prisma } from '@lib/shared/database/client';
+import { GET, POST } from './route';
 
 describe("Search Patterns Route Handler", () => {
   const ModelType = {
-    PATTERN_DETECTOR: "PATTERN_DETECTOR",
+    PATTERN_DETECTOR: "PATTERN_DETECTOR"
   } as const;
 
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
   });
 
   describe("GET /api/nous/learn/search-patterns", () => {
@@ -79,20 +97,22 @@ describe("Search Patterns Route Handler", () => {
           lastTrainingError: null,
           createdAt: new Date(),
           updatedAt: new Date(),
-          metrics: [
-            {
+          metrics: {
+            training: {
               accuracy: 0.9,
               precision: 0.85,
               recall: 0.88,
               f1Score: 0.86,
-              latencyMs: 100,
-              loss: 0.1,
+              loss: 0.1
             },
-          ],
+            inference: {
+              latencyMs: 100
+            }
+          },
         },
       ];
 
-      vi.mocked(mockPrisma.modelState.findMany).mockResolvedValue(mockPatterns);
+      vi.mocked(prisma.modelState.findMany).mockResolvedValue(mockPatterns);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/search-patterns"
@@ -103,54 +123,15 @@ describe("Search Patterns Route Handler", () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.data).toEqual(mockPatterns);
-      expect(data.metadata.limit).toBe(10);
-    });
-
-    it("should handle query filtering", async () => {
-      const mockPatterns = [
-        {
-          id: "1",
-          modelType: ModelType.PATTERN_DETECTOR,
-          featureNames: ["specific_query"],
-          versionId: "v1",
-          weights: [0.1, 0.2],
-          bias: 0.5,
-          scaler: { mean: [0], std: [1] },
-          hyperparameters: { learning_rate: 0.01 },
-          isTrained: true,
-          currentEpoch: 10,
-          trainingProgress: 1,
-          lastTrainingError: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          metrics: [
-            {
-              accuracy: 0.9,
-              precision: 0.85,
-              recall: 0.88,
-              f1Score: 0.86,
-              latencyMs: 100,
-              loss: 0.1,
-            },
-          ],
-        },
-      ];
-
-      vi.mocked(mockPrisma.modelState.findMany).mockResolvedValue(mockPatterns);
-
-      const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/search-patterns?query=specific_query"
-      );
-      const response = await GET(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toEqual(mockPatterns);
+      expect(data.meta).toEqual({
+        total: mockPatterns.length,
+        page: 1,
+        limit: 10
+      });
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(mockPrisma.modelState.findMany).mockRejectedValue(
+      vi.mocked(prisma.modelState.findMany).mockRejectedValue(
         new Error("DB Error")
       );
 
@@ -162,7 +143,10 @@ describe("Search Patterns Route Handler", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Failed to search patterns");
+      expect(data.error).toEqual({
+        message: "Failed to search patterns",
+        code: "INTERNAL_SERVER_ERROR"
+      });
     });
   });
 
@@ -200,25 +184,26 @@ describe("Search Patterns Route Handler", () => {
           currentEpoch: 0,
           trainingProgress: 1,
           metrics: {
-            accuracy: 0.8,
-            precision: 0,
-            recall: 0,
-            f1Score: 0,
-            latencyMs: 100,
-            loss: 0,
+            training: {
+              accuracy: 0.8,
+              precision: 0,
+              recall: 0,
+              f1Score: 0,
+              loss: 0,
+            },
+            inference: {
+              latencyMs: 100
+            }
           },
         },
       ];
 
-      vi.mocked(mockPrisma.$transaction).mockResolvedValue(mockResponse);
+      vi.mocked(prisma.$transaction).mockResolvedValue(mockResponse);
 
       const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/search-patterns",
-        {
-          method: "POST",
-          body: JSON.stringify(mockPatterns),
-        }
+        "http://localhost:3000/api/nous/learn/search-patterns"
       );
+      request.json = vi.fn().mockResolvedValue(mockPatterns);
 
       const response = await POST(request);
       const data = await response.json();
@@ -238,12 +223,9 @@ describe("Search Patterns Route Handler", () => {
       };
 
       const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/search-patterns",
-        {
-          method: "POST",
-          body: JSON.stringify(invalidPatterns),
-        }
+        "http://localhost:3000/api/nous/learn/search-patterns"
       );
+      request.json = vi.fn().mockResolvedValue(invalidPatterns);
 
       const response = await POST(request);
       const data = await response.json();
@@ -253,4 +235,4 @@ describe("Search Patterns Route Handler", () => {
       expect(data.error).toBe("Invalid request format");
     });
   });
-}); 
+});

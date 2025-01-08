@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, POST } from './route';
 import { NextRequest } from 'next/server';
-import logger from "@/lib/shared/logger";
+import logger from '../../../../../lib/shared/logger';
 import { ExperimentStatus } from "@prisma/client";
-import { mockPrisma } from "~/vitest.setup";
 
-vi.mock('@/lib/shared/logger', () => ({
+// Mock modules
+vi.mock('../../../../../lib/shared/logger', () => ({
   default: {
     info: vi.fn(),
     error: vi.fn()
@@ -28,6 +27,21 @@ vi.mock('next/server', () => ({
     }))
   }
 }));
+
+vi.mock('../../../../../lib/shared/database/client', () => {
+  const mockPrisma = {
+    aBTest: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      count: vi.fn()
+    }
+  };
+  return { prisma: mockPrisma };
+});
+
+// Import after mocks
+import { prisma } from '../../../../../lib/shared/database/client';
+import { GET, POST } from './route';
 
 describe('Experiments Route Handler', () => {
   beforeEach(() => {
@@ -64,8 +78,8 @@ describe('Experiments Route Handler', () => {
         }
       ];
 
-      vi.mocked(mockPrisma.aBTest.findMany).mockResolvedValue(mockExperiments);
-      vi.mocked(mockPrisma.aBTest.count).mockResolvedValue(2);
+      vi.mocked(prisma.aBTest.findMany).mockResolvedValue(mockExperiments);
+      vi.mocked(prisma.aBTest.count).mockResolvedValue(2);
 
       const request = new NextRequest('http://localhost/api/nous/ab-testing/experiments');
       const response = await GET(request);
@@ -80,13 +94,13 @@ describe('Experiments Route Handler', () => {
         limit: 10,
         hasMore: false
       });
-      expect(mockPrisma.aBTest.findMany).toHaveBeenCalledWith({
+      expect(prisma.aBTest.findMany).toHaveBeenCalledWith({
         where: {},
         skip: 0,
         take: 10,
         orderBy: { createdAt: 'desc' }
       });
-      expect(mockPrisma.aBTest.count).toHaveBeenCalledWith({ where: {} });
+      expect(prisma.aBTest.count).toHaveBeenCalledWith({ where: {} });
     });
 
     it('should handle pagination parameters', async () => {
@@ -104,8 +118,8 @@ describe('Experiments Route Handler', () => {
         }
       ];
 
-      vi.mocked(mockPrisma.aBTest.findMany).mockResolvedValue(mockExperiments);
-      vi.mocked(mockPrisma.aBTest.count).mockResolvedValue(15);
+      vi.mocked(prisma.aBTest.findMany).mockResolvedValue(mockExperiments);
+      vi.mocked(prisma.aBTest.count).mockResolvedValue(15);
 
       const request = new NextRequest('http://localhost/api/nous/ab-testing/experiments?page=2&limit=5');
       const response = await GET(request);
@@ -120,13 +134,13 @@ describe('Experiments Route Handler', () => {
         limit: 5,
         hasMore: true
       });
-      expect(mockPrisma.aBTest.findMany).toHaveBeenCalledWith({
+      expect(prisma.aBTest.findMany).toHaveBeenCalledWith({
         where: {},
         skip: 5,
         take: 5,
         orderBy: { createdAt: 'desc' }
       });
-      expect(mockPrisma.aBTest.count).toHaveBeenCalledWith({ where: {} });
+      expect(prisma.aBTest.count).toHaveBeenCalledWith({ where: {} });
     });
 
     it('should handle status filter', async () => {
@@ -144,8 +158,8 @@ describe('Experiments Route Handler', () => {
         }
       ];
 
-      vi.mocked(mockPrisma.aBTest.findMany).mockResolvedValue(mockExperiments);
-      vi.mocked(mockPrisma.aBTest.count).mockResolvedValue(1);
+      vi.mocked(prisma.aBTest.findMany).mockResolvedValue(mockExperiments);
+      vi.mocked(prisma.aBTest.count).mockResolvedValue(1);
 
       const request = new NextRequest('http://localhost/api/nous/ab-testing/experiments?status=ACTIVE');
       const response = await GET(request);
@@ -154,19 +168,19 @@ describe('Experiments Route Handler', () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.data).toEqual(mockExperiments);
-      expect(mockPrisma.aBTest.findMany).toHaveBeenCalledWith({
+      expect(prisma.aBTest.findMany).toHaveBeenCalledWith({
         where: { status: 'ACTIVE' },
         skip: 0,
         take: 10,
         orderBy: { createdAt: 'desc' }
       });
-      expect(mockPrisma.aBTest.count).toHaveBeenCalledWith({ 
+      expect(prisma.aBTest.count).toHaveBeenCalledWith({ 
         where: { status: 'ACTIVE' } 
       });
     });
 
     it('should handle database errors', async () => {
-      vi.mocked(mockPrisma.aBTest.findMany).mockRejectedValue(new Error('Database error'));
+      vi.mocked(prisma.aBTest.findMany).mockRejectedValue(new Error('Database error'));
 
       const request = new NextRequest('http://localhost/api/nous/ab-testing/experiments');
       const response = await GET(request);
@@ -204,7 +218,7 @@ describe('Experiments Route Handler', () => {
 
       const request = new NextRequest('http://localhost/api/nous/ab-testing/experiments');
       request.json = vi.fn().mockResolvedValue(newExperiment);
-      vi.mocked(mockPrisma.aBTest.create).mockResolvedValue(mockCreatedExperiment);
+      vi.mocked(prisma.aBTest.create).mockResolvedValue(mockCreatedExperiment);
 
       const response = await POST(request);
       const data = await response.json();
@@ -246,7 +260,7 @@ describe('Experiments Route Handler', () => {
 
       const request = new NextRequest('http://localhost/api/nous/ab-testing/experiments');
       request.json = vi.fn().mockResolvedValue(newExperiment);
-      vi.mocked(mockPrisma.aBTest.create).mockRejectedValue(new Error('Database error'));
+      vi.mocked(prisma.aBTest.create).mockRejectedValue(new Error('Database error'));
 
       const response = await POST(request);
       const data = await response.json();
