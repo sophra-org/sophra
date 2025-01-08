@@ -4,6 +4,8 @@ An interactive command-line tool for analyzing, fixing, and generating tests in 
 
 ## Installation
 
+The test analyzer is installed as part of the main project setup:
+
 ```bash
 pnpm install
 ```
@@ -24,15 +26,101 @@ CLEANUP_INTERVAL=3600   # Cleanup interval in seconds (default: 1 hour)
 2. Initialize the database:
 
 ```bash
-pnpm test-analyzer:prisma:migrate:dev
+pnpm test:analyze:setup
 ```
 
 ## Usage
 
-To start the CLI:
+### Basic Usage
+
+To start the CLI in interactive mode:
 
 ```bash
-pnpm cli
+pnpm test:analyze
+```
+
+### Command Chaining
+
+You can chain multiple operations in a specific order:
+
+```bash
+# Analyze and then generate tests
+pnpm test:analyze analyze generate
+
+# Full workflow: analyze, fix issues, generate new tests
+pnpm test:analyze analyze fix generate
+
+# Custom workflow with specific options
+pnpm test:analyze analyze --coverage fix --flaky generate --type=coverage
+```
+
+### Available Commands
+
+- `analyze`: Analyze test files for issues and patterns
+- `fix`: Apply fixes to identified issues
+- `generate`: Generate new tests based on analysis
+- `report`: Generate a report of test health
+- `watch`: Watch mode for continuous analysis
+
+### Command Options
+
+#### analyze
+
+- `--coverage`: Focus on coverage analysis
+- `--patterns`: Focus on pattern detection
+- `--performance`: Focus on performance issues
+
+#### fix
+
+- `--flaky`: Focus on fixing flaky tests
+- `--coverage`: Fix coverage gaps
+- `--patterns`: Fix anti-patterns
+
+#### generate
+
+- `--type=<type>`: Type of tests to generate (coverage|enhancement|regression|edge)
+- `--target=<path>`: Target specific area for test generation
+
+### Workflow Examples
+
+1. Coverage Improvement Workflow:
+
+   ```bash
+   pnpm test:analyze analyze --coverage fix --coverage generate --type=coverage
+   ```
+
+2. Performance Optimization:
+
+   ```bash
+   pnpm test:analyze analyze --performance fix
+   ```
+
+3. Pattern-based Enhancement:
+
+   ```bash
+   pnpm test:analyze analyze --patterns fix --patterns generate --type=enhancement
+   ```
+
+4. Continuous Monitoring:
+   ```bash
+   pnpm test:analyze watch analyze fix
+   ```
+
+## Available Scripts
+
+The following scripts are available in the root package.json:
+
+```bash
+# Start the interactive CLI
+pnpm test:analyze
+
+# Run with debug output
+pnpm test:analyze:debug
+
+# Database management
+pnpm test:analyze:setup     # Initialize/update database with migrations
+pnpm test:analyze:migrate   # Deploy migrations to production
+pnpm test:analyze:reset     # Reset the database (caution: deletes all data)
 ```
 
 ## Features
@@ -189,10 +277,10 @@ The CLI provides clear error messages for common issues:
 
 ### Debug Mode
 
-To run the CLI in debug mode:
+To run the CLI in debug mode, use the debug script from the root:
 
 ```bash
-DEBUG=test-analyzer:* pnpm cli
+pnpm test:analyze:debug
 ```
 
 This will show additional information about:
@@ -201,3 +289,36 @@ This will show additional information about:
 - Database operations
 - Analysis steps
 - Error details
+
+## Advanced Usage
+
+### Custom Workflows
+
+You can create custom workflows by combining commands:
+
+```bash
+# Create a custom workflow script in package.json
+"scripts": {
+  "test:analyze:coverage": "pnpm test:analyze analyze --coverage fix --coverage generate --type=coverage",
+  "test:analyze:patterns": "pnpm test:analyze analyze --patterns fix --patterns",
+  "test:analyze:full": "pnpm test:analyze analyze fix generate report"
+}
+```
+
+### Session Management
+
+Commands in a chain share the same analysis session, allowing for:
+
+- Consistent context across operations
+- Cumulative improvements
+- Comprehensive reporting
+- Progress tracking
+
+### Workflow State
+
+The CLI maintains state throughout the workflow:
+
+- Analysis results are carried forward
+- Fix suggestions are tracked
+- Generated tests are validated
+- Reports include all operations

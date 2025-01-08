@@ -413,7 +413,7 @@ export namespace Prisma {
 
   /**
    * Prisma Client JS version: 6.1.0
-   * Query Engine version: 4123509d24aa4dede1e864b46351bf2790323b69
+   * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
    */
   export type PrismaVersion = {
     client: string
@@ -11528,8 +11528,8 @@ export namespace Prisma {
     suggestions?: JsonFilter<"TestAnalysis">
     context?: JsonFilter<"TestAnalysis">
     timestamp?: DateTimeFilter<"TestAnalysis"> | Date | string
-    session?: XOR<AnalysisSessionScalarRelationFilter, AnalysisSessionWhereInput>
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    session?: XOR<AnalysisSessionRelationFilter, AnalysisSessionWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }
 
   export type TestAnalysisOrderByWithRelationInput = {
@@ -11557,8 +11557,8 @@ export namespace Prisma {
     suggestions?: JsonFilter<"TestAnalysis">
     context?: JsonFilter<"TestAnalysis">
     timestamp?: DateTimeFilter<"TestAnalysis"> | Date | string
-    session?: XOR<AnalysisSessionScalarRelationFilter, AnalysisSessionWhereInput>
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    session?: XOR<AnalysisSessionRelationFilter, AnalysisSessionWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }, "id">
 
   export type TestAnalysisOrderByWithAggregationInput = {
@@ -11741,7 +11741,7 @@ export namespace Prisma {
     environment?: StringFilter<"TestExecution"> | string
     commitHash?: StringNullableFilter<"TestExecution"> | string | null
     performance?: JsonNullableFilter<"TestExecution">
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }
 
   export type TestExecutionOrderByWithRelationInput = {
@@ -11772,7 +11772,7 @@ export namespace Prisma {
     environment?: StringFilter<"TestExecution"> | string
     commitHash?: StringNullableFilter<"TestExecution"> | string | null
     performance?: JsonNullableFilter<"TestExecution">
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }, "id">
 
   export type TestExecutionOrderByWithAggregationInput = {
@@ -11823,7 +11823,7 @@ export namespace Prisma {
     functionCoverage?: JsonNullableFilter<"TestCoverage">
     suggestedAreas?: JsonNullableFilter<"TestCoverage">
     coverageType?: StringFilter<"TestCoverage"> | string
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }
 
   export type TestCoverageOrderByWithRelationInput = {
@@ -11854,7 +11854,7 @@ export namespace Prisma {
     functionCoverage?: JsonNullableFilter<"TestCoverage">
     suggestedAreas?: JsonNullableFilter<"TestCoverage">
     coverageType?: StringFilter<"TestCoverage"> | string
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }, "id">
 
   export type TestCoverageOrderByWithAggregationInput = {
@@ -11907,7 +11907,7 @@ export namespace Prisma {
     afterState?: JsonFilter<"TestFix">
     patternUsed?: StringNullableFilter<"TestFix"> | string | null
     impactScore?: FloatFilter<"TestFix"> | number
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }
 
   export type TestFixOrderByWithRelationInput = {
@@ -11942,7 +11942,7 @@ export namespace Prisma {
     afterState?: JsonFilter<"TestFix">
     patternUsed?: StringNullableFilter<"TestFix"> | string | null
     impactScore?: FloatFilter<"TestFix"> | number
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }, "id">
 
   export type TestFixOrderByWithAggregationInput = {
@@ -11997,7 +11997,7 @@ export namespace Prisma {
     coverageImprovement?: FloatFilter<"TestGeneration"> | number
     generationStrategy?: StringFilter<"TestGeneration"> | string
     context?: JsonFilter<"TestGeneration">
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }
 
   export type TestGenerationOrderByWithRelationInput = {
@@ -12028,7 +12028,7 @@ export namespace Prisma {
     coverageImprovement?: FloatFilter<"TestGeneration"> | number
     generationStrategy?: StringFilter<"TestGeneration"> | string
     context?: JsonFilter<"TestGeneration">
-    testFile?: XOR<TestFileScalarRelationFilter, TestFileWhereInput>
+    testFile?: XOR<TestFileRelationFilter, TestFileWhereInput>
   }, "id">
 
   export type TestGenerationOrderByWithAggregationInput = {
@@ -12973,9 +12973,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
@@ -13114,9 +13114,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
@@ -13380,9 +13380,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
@@ -13390,12 +13390,12 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type AnalysisSessionScalarRelationFilter = {
+  export type AnalysisSessionRelationFilter = {
     is?: AnalysisSessionWhereInput
     isNot?: AnalysisSessionWhereInput
   }
 
-  export type TestFileScalarRelationFilter = {
+  export type TestFileRelationFilter = {
     is?: TestFileWhereInput
     isNot?: TestFileWhereInput
   }
@@ -13437,9 +13437,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
@@ -14388,9 +14388,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
@@ -14501,9 +14501,9 @@ export namespace Prisma {
     string_contains?: string | StringFieldRefInput<$PrismaModel>
     string_starts_with?: string | StringFieldRefInput<$PrismaModel>
     string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>

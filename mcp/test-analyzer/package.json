@@ -7,7 +7,12 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "cli": "ts-node src/cli.ts"
+    "cli": "ts-node src/cli.ts",
+    "prisma:generate": "prisma generate --schema=../../prisma/test-analyzer.prisma",
+    "prisma:migrate:dev": "prisma migrate dev --schema=../../prisma/test-analyzer.prisma",
+    "prisma:migrate:deploy": "prisma migrate deploy --schema=../../prisma/test-analyzer.prisma",
+    "prisma:migrate:reset": "prisma migrate reset --schema=../../prisma/test-analyzer.prisma --force",
+    "prisma:studio": "prisma studio --schema=../../prisma/test-analyzer.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
