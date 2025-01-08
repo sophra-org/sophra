@@ -1,10 +1,858 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="1" failures="1" errors="0" time="793.983">
-    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.test.ts" timestamp="2025-01-08T09:23:05.080Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+<testsuites name="vitest tests" tests="117" failures="117" errors="0" time="2735.99">
+    <testsuite name="src/lib/nous/engine/service.test.ts" timestamp="2025-01-08T09:55:27.087Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/engine/service.test.ts" name="src/lib/nous/engine/service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/engine/service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/engine/service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/learn/pipeline.test.ts" timestamp="2025-01-08T09:55:27.092Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/learn/pipeline.test.ts" name="src/lib/nous/learn/pipeline.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/elasticsearch/services.test.ts" timestamp="2025-01-08T09:55:27.097Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/elasticsearch/services.test.ts" name="src/lib/cortex/elasticsearch/services.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/services.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/services.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/core/sync-service.test.ts" timestamp="2025-01-08T09:55:27.102Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/core/sync-service.test.ts" name="src/lib/cortex/core/sync-service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/core/sync-service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/core/sync-service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/core/client.test.ts" timestamp="2025-01-08T09:55:27.108Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/core/client.test.ts" name="src/lib/cortex/core/client.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/core/client.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/core/client.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/observe/signals.test.ts" timestamp="2025-01-08T09:55:27.114Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/observe/signals.test.ts" name="src/lib/nous/observe/signals.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/observe/signals.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/observe/signals.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/analytics/service.test.ts" timestamp="2025-01-08T09:55:27.119Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/analytics/service.test.ts" name="src/lib/cortex/analytics/service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/analytics/service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/analytics/service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/monitoring/metrics.test.ts" timestamp="2025-01-08T09:55:27.124Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/monitoring/metrics.test.ts" name="src/lib/nous/monitoring/metrics.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/monitoring/metrics.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/monitoring/metrics.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/signals/process/process.route.test.ts" timestamp="2025-01-08T09:55:27.131Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="src/app/api/nous/signals/process/process.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/signals/process/process.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/signals/process/process.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/ab-testing/experiments/apply/apply.route.test.ts" timestamp="2025-01-08T09:55:27.136Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/ab-testing/experiments/apply/apply.route.test.ts" name="src/app/api/nous/ab-testing/experiments/apply/apply.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/apply/apply.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/apply/apply.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/redis/services.test.ts" timestamp="2025-01-08T09:55:27.142Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/redis/services.test.ts" name="src/lib/cortex/redis/services.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/redis/services.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/redis/services.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/types/search.types.test.ts" timestamp="2025-01-08T09:55:27.147Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/types/search.types.test.ts" name="src/lib/cortex/types/search.types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/types/search.types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/types/search.types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/processors/strategy-processor.test.ts" timestamp="2025-01-08T09:55:27.152Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/processors/strategy-processor.test.ts" name="src/lib/shared/engine/processors/strategy-processor.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/processors/strategy-processor.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/processors/strategy-processor.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/engine/health/engine.health.route.test.ts" timestamp="2025-01-08T09:55:27.157Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/engine/health/engine.health.route.test.ts" name="src/app/api/cortex/engine/health/engine.health.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/engine/health/engine.health.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/engine/health/engine.health.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/ab-testing/experiments/experiments.route.test.ts" timestamp="2025-01-08T09:55:27.162Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/ab-testing/experiments/experiments.route.test.ts" name="src/app/api/nous/ab-testing/experiments/experiments.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/experiments.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/experiments.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/signals/observe/observe.route.test.ts" timestamp="2025-01-08T09:55:27.166Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="src/app/api/nous/signals/observe/observe.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/signals/observe/observe.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/signals/observe/observe.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/elasticsearch/client.test.ts" timestamp="2025-01-08T09:55:27.172Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/elasticsearch/client.test.ts" name="src/lib/cortex/elasticsearch/client.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/client.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/client.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/feedback/service.test.ts" timestamp="2025-01-08T09:55:27.178Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/feedback/service.test.ts" name="src/lib/cortex/feedback/service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/feedback/service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/feedback/service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/signals/route.test.ts" timestamp="2025-01-08T09:55:27.183Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/signals/route.test.ts" name="src/app/api/nous/signals/route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/signals/route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/signals/route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" timestamp="2025-01-08T09:55:27.188Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/engine/real-time-learner.test.ts" timestamp="2025-01-08T09:55:27.193Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/engine/real-time-learner.test.ts" name="src/lib/nous/engine/real-time-learner.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/engine/real-time-learner.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/engine/real-time-learner.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/observe/processors.test.ts" timestamp="2025-01-08T09:55:27.199Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/observe/processors.test.ts" name="src/lib/nous/observe/processors.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/observe/processors.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/observe/processors.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/feedback/feedback.route.test.ts" timestamp="2025-01-08T09:55:27.204Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/feedback/feedback.route.test.ts" name="src/app/api/cortex/feedback/feedback.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/feedback/feedback.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/feedback/feedback.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/sessions/sessions.route.test.ts" timestamp="2025-01-08T09:55:27.209Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/sessions/sessions.route.test.ts" name="src/app/api/cortex/sessions/sessions.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/sessions/sessions.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/sessions/sessions.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/health/health.route.test.ts" timestamp="2025-01-08T09:55:27.214Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/health/health.route.test.ts" name="src/app/health/health.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/health/health.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/health/health.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/ab-testing/results/results.route.test.ts" timestamp="2025-01-08T09:55:27.221Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/ab-testing/results/results.route.test.ts" name="src/app/api/nous/ab-testing/results/results.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/ab-testing/results/results.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/ab-testing/results/results.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/processors/time-based-processor.test.ts" timestamp="2025-01-08T09:55:27.226Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/processors/time-based-processor.test.ts" name="src/lib/shared/engine/processors/time-based-processor.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/processors/time-based-processor.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/processors/time-based-processor.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/database/client.test.ts" timestamp="2025-01-08T09:55:27.231Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/database/client.test.ts" name="src/lib/shared/database/client.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/database/client.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/database/client.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/api.admin.middleware.test.ts" timestamp="2025-01-08T09:55:27.236Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/api.admin.middleware.test.ts" name="src/app/api/api.admin.middleware.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/api.admin.middleware.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/api.admin.middleware.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/[id]/id.route.test.ts" timestamp="2025-01-08T09:55:27.241Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.test.ts" name="src/app/api/cortex/documents/[id]/id.route.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/registry/metadata.test.ts" timestamp="2025-01-08T09:55:27.246Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="src/lib/nous/registry/metadata.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/registry/metadata.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/registry/metadata.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/keys/keys.route.test.ts" timestamp="2025-01-08T09:55:27.251Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/keys/keys.route.test.ts" name="src/app/api/keys/keys.route.test.ts" time="0">
+            <failure message="[vitest] There was an error when mocking a module. If you are using &quot;vi.mock&quot; factory, make sure there are no top level variables inside, since this call is hoisted to top of the file. Read more: https://vitest.dev/api/vi.html#vi-mock" type="Error">
+Error: [vitest] There was an error when mocking a module. If you are using &quot;vi.mock&quot; factory, make sure there are no top level variables inside, since this call is hoisted to top of the file. Read more: https://vitest.dev/api/vi.html#vi-mock
+ ❯ src/app/api/keys/route.ts:1:1
+
+Caused by: Caused by: ReferenceError: Cannot access &apos;mockCreate&apos; before initialization
+ ❯ src/app/api/keys/keys.route.test.ts:5:15
+ ❯ src/app/api/keys/route.ts:1:1
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/feedback/feedback.route.test.ts" timestamp="2025-01-08T09:55:27.257Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/feedback/feedback.route.test.ts" name="src/app/api/nous/learn/feedback/feedback.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/learn/feedback/feedback.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/learn/feedback/feedback.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/learning-engine.test.ts" timestamp="2025-01-08T09:55:27.262Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/learning-engine.test.ts" name="src/lib/shared/engine/learning-engine.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" timestamp="2025-01-08T09:55:27.267Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/indices/indices.route.test.ts" timestamp="2025-01-08T09:55:27.273Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/indices/indices.route.test.ts" name="src/app/api/cortex/indices/indices.route.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/observe/coordinator.test.ts" timestamp="2025-01-08T09:55:27.278Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/observe/coordinator.test.ts" name="src/lib/nous/observe/coordinator.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/observe/coordinator.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/observe/coordinator.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/observe/collector.test.ts" timestamp="2025-01-08T09:55:27.283Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/observe/collector.test.ts" name="src/lib/nous/observe/collector.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/observe/collector.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/observe/collector.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/documents.route.test.ts" timestamp="2025-01-08T09:55:27.288Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/documents.route.test.ts" name="src/app/api/cortex/documents/documents.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/documents/documents.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/documents/documents.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/search/search.route.test.ts" timestamp="2025-01-08T09:55:27.293Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/search/search.route.test.ts" name="src/app/api/cortex/search/search.route.test.ts" time="0">
+            <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
+Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/events/events.route.test.ts" timestamp="2025-01-08T09:55:27.299Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/events/events.route.test.ts" name="src/app/api/nous/learn/events/events.route.test.ts" time="0">
+            <failure message="[vitest] There was an error when mocking a module. If you are using &quot;vi.mock&quot; factory, make sure there are no top level variables inside, since this call is hoisted to top of the file. Read more: https://vitest.dev/api/vi.html#vi-mock" type="Error">
+Error: [vitest] There was an error when mocking a module. If you are using &quot;vi.mock&quot; factory, make sure there are no top level variables inside, since this call is hoisted to top of the file. Read more: https://vitest.dev/api/vi.html#vi-mock
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:28:25
+
+Caused by: Caused by: ReferenceError: Cannot access &apos;mockPrisma&apos; before initialization
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:25:11
+ ❯ src/app/api/nous/learn/events/events.route.test.ts:28:25
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/documents/service.test.ts" timestamp="2025-01-08T09:55:27.304Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/documents/service.test.ts" name="src/lib/cortex/documents/service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/documents/service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/documents/service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/registry/version.test.ts" timestamp="2025-01-08T09:55:27.309Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/registry/version.test.ts" name="src/lib/nous/registry/version.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/registry/version.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/registry/version.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/verify/verify.route.test.ts" timestamp="2025-01-08T09:55:27.315Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/verify/verify.route.test.ts" name="src/app/api/cortex/documents/verify/verify.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/documents/verify/verify.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/documents/verify/verify.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/analytics/search/search.route.test.ts" timestamp="2025-01-08T09:55:27.320Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/analytics/search/search.route.test.ts" name="src/app/api/cortex/analytics/search/search.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/analytics/search/search.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/analytics/search/search.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/documents/bulk/bulk.route.test.ts" timestamp="2025-01-08T09:55:27.326Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/documents/bulk/bulk.route.test.ts" name="src/app/api/cortex/documents/bulk/bulk.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/documents/bulk/bulk.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/documents/bulk/bulk.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/config/types.test.ts" timestamp="2025-01-08T09:55:27.331Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/config/types.test.ts" name="src/lib/nous/config/types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/config/types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/config/types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/adapt/apply/apply.route.test.ts" timestamp="2025-01-08T09:55:27.337Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/adapt/apply/apply.route.test.ts" name="src/app/api/nous/adapt/apply/apply.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/adapt/apply/apply.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/adapt/apply/apply.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/types/api.types.test.ts" timestamp="2025-01-08T09:55:27.342Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/types/api.types.test.ts" name="src/lib/cortex/types/api.types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/types/api.types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/types/api.types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/types/core.test.ts" timestamp="2025-01-08T09:55:27.348Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/types/core.test.ts" name="src/lib/nous/types/core.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/types/core.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/types/core.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/processors/base-processor.test.ts" timestamp="2025-01-08T09:55:27.353Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/processors/base-processor.test.ts" name="src/lib/shared/engine/processors/base-processor.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/processors/base-processor.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/processors/base-processor.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" timestamp="2025-01-08T09:55:27.358Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" name="src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/learn/search-patterns/search-patterns.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/engine/types.test.ts" timestamp="2025-01-08T09:55:27.366Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/engine/types.test.ts" name="src/lib/nous/engine/types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/engine/types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/engine/types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/config/settings.test.ts" timestamp="2025-01-08T09:55:27.372Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/config/settings.test.ts" name="src/lib/nous/config/settings.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/config/settings.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/config/settings.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/adapters/metrics-adapter.test.ts" timestamp="2025-01-08T09:55:27.378Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/adapters/metrics-adapter.test.ts" name="src/lib/shared/engine/adapters/metrics-adapter.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/adapters/metrics-adapter.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/adapters/metrics-adapter.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.test.ts" timestamp="2025-01-08T09:55:27.384Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
         <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="src/app/api/nous/learn/metrics/metrics.route.test.ts" time="0">
             <failure message="Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?" type="Error">
 Error: Failed to load url ~/vitest.setup (resolved id: ~/vitest.setup) in D:/sophra/src/lib/nous/learn/pipeline.test.ts. Does the file exist?
  ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/adaptation-engine.test.ts" timestamp="2025-01-08T09:55:27.389Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/adaptation-engine.test.ts" name="src/lib/shared/engine/adaptation-engine.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/adaptation-engine.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/adaptation-engine.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/adapters/redis-adapter.test.ts" timestamp="2025-01-08T09:55:27.395Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/adapters/redis-adapter.test.ts" name="src/lib/shared/engine/adapters/redis-adapter.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/adapters/redis-adapter.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/adapters/redis-adapter.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/test/next-server.mock.test.ts" timestamp="2025-01-08T09:55:27.401Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/test/next-server.mock.test.ts" name="src/lib/test/next-server.mock.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/test/next-server.mock.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/test/next-server.mock.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/utils/service-manager.test.ts" timestamp="2025-01-08T09:55:27.408Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="src/lib/cortex/utils/service-manager.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/utils/service-manager.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/utils/service-manager.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/types/events.test.ts" timestamp="2025-01-08T09:55:27.414Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/types/events.test.ts" name="src/lib/nous/types/events.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/types/events.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/types/events.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/reporting/alert-thresholds.test.ts" timestamp="2025-01-08T09:55:27.421Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/reporting/alert-thresholds.test.ts" name="src/lib/cortex/reporting/alert-thresholds.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/reporting/alert-thresholds.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/reporting/alert-thresholds.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/reporting/distribution.test.ts" timestamp="2025-01-08T09:55:27.427Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/reporting/distribution.test.ts" name="src/lib/cortex/reporting/distribution.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/reporting/distribution.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/reporting/distribution.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/events/emitter.test.ts" timestamp="2025-01-08T09:55:27.431Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/events/emitter.test.ts" name="src/lib/cortex/events/emitter.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/events/emitter.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/events/emitter.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/models/models.route.test.ts" timestamp="2025-01-08T09:55:27.437Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="src/app/api/nous/learn/models/models.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/learn/models/models.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/learn/models/models.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/redis/client.test.ts" timestamp="2025-01-08T09:55:27.442Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/redis/client.test.ts" name="src/lib/cortex/redis/client.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/redis/client.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/redis/client.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/utils/rate-limit.test.ts" timestamp="2025-01-08T09:55:27.448Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/utils/rate-limit.test.ts" name="src/lib/cortex/utils/rate-limit.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/utils/rate-limit.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/utils/rate-limit.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/sessions/service.test.ts" timestamp="2025-01-08T09:55:27.454Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/sessions/service.test.ts" name="src/lib/cortex/sessions/service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/sessions/service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/sessions/service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/learn/training.test.ts" timestamp="2025-01-08T09:55:27.459Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/learn/training.test.ts" name="src/lib/nous/learn/training.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/learn/training.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/learn/training.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/utils/request-queue.test.ts" timestamp="2025-01-08T09:55:27.465Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/utils/request-queue.test.ts" name="src/lib/cortex/utils/request-queue.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/utils/request-queue.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/utils/request-queue.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/ab-testing/experiments/deactivate/deactivate.route.test.ts" timestamp="2025-01-08T09:55:27.472Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/ab-testing/experiments/deactivate/deactivate.route.test.ts" name="src/app/api/nous/ab-testing/experiments/deactivate/deactivate.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/deactivate/deactivate.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/deactivate/deactivate.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/monitoring/metrics.test.ts" timestamp="2025-01-08T09:55:27.479Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/monitoring/metrics.test.ts" name="src/lib/cortex/monitoring/metrics.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/monitoring/metrics.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/monitoring/metrics.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/types/index.test.ts" timestamp="2025-01-08T09:55:27.485Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/types/index.test.ts" name="src/lib/shared/types/index.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/types/index.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/types/index.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/reporting/service.test.ts" timestamp="2025-01-08T09:55:27.491Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/reporting/service.test.ts" name="src/lib/cortex/reporting/service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/reporting/service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/reporting/service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/processors/performance-processor.test.ts" timestamp="2025-01-08T09:55:27.496Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/processors/performance-processor.test.ts" name="src/lib/shared/engine/processors/performance-processor.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/processors/performance-processor.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/processors/performance-processor.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/adapt/rules/rules.route.test.ts" timestamp="2025-01-08T09:55:27.502Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/adapt/rules/rules.route.test.ts" name="src/app/api/nous/adapt/rules/rules.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/adapt/rules/rules.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/adapt/rules/rules.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/models/base.test.ts" timestamp="2025-01-08T09:55:27.508Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/models/base.test.ts" name="src/lib/nous/models/base.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/models/base.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/models/base.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/middleware/auth.test.ts" timestamp="2025-01-08T09:55:27.514Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/middleware/auth.test.ts" name="src/lib/cortex/middleware/auth.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/middleware/auth.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/middleware/auth.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/processors/feedback-processor.test.ts" timestamp="2025-01-08T09:55:27.522Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/processors/feedback-processor.test.ts" name="src/lib/shared/engine/processors/feedback-processor.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/processors/feedback-processor.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/processors/feedback-processor.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/ab-testing/experiments/activate/activate.route.test.ts" timestamp="2025-01-08T09:55:27.529Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/ab-testing/experiments/activate/activate.route.test.ts" name="src/app/api/nous/ab-testing/experiments/activate/activate.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/activate/activate.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/ab-testing/experiments/activate/activate.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/utils/validation.test.ts" timestamp="2025-01-08T09:55:27.535Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/utils/validation.test.ts" name="src/lib/cortex/utils/validation.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/utils/validation.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/utils/validation.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/adapt/rules/index.test.ts" timestamp="2025-01-08T09:55:27.542Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="src/lib/nous/adapt/rules/index.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/adapt/rules/index.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/adapt/rules/index.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/models/sync/sync.route.test.ts" timestamp="2025-01-08T09:55:27.547Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/learn/models/sync/sync.route.test.ts" name="src/app/api/nous/learn/models/sync/sync.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/nous/learn/models/sync/sync.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/nous/learn/models/sync/sync.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/types/services.types.test.ts" timestamp="2025-01-08T09:55:27.552Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/types/services.types.test.ts" name="src/lib/cortex/types/services.types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/types/services.types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/types/services.types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/ab-test/assign/assign.route.test.ts" timestamp="2025-01-08T09:55:27.559Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/ab-test/assign/assign.route.test.ts" name="src/app/api/cortex/ab-test/assign/assign.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/ab-test/assign/assign.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/ab-test/assign/assign.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/adapt/actions/index.test.ts" timestamp="2025-01-08T09:55:27.564Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="src/lib/nous/adapt/actions/index.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/adapt/actions/index.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/adapt/actions/index.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/ab-test/create/create.route.test.ts" timestamp="2025-01-08T09:55:27.569Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/ab-test/create/create.route.test.ts" name="src/app/api/cortex/ab-test/create/create.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/ab-test/create/create.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/ab-test/create/create.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/clients/openai.test.ts" timestamp="2025-01-08T09:55:27.576Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/clients/openai.test.ts" name="src/lib/nous/clients/openai.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/clients/openai.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/clients/openai.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/types/session.types.test.ts" timestamp="2025-01-08T09:55:27.582Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/types/session.types.test.ts" name="src/lib/cortex/types/session.types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/types/session.types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/types/session.types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/types/services.test.ts" timestamp="2025-01-08T09:55:27.587Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/types/services.test.ts" name="src/types/services.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/types/services.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/types/services.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/elasticsearch/init.test.ts" timestamp="2025-01-08T09:55:27.592Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/elasticsearch/init.test.ts" name="src/lib/cortex/elasticsearch/init.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/init.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/init.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/sessions/[sessionId]/analytics/id.analytics.route.test.ts" timestamp="2025-01-08T09:55:27.597Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/sessions/[sessionId]/analytics/id.analytics.route.test.ts" name="src/app/api/cortex/sessions/[sessionId]/analytics/id.analytics.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/sessions/[sessionId]/analytics/id.analytics.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/sessions/[sessionId]/analytics/id.analytics.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/engine/base-engine.test.ts" timestamp="2025-01-08T09:55:27.603Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/engine/base-engine.test.ts" name="src/lib/shared/engine/base-engine.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/engine/base-engine.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/engine/base-engine.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/api.cortex.types.test.ts" timestamp="2025-01-08T09:55:27.608Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/api.cortex.types.test.ts" name="src/app/api/cortex/api.cortex.types.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/api.cortex.types.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/api.cortex.types.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/metrics/metrics.route.test.ts" timestamp="2025-01-08T09:55:27.613Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/metrics/metrics.route.test.ts" name="src/app/api/cortex/metrics/metrics.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/metrics/metrics.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/metrics/metrics.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/reporting/recommendations.test.ts" timestamp="2025-01-08T09:55:27.618Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/reporting/recommendations.test.ts" name="src/lib/cortex/reporting/recommendations.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/reporting/recommendations.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/reporting/recommendations.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/keys/admin.middleware.test.ts" timestamp="2025-01-08T09:55:27.623Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/keys/admin.middleware.test.ts" name="src/app/api/keys/admin.middleware.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/keys/admin.middleware.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/keys/admin.middleware.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/core/validation-service.test.ts" timestamp="2025-01-08T09:55:27.629Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/core/validation-service.test.ts" name="src/lib/cortex/core/validation-service.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/core/validation-service.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/core/validation-service.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/shared/logger/src/logger.test.ts" timestamp="2025-01-08T09:55:27.635Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/shared/logger/src/logger.test.ts" name="src/lib/shared/logger/src/logger.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/shared/logger/src/logger.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/shared/logger/src/logger.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/cortex/analytics/reports/report.route.test.ts" timestamp="2025-01-08T09:55:27.641Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/cortex/analytics/reports/report.route.test.ts" name="src/app/api/cortex/analytics/reports/report.route.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/cortex/analytics/reports/report.route.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/cortex/analytics/reports/report.route.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/adapt/suggest/suggest.route.test.ts" timestamp="2025-01-08T09:55:27.646Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/nous/adapt/suggest/suggest.route.test.ts" name="src/app/api/nous/adapt/suggest/suggest.route.test.ts" time="0">
+            <failure message="Expression expected" type="Error">
+Error: Expression expected
+ ❯ getRollupError node_modules/rollup/dist/es/shared/parseAst.js:396:41
+ ❯ convertProgram node_modules/rollup/dist/es/shared/parseAst.js:1084:26
+ ❯ parseAstAsync node_modules/rollup/dist/es/shared/parseAst.js:2070:106
+ ❯ ssrTransformScript node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:52381:11
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51979:72
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/elasticsearch/mappings.test.ts" timestamp="2025-01-08T09:55:27.652Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/elasticsearch/mappings.test.ts" name="src/lib/cortex/elasticsearch/mappings.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/mappings.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/mappings.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/registry/store.test.ts" timestamp="2025-01-08T09:55:27.658Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/registry/store.test.ts" name="src/lib/nous/registry/store.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/registry/store.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/registry/store.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/registry/index.test.ts" timestamp="2025-01-08T09:55:27.664Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/registry/index.test.ts" name="src/lib/nous/registry/index.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/registry/index.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/registry/index.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/utils/circuit-breaker.test.ts" timestamp="2025-01-08T09:55:27.669Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/utils/circuit-breaker.test.ts" name="src/lib/cortex/utils/circuit-breaker.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/utils/circuit-breaker.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/utils/circuit-breaker.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/utils/threading.test.ts" timestamp="2025-01-08T09:55:27.674Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/utils/threading.test.ts" name="src/lib/nous/utils/threading.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/utils/threading.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/utils/threading.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/postgres/services.test.ts" timestamp="2025-01-08T09:55:27.680Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/postgres/services.test.ts" name="src/lib/cortex/postgres/services.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/postgres/services.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/postgres/services.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/admin/permissions.test.ts" timestamp="2025-01-08T09:55:27.685Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/app/api/admin/permissions.test.ts" name="src/app/api/admin/permissions.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/app/api/admin/permissions.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/app/api/admin/permissions.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/utils/service-manager.test.ts" timestamp="2025-01-08T09:55:27.691Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="src/lib/nous/utils/service-manager.test.ts" time="0">
+            <failure message="[vitest] No &quot;prisma&quot; export is defined on the &quot;@/lib/shared/database/client&quot; mock. Did you forget to return it from &quot;vi.mock&quot;?
+If you need to partially mock a module, you can use &quot;importOriginal&quot; helper inside:
+" type="Error">
+Error: [vitest] No &quot;prisma&quot; export is defined on the &quot;@/lib/shared/database/client&quot; mock. Did you forget to return it from &quot;vi.mock&quot;?
+If you need to partially mock a module, you can use &quot;importOriginal&quot; helper inside:
+
+vi.mock(import(&quot;@/lib/shared/database/client&quot;), async (importOriginal) =&gt; {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ new ServiceManager src/lib/nous/utils/service-manager.ts:38:16
+ ❯ Function.getInstance src/lib/nous/utils/service-manager.ts:76:17
+ ❯ src/lib/nous/utils/service-manager.ts:1216:66
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/core/services.test.ts" timestamp="2025-01-08T09:55:27.696Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/core/services.test.ts" name="src/lib/cortex/core/services.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/core/services.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/core/services.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/adapt/types/index.test.ts" timestamp="2025-01-08T09:55:27.701Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="src/lib/nous/adapt/types/index.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/adapt/types/index.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/adapt/types/index.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/ab-testing/services.test.ts" timestamp="2025-01-08T09:55:27.707Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/ab-testing/services.test.ts" name="src/lib/cortex/ab-testing/services.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/ab-testing/services.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/ab-testing/services.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/utils/signal-response.test.ts" timestamp="2025-01-08T09:55:27.712Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/utils/signal-response.test.ts" name="src/lib/nous/utils/signal-response.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/utils/signal-response.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/utils/signal-response.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/elasticsearch/core.test.ts" timestamp="2025-01-08T09:55:27.716Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/elasticsearch/core.test.ts" name="src/lib/cortex/elasticsearch/core.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/core.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/core.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/services/vectorization.test.ts" timestamp="2025-01-08T09:55:27.721Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/services/vectorization.test.ts" name="src/lib/cortex/services/vectorization.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/services/vectorization.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/services/vectorization.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/cortex/elasticsearch/query-builders.test.ts" timestamp="2025-01-08T09:55:27.728Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/cortex/elasticsearch/query-builders.test.ts" name="src/lib/cortex/elasticsearch/query-builders.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/query-builders.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/cortex/elasticsearch/query-builders.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/learn/models.test.ts" timestamp="2025-01-08T09:55:27.733Z" hostname="sophra" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="src/lib/nous/learn/models.test.ts" time="0">
+            <failure message="No test suite found in file D:/sophra/src/lib/nous/learn/models.test.ts" type="Error">
+Error: No test suite found in file D:/sophra/src/lib/nous/learn/models.test.ts
             </failure>
         </testcase>
     </testsuite>

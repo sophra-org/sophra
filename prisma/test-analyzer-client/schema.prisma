@@ -1,0 +1,139 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_ANALYZER_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./test-analyzer-client"
+}
+
+enum TestHealthScore {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  CRITICAL
+}
+
+enum FixType {
+  ASSERTION
+  SETUP
+  TEARDOWN
+  ASYNC
+  MOCK
+  TIMING
+  DEPENDENCY
+  LOGIC
+  OTHER
+}
+
+enum GenerationType {
+  COVERAGE_GAP
+  ENHANCEMENT
+  REGRESSION
+  EDGE_CASE
+}
+
+model TestFile {
+  id                String          @id @default(cuid())
+  filePath          String          @unique
+  fileName          String
+  firstSeen         DateTime        @default(now())
+  lastUpdated       DateTime        @updatedAt
+  totalRuns         Int             @default(0)
+  avgPassRate       Float           @default(0)
+  currentPassRate   Float           @default(0)
+  avgDuration       Float           @default(0)
+  currentCoverage   Float           @default(0)
+  avgCoverage       Float           @default(0)
+  totalFixes        Int             @default(0)
+  flakyTests        Int             @default(0)
+  metadata          Json?
+  healthScore       TestHealthScore @default(GOOD)
+  totalTests        Int             @default(0)
+  criticalTests     Int             @default(0)
+  lastFailureReason String?
+
+  // Relations
+  executions  TestExecution[]
+  coverage    TestCoverage[]
+  fixes       TestFix[]
+  generations TestGeneration[]
+
+  @@index([healthScore])
+  @@index([currentPassRate])
+  @@index([currentCoverage])
+}
+
+model TestExecution {
+  id           String   @id @default(cuid())
+  testFile     TestFile @relation(fields: [testFileId], references: [id])
+  testFileId   String
+  executedAt   DateTime @default(now())
+  passed       Boolean
+  duration     Float
+  errorMessage String?
+  testResults  Json
+  environment  String
+  commitHash   String?
+  performance  Json?
+
+  @@index([testFileId, executedAt])
+  @@index([passed])
+}
+
+model TestCoverage {
+  id               String   @id @default(cuid())
+  testFile         TestFile @relation(fields: [testFileId], references: [id])
+  testFileId       String
+  measuredAt       DateTime @default(now())
+  coveragePercent  Float
+  linesCovered     Json
+  linesUncovered   Json
+  branchCoverage   Json?
+  functionCoverage Json?
+  suggestedAreas   Json?
+  coverageType     String
+
+  @@index([testFileId, measuredAt])
+  @@index([coveragePercent])
+}
+
+model TestFix {
+  id              String   @id @default(cuid())
+  testFile        TestFile @relation(fields: [testFileId], references: [id])
+  testFileId      String
+  appliedAt       DateTime @default(now())
+  fixType         FixType
+  problem         String
+  solution        String
+  successful      Boolean
+  confidenceScore Float
+  beforeState     Json
+  afterState      Json
+  patternUsed     String?
+  impactScore     Float
+
+  @@index([testFileId, appliedAt])
+  @@index([successful])
+  @@index([fixType])
+}
+
+model TestGeneration {
+  id                  String         @id @default(cuid())
+  testFile            TestFile       @relation(fields: [testFileId], references: [id])
+  testFileId          String
+  generatedAt         DateTime       @default(now())
+  generationType      GenerationType
+  newTests            Json
+  accepted            Boolean
+  targetArea          String
+  coverageImprovement Float
+  generationStrategy  String
+  context             Json
+
+  @@index([testFileId, generatedAt])
+  @@index([accepted])
+  @@index([generationType])
+}

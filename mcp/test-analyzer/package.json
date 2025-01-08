@@ -1,0 +1,28 @@
+{
+  "name": "mcp-test-analyzer",
+  "version": "1.0.0",
+  "description": "MCP server for test analysis and improvement",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "prisma:generate": "prisma generate --schema=../prisma/test-analyzer.prisma",
+    "prisma:migrate": "prisma migrate dev --schema=../prisma/test-analyzer.prisma",
+    "prisma:setup": "npm run prisma:generate && npm run prisma:migrate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "@types/node": "^20.10.4",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "vitest": "^1.0.4",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "prisma": "^5.7.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    network_mode: service:db
+
+  test-analyzer:
+    build:
+      context: ../mcp/test-analyzer
+      dockerfile: Dockerfile
+    volumes:
+      - ../mcp/test-analyzer:/app
+      - ../tests:/app/tests
+    environment:
+      - TEST_ANALYZER_DATABASE_URL=postgresql://postgres:postgres@db:5432/test_analyzer
+    depends_on:
+      - db
+    network_mode: service:db
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: test_analyzer
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:
