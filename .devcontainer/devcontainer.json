@@ -11,7 +11,16 @@
       "version": "latest"
     },
     "ghcr.io/devcontainers/features/powershell:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/flexwie/devcontainer-features/op:1": {},
+    "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
+    "ghcr.io/devcontainers-extra/features/digitalocean-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
   },
 
   "customizations": {
@@ -57,9 +66,13 @@
 
   "forwardPorts": [3000],
 
-  "postCreateCommand": "npm install -g pnpm && pnpm install",
+  "postCreateCommand": "npm install -g pnpm && pnpm install && cd mcp/test-analyzer && npm install -g pnpm && pnpm install",
 
-  "postStartCommand": "pnpm install",
+  "postStartCommand": {
+    "install-deps": "pnpm install",
+    "build-mcp": "pnpm mcp:build",
+    "setup-analyzer": "pnpm test-analyzer:prisma:setup"
+  },
 
   "remoteUser": "node",
 
@@ -71,5 +84,7 @@
     "SHELL": "/usr/bin/pwsh"
   },
 
-  "waitFor": "postCreateCommand"
+  "waitFor": "postCreateCommand",
+
+  "runArgs": ["--init", "--privileged"]
 }

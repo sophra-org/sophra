@@ -2,7 +2,10 @@ import { execSync } from "child_process";
 import * as fs from "fs/promises";
 import * as os from "os";
 import * as path from "path";
-import { TestHealthScore } from "../../../../prisma/test-analyzer-client";
+import {
+  TestExecution,
+  TestHealthScore,
+} from "../../../../prisma/test-analyzer-client";
 import { TestFile } from "../types";
 import { ThreadPool } from "../utils";
 import { prisma } from "../utils/prisma";
@@ -105,45 +108,21 @@ export class TestAnalyzer {
     console.log(`Starting analysis of ${testFiles.length} test files...`);
     const results = new Map<string, AnalysisResult>();
 
-    return new Promise((resolve, reject) => {
-      let completedTasks = 0;
-      let hasError = false;
+    // Process files sequentially instead of in parallel
+    for (const testFile of testFiles) {
+      try {
+        console.log(`\nAnalyzing ${testFile.fileName}...`);
+        const result = await this.analyzeTestFile(testFile);
+        results.set(testFile.filePath, result);
+        console.log(`✓ Completed analysis of ${testFile.fileName}`);
+      } catch (error) {
+        console.error(`✗ Failed analysis of ${testFile.fileName}:`, error);
+        // Continue with next file even if one fails
+      }
+    }
 
-      this.threadPool.on("taskComplete", ({ taskId, result }) => {
-        console.log(`\n✓ Task ${taskId} completed successfully`);
-        results.set(taskId, result);
-        completedTasks++;
-
-        if (completedTasks === testFiles.length && !hasError) {
-          console.log(`\n✓ All ${testFiles.length} analyses completed`);
-          resolve(results);
-        }
-      });
-
-      this.threadPool.on("taskError", ({ taskId, error }) => {
-        console.error(`\n✗ Task ${taskId} failed:`, error);
-        hasError = true;
-        reject(error);
-      });
-
-      // Create tasks with immediate logging
-      const tasks = testFiles.map((testFile) => ({
-        id: testFile.filePath,
-        task: async () => {
-          try {
-            const result = await this.analyzeTestFile(testFile);
-            console.log(`✓ Completed analysis of ${testFile.fileName}`);
-            return result;
-          } catch (error) {
-            console.error(`✗ Failed analysis of ${testFile.fileName}:`, error);
-            throw error;
-          }
-        },
-      }));
-
-      // Start processing tasks
-      this.threadPool.runTasks(tasks).catch(reject);
-    });
+    console.log(`\n✓ All ${testFiles.length} analyses completed`);
+    return results;
   }
 
   private async analyzeTestFile(testFile: TestFile): Promise<AnalysisResult> {
@@ -200,10 +179,13 @@ export class TestAnalyzer {
         metrics,
       };
 
-      // Immediately record the results
-      await this.upsertAnalysisResult(testFile, result, context);
-      console.log(`✓ Recorded analysis results for ${testFile.fileName}`);
+      // Record results one by one
+      await this.createAnalysisRecord(testFile, result, context);
+      await this.updateTestFileMetrics(testFile, result.metrics);
+      await this.recordTestExecution(testFile, result);
+      await this.recordCoverage(testFile, result.metrics);
 
+      console.log(`✓ Recorded analysis results for ${testFile.fileName}`);
       return result;
     } catch (error) {
       console.error(`✗ Error analyzing ${testFile.fileName}:`, error);
@@ -213,36 +195,141 @@ export class TestAnalyzer {
     }
   }
 
+  private async createAnalysisRecord(
+    testFile: TestFile,
+    result: AnalysisResult,
+    context: PatternContext
+  ): Promise<void> {
+    console.log(`- Creating analysis record for ${testFile.fileName}`);
+    const analysis = await prisma.testAnalysis.create({
+      data: {
+        session: { connect: { id: this.currentSessionId } },
+        testFile: { connect: { id: testFile.id } },
+        patterns: result.patterns as any,
+        antiPatterns: result.antiPatterns as any,
+        suggestions: result.suggestions as any,
+        context: context as any,
+        timestamp: new Date(),
+      },
+    });
+    console.log(`✓ Created analysis record: ${analysis.id}`);
+  }
+
+  private async recordTestExecution(
+    testFile: TestFile,
+    result: AnalysisResult
+  ): Promise<void> {
+    console.log(`- Recording execution for ${testFile.fileName}`);
+    const execution = await prisma.testExecution.create({
+      data: {
+        testFile: { connect: { id: testFile.id } },
+        passed: result.metrics.passRate === 100,
+        duration: result.metrics.avgDuration,
+        testResults: result.patterns as any,
+        environment: process.env.NODE_ENV || "development",
+        executedAt: new Date(),
+      },
+    });
+    console.log(`✓ Created execution record: ${execution.id}`);
+  }
+
+  private async recordCoverage(
+    testFile: TestFile,
+    metrics: AnalysisResult["metrics"]
+  ): Promise<void> {
+    console.log(`- Recording coverage for ${testFile.fileName}`);
+    try {
+      // Try to read coverage data from coverage-final.json
+      const coverageFile = path.join(
+        process.cwd(),
+        "coverage",
+        "coverage-final.json"
+      );
+      let linesCovered: string[] = [];
+      let linesUncovered: string[] = [];
+
+      try {
+        const coverageData = JSON.parse(
+          await fs.readFile(coverageFile, "utf-8")
+        );
+        const fileData = Object.values(coverageData).find((data: any) =>
+          data.path?.includes(
+            path.basename(testFile.filePath).replace(".test.", ".")
+          )
+        ) as
+          | {
+              statementMap: Record<string, { start: { line: number } }>;
+              s: Record<string, number>;
+            }
+          | undefined;
+
+        if (fileData) {
+          const lines = fileData.statementMap || {};
+          const statements = fileData.s || {};
+
+          Object.entries(statements).forEach(([key, hit]) => {
+            const line = lines[key]?.start?.line?.toString();
+            if (line) {
+              if (hit) {
+                linesCovered.push(line);
+              } else {
+                linesUncovered.push(line);
+              }
+            }
+          });
+        }
+      } catch (error) {
+        console.warn(
+          `Warning: Could not read coverage data from file: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+
+      const coverage = await prisma.testCoverage.create({
+        data: {
+          testFile: { connect: { id: testFile.id } },
+          coveragePercent: metrics.coverage,
+          linesCovered,
+          linesUncovered,
+          coverageType: "static",
+          measuredAt: new Date(),
+        },
+      });
+      console.log(`✓ Created coverage record: ${coverage.id}`);
+    } catch (error) {
+      console.error(
+        `Error recording coverage: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
   private async recordAnalysisFailure(
     testFile: TestFile,
     error: any
   ): Promise<void> {
     console.log(`\nRecording analysis failure for ${testFile.fileName}...`);
     try {
-      await prisma.$transaction(async (tx) => {
-        const execution = await tx.testExecution.create({
-          data: {
-            testFile: { connect: { id: testFile.id } },
-            passed: false,
-            duration: 0,
-            errorMessage: error.message || String(error),
-            testResults: { error: error.message || String(error) } as any,
-            environment: process.env.NODE_ENV || "development",
-            executedAt: new Date(),
-          },
-        });
-        console.log(`✓ Created failure record: ${execution.id}`);
-
-        await tx.testFile.update({
-          where: { id: testFile.id },
-          data: {
-            lastFailureReason: error.message || String(error),
-            lastUpdated: new Date(),
-            totalRuns: { increment: 1 },
-          },
-        });
-        console.log(`✓ Updated test file with failure info`);
+      const execution = await prisma.testExecution.create({
+        data: {
+          testFile: { connect: { id: testFile.id } },
+          passed: false,
+          duration: 0,
+          errorMessage: error.message || String(error),
+          testResults: { error: error.message || String(error) } as any,
+          environment: process.env.NODE_ENV || "development",
+          executedAt: new Date(),
+        },
       });
+      console.log(`✓ Created failure record: ${execution.id}`);
+
+      await prisma.testFile.update({
+        where: { id: testFile.id },
+        data: {
+          lastFailureReason: error.message || String(error),
+          lastUpdated: new Date(),
+          totalRuns: { increment: 1 },
+        },
+      });
+      console.log(`✓ Updated test file with failure info`);
       console.log(`✓ Failure recording completed for ${testFile.fileName}`);
     } catch (dbError) {
       console.error(
@@ -257,93 +344,6 @@ export class TestAnalyzer {
         },
         originalError: error,
       });
-    }
-  }
-
-  private async upsertAnalysisResult(
-    testFile: TestFile,
-    result: AnalysisResult,
-    context: PatternContext
-  ): Promise<void> {
-    const timestamp = new Date();
-    console.log(`\nStarting database operations for ${testFile.fileName}...`);
-
-    try {
-      // Use a transaction to ensure all related records are created atomically
-      await prisma.$transaction(async (tx) => {
-        console.log(`- Creating analysis record for ${testFile.fileName}`);
-        const analysis = await tx.testAnalysis.create({
-          data: {
-            session: { connect: { id: this.currentSessionId } },
-            testFile: { connect: { id: testFile.id } },
-            patterns: result.patterns as any,
-            antiPatterns: result.antiPatterns as any,
-            suggestions: result.suggestions as any,
-            context: context as any,
-            timestamp,
-          },
-        });
-        console.log(`✓ Created analysis record: ${analysis.id}`);
-
-        console.log(`- Updating metrics for ${testFile.fileName}`);
-        const updatedFile = await tx.testFile.update({
-          where: { id: testFile.id },
-          data: {
-            currentCoverage: result.metrics.coverage,
-            avgCoverage: (testFile.avgCoverage + result.metrics.coverage) / 2,
-            currentPassRate: result.metrics.passRate,
-            avgPassRate: (testFile.avgPassRate + result.metrics.passRate) / 2,
-            avgDuration: result.metrics.avgDuration,
-            healthScore: result.metrics.healthScore,
-            lastUpdated: timestamp,
-            totalRuns: { increment: 1 },
-          },
-        });
-        console.log(`✓ Updated test file metrics: ${updatedFile.id}`);
-
-        console.log(`- Recording execution for ${testFile.fileName}`);
-        const execution = await tx.testExecution.create({
-          data: {
-            testFile: { connect: { id: testFile.id } },
-            passed: result.metrics.passRate === 100,
-            duration: result.metrics.avgDuration,
-            testResults: result.patterns as any,
-            environment: process.env.NODE_ENV || "development",
-            executedAt: timestamp,
-          },
-        });
-        console.log(`✓ Created execution record: ${execution.id}`);
-
-        console.log(`- Recording coverage for ${testFile.fileName}`);
-        const coverage = await tx.testCoverage.create({
-          data: {
-            testFile: { connect: { id: testFile.id } },
-            coveragePercent: result.metrics.coverage,
-            linesCovered: [], // Would need actual coverage data
-            linesUncovered: [], // Would need actual coverage data
-            coverageType: "static",
-            measuredAt: timestamp,
-          },
-        });
-        console.log(`✓ Created coverage record: ${coverage.id}`);
-      });
-
-      console.log(
-        `✓ All database operations completed for ${testFile.fileName}`
-      );
-    } catch (error) {
-      console.error(`✗ Database error for ${testFile.fileName}:`, error);
-      // Log the full error details for debugging
-      console.error("Detailed error:", {
-        error: error,
-        testFile: {
-          id: testFile.id,
-          fileName: testFile.fileName,
-        },
-        sessionId: this.currentSessionId,
-        timestamp: timestamp,
-      });
-      throw error;
     }
   }
 
@@ -503,7 +503,7 @@ export class TestAnalyzer {
 
     return this.deepseek.analyzeTestReliability(
       testContent,
-      executionHistory.map((exec) => ({
+      executionHistory.map((exec: TestExecution) => ({
         timestamp: exec.executedAt,
         passed: exec.passed,
         duration: exec.duration,
