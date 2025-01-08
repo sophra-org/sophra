@@ -3,16 +3,12 @@ import { glob } from "glob";
 import inquirer from "inquirer";
 import ora from "ora";
 import * as path from "path";
-import {
-  PrismaClient,
-  TestHealthScore,
-} from "../../../prisma/test-analyzer-client";
+import { TestHealthScore } from "../../../prisma/test-analyzer-client";
 import { TestAnalyzer } from "./services/analyzer";
 import { TestFixer } from "./services/fixer";
 import { TestGenerator } from "./services/generator";
 import { TestFile } from "./types";
-
-const prisma = new PrismaClient();
+import { prisma } from "./utils/prisma";
 
 interface TestScanResult {
   filePath: string;
@@ -68,11 +64,8 @@ commands.set(
         state.selectedFiles = selectedFiles;
       }
 
-      for (const filePath of state.selectedFiles) {
-        spinner.text = `Analyzing ${path.basename(filePath)}...`;
-        const testFile = await analyzeTestFile(filePath);
-        state.analysisResults.set(filePath, testFile);
-      }
+      const results = await analyzeTestFiles(state.selectedFiles);
+      state.analysisResults = results;
 
       spinner.succeed("Analysis complete");
       return state;
@@ -405,42 +398,53 @@ async function scanTestFiles(): Promise<TestScanResult[]> {
   }
 }
 
-async function analyzeTestFile(filePath: string) {
-  const spinner = ora(`Analyzing ${path.basename(filePath)}...`).start();
+async function analyzeTestFiles(
+  filePaths: string[]
+): Promise<Map<string, any>> {
+  const spinner = ora(`Analyzing ${filePaths.length} test files...`).start();
   try {
-    const testFile = await prisma.testFile.upsert({
-      where: { filePath },
-      create: {
-        filePath,
-        fileName: path.basename(filePath),
-        firstSeen: new Date(),
-        lastUpdated: new Date(),
-        totalRuns: 0,
-        avgPassRate: 0,
-        currentPassRate: 0,
-        avgDuration: 0,
-        currentCoverage: 0,
-        avgCoverage: 0,
-        totalFixes: 0,
-        flakyTests: 0,
-        totalTests: 0,
-        criticalTests: 0,
-        healthScore: TestHealthScore.POOR,
-      },
-      update: {
-        lastUpdated: new Date(),
-      },
-    });
+    const testFiles = await Promise.all(
+      filePaths.map(async (filePath) => {
+        const testFile = await prisma.testFile.upsert({
+          where: { filePath },
+          create: {
+            filePath,
+            fileName: path.basename(filePath),
+            firstSeen: new Date(),
+            lastUpdated: new Date(),
+            totalRuns: 0,
+            avgPassRate: 0,
+            currentPassRate: 0,
+            avgDuration: 0,
+            currentCoverage: 0,
+            avgCoverage: 0,
+            totalFixes: 0,
+            flakyTests: 0,
+            totalTests: 0,
+            criticalTests: 0,
+            healthScore: TestHealthScore.POOR,
+          },
+          update: {
+            lastUpdated: new Date(),
+          },
+        });
+        return convertPrismaTestFileToType(testFile);
+      })
+    );
 
-    const typedTestFile = await convertPrismaTestFileToType(testFile);
     const analyzer = TestAnalyzer.getInstance();
-    const sessionId = await analyzer.startAnalysis(typedTestFile);
-    const result = await analyzer.analyzeTest(sessionId, typedTestFile);
 
-    spinner.succeed(`Analysis complete for ${path.basename(filePath)}`);
-    return result;
+    // Start a session for the first test file (we'll use this session for all files)
+    if (testFiles.length > 0) {
+      await analyzer.startAnalysis(testFiles[0]);
+    }
+
+    const results = await analyzer.analyzeTests(testFiles);
+
+    spinner.succeed(`Analysis complete for ${filePaths.length} files`);
+    return results;
   } catch (error) {
-    spinner.fail(`Error analyzing ${path.basename(filePath)}`);
+    spinner.fail(`Error analyzing test files`);
     throw error;
   }
 }

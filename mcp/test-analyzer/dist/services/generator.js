@@ -70,9 +70,11 @@ class TestGenerator {
         // Apply the new tests
         const updatedContent = await this.applyNewTests(testFile, testContent, improvements.code);
         // Calculate coverage improvement
-        const beforeMetrics = await this.analyzer.analyzeTest(sessionId, testFile);
+        const beforeAnalysis = await this.analyzer.analyzeTests([testFile]);
+        const beforeMetrics = beforeAnalysis.get(testFile.filePath);
         await fs.writeFile(testFile.filePath, updatedContent, "utf-8");
-        const afterMetrics = await this.analyzer.analyzeTest(sessionId, testFile);
+        const afterAnalysis = await this.analyzer.analyzeTests([testFile]);
+        const afterMetrics = afterAnalysis.get(testFile.filePath);
         const coverageImprovement = afterMetrics.metrics.coverage - beforeMetrics.metrics.coverage;
         // Record the generation
         const testGeneration = await prisma.testGeneration.create({

@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="13.876">
-    <testsuite name="src/types/services.test.ts" timestamp="2025-01-08T11:23:29.350Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0162451">
-        <testcase classname="src/types/services.test.ts" name="Services &gt; getUsers &gt; should fetch users successfully" time="0.0040663">
+<testsuites name="vitest tests" tests="19" failures="0" errors="0" time="12.807">
+    <testsuite name="src/lib/nous/registry/metadata.test.ts" timestamp="2025-01-08T12:11:52.419Z" hostname="sophra" tests="19" failures="0" errors="0" skipped="0" time="0.0197978">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; schema management &gt; should register schema successfully" time="0.0045619">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; getUsers &gt; should handle empty users list" time="0.0012518">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; schema management &gt; should throw error when validating with non-existent schema" time="0.0009208">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; getUsers &gt; should handle network errors" time="0.0022135">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should validate metadata against schema" time="0.000648">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; createUser &gt; should create user successfully" time="0.0012686">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should validate metadata with optional fields" time="0.0015366">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; createUser &gt; should handle validation errors" time="0.0009183">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should validate metadata with missing optional fields" time="0.0016571">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; updateUser &gt; should update user successfully" time="0.0016356">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should fail validation when required fields are missing" time="0.000335">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; updateUser &gt; should handle non-existent user" time="0.0009991">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should fail validation when field types are incorrect" time="0.0009108">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; deleteUser &gt; should delete user successfully" time="0.0006302">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should fail validation when custom validators fail" time="0.0003664">
         </testcase>
-        <testcase classname="src/types/services.test.ts" name="Services &gt; deleteUser &gt; should handle deletion of non-existent user" time="0.0012139">
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should fail validation when nested object is invalid" time="0.0005972">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata validation &gt; should ignore unknown fields during validation" time="0.0004123">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata storage operations &gt; should store metadata successfully" time="0.0005977">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata storage operations &gt; should throw error when storing invalid metadata" time="0.0003853">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata storage operations &gt; should update metadata successfully" time="0.0005411">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata storage operations &gt; should fail update with invalid metadata" time="0.0004418">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata storage operations &gt; should delete metadata successfully" time="0.0004779">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata storage operations &gt; should handle deletion of non-existent entry" time="0.0002806">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata listing &gt; should list all metadata entries" time="0.0013896">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata listing &gt; should filter metadata entries" time="0.0007311">
+        </testcase>
+        <testcase classname="src/lib/nous/registry/metadata.test.ts" name="MetadataManager &gt; metadata listing &gt; should return empty object when no entries match filter" time="0.0007534">
         </testcase>
     </testsuite>
 </testsuites>

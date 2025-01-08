@@ -37,15 +37,28 @@ exports.TestAnalyzer = void 0;
 exports.analyzeTest = analyzeTest;
 const child_process_1 = require("child_process");
 const fs = __importStar(require("fs/promises"));
+const os = __importStar(require("os"));
 const path = __importStar(require("path"));
-const test_analyzer_client_1 = require("../../../../prisma/test-analyzer-client");
+const utils_1 = require("../utils");
+const prisma_1 = require("../utils/prisma");
 const client_1 = require("./client");
 const session_1 = require("./session");
-const prisma = new test_analyzer_client_1.PrismaClient();
+// Calculate optimal number of concurrent analyses based on system resources
+const cpuCount = os.cpus().length;
+const systemMemoryGB = os.totalmem() / 1024 / 1024 / 1024;
+const MAX_CONCURRENT_ANALYSES = Math.max(
+// Use 75% of available CPU cores, minimum of 4, maximum of 16
+Math.min(Math.floor(cpuCount * 0.75), 16), 
+// Or scale based on available memory (1 worker per 2GB, max 16)
+Math.min(Math.floor(systemMemoryGB / 2), 16), 
+// But never less than 4
+4);
 class TestAnalyzer {
     constructor() {
+        this.currentSessionId = "";
         this.sessionManager = session_1.SessionManager.getInstance();
         this.deepseek = client_1.DeepSeekClient.getInstance();
+        this.threadPool = new utils_1.ThreadPool(MAX_CONCURRENT_ANALYSES);
     }
     static getInstance() {
         if (!TestAnalyzer.instance) {
@@ -54,68 +67,230 @@ class TestAnalyzer {
         return TestAnalyzer.instance;
     }
     async startAnalysis(testFile, context = {}) {
-        const session = await this.sessionManager.createSession({
-            ...context,
-            testPattern: testFile.fileName,
-        });
-        await this.sessionManager.addTestFile(session.id, testFile);
-        const operation = {
-            type: "START_ANALYSIS",
-            target: testFile.filePath,
-            params: context,
-            result: { sessionId: session.id },
-            timestamp: new Date(),
-        };
-        await this.sessionManager.recordOperation(session.id, operation);
-        return session.id;
-    }
-    async analyzeTest(sessionId, testFile) {
-        const session = await this.sessionManager.getSession(sessionId);
-        if (!session)
-            throw new Error(`Session not found: ${sessionId}`);
-        // Read test file and related source files
-        const { testContent, sourceFiles } = await this.gatherTestContext(testFile);
-        // Extract test framework and dependencies
-        const context = await this.extractContext(testFile);
-        // Run test and collect metrics
-        const metrics = await this.collectMetrics(testFile);
-        // Analyze patterns and anti-patterns using DeepSeek
-        const analysis = await this.deepseek.analyzeTestStructure(testContent, context);
-        // Analyze coverage gaps
-        const coverageAnalysis = await this.analyzeCoverage(testFile, sourceFiles, metrics);
-        // Check for reliability issues
-        const reliabilityAnalysis = await this.analyzeReliability(testFile, testContent);
-        // Generate comprehensive suggestions
-        const suggestions = await this.generateSuggestions(analysis, coverageAnalysis, reliabilityAnalysis, metrics);
-        // Record analysis
-        const testAnalysis = await prisma.testAnalysis.create({
+        // Create a new session
+        const session = await prisma_1.prisma.analysisSession.create({
             data: {
-                session: { connect: { id: sessionId } },
-                testFile: { connect: { id: testFile.id } },
-                patterns: analysis.patterns,
-                antiPatterns: analysis.antiPatterns,
-                suggestions: suggestions,
+                status: "ACTIVE",
                 context: context,
+                testFiles: {
+                    connect: { id: testFile.id },
+                },
             },
         });
-        // Update test file metrics
-        await this.updateTestFileMetrics(testFile, metrics);
-        const result = {
-            patterns: analysis.patterns,
-            antiPatterns: analysis.antiPatterns,
-            suggestions,
-            metrics,
-        };
-        // Record operation
-        const operation = {
-            type: "COMPLETE_ANALYSIS",
-            target: testFile.filePath,
-            params: { context },
-            result,
-            timestamp: new Date(),
-        };
-        await this.sessionManager.recordOperation(sessionId, operation);
-        return result;
+        this.currentSessionId = session.id;
+        return session.id;
+    }
+    async analyzeTests(testFiles) {
+        console.log(`Starting analysis of ${testFiles.length} test files...`);
+        const results = new Map();
+        return new Promise((resolve, reject) => {
+            let completedTasks = 0;
+            let hasError = false;
+            this.threadPool.on("taskComplete", ({ taskId, result }) => {
+                console.log(`\n✓ Task ${taskId} completed successfully`);
+                results.set(taskId, result);
+                completedTasks++;
+                if (completedTasks === testFiles.length && !hasError) {
+                    console.log(`\n✓ All ${testFiles.length} analyses completed`);
+                    resolve(results);
+                }
+            });
+            this.threadPool.on("taskError", ({ taskId, error }) => {
+                console.error(`\n✗ Task ${taskId} failed:`, error);
+                hasError = true;
+                reject(error);
+            });
+            // Create tasks with immediate logging
+            const tasks = testFiles.map((testFile) => ({
+                id: testFile.filePath,
+                task: async () => {
+                    try {
+                        const result = await this.analyzeTestFile(testFile);
+                        console.log(`✓ Completed analysis of ${testFile.fileName}`);
+                        return result;
+                    }
+                    catch (error) {
+                        console.error(`✗ Failed analysis of ${testFile.fileName}:`, error);
+                        throw error;
+                    }
+                },
+            }));
+            // Start processing tasks
+            this.threadPool.runTasks(tasks).catch(reject);
+        });
+    }
+    async analyzeTestFile(testFile) {
+        console.log(`Analyzing ${testFile.fileName}...`);
+        try {
+            // Read test file and related source files
+            const { testContent, sourceFiles } = await this.gatherTestContext(testFile);
+            console.log(`- Gathered context for ${testFile.fileName}`);
+            // Extract test framework and dependencies
+            const context = await this.extractContext(testFile);
+            console.log(`- Extracted framework context for ${testFile.fileName}`);
+            // Run test and collect metrics
+            const metrics = await this.collectMetrics(testFile);
+            console.log(`- Collected metrics for ${testFile.fileName}`);
+            // Analyze patterns and anti-patterns using DeepSeek
+            console.log(`- Starting DeepSeek analysis for ${testFile.fileName}`);
+            const analysis = await this.deepseek.analyzeTestStructure(testContent, context);
+            console.log(`- Completed DeepSeek analysis for ${testFile.fileName}`);
+            // Analyze coverage gaps
+            const coverageAnalysis = await this.analyzeCoverage(testFile, sourceFiles, metrics);
+            console.log(`- Analyzed coverage for ${testFile.fileName}`);
+            // Check for reliability issues
+            const reliabilityAnalysis = await this.analyzeReliability(testFile, testContent);
+            console.log(`- Analyzed reliability for ${testFile.fileName}`);
+            // Generate comprehensive suggestions
+            const suggestions = await this.generateSuggestions(analysis, coverageAnalysis, reliabilityAnalysis, metrics);
+            const result = {
+                patterns: analysis.patterns,
+                antiPatterns: analysis.antiPatterns,
+                suggestions,
+                metrics,
+            };
+            // Immediately record the results
+            await this.upsertAnalysisResult(testFile, result, context);
+            console.log(`✓ Recorded analysis results for ${testFile.fileName}`);
+            return result;
+        }
+        catch (error) {
+            console.error(`✗ Error analyzing ${testFile.fileName}:`, error);
+            // Still record the failure in the database
+            await this.recordAnalysisFailure(testFile, error);
+            throw error;
+        }
+    }
+    async recordAnalysisFailure(testFile, error) {
+        console.log(`\nRecording analysis failure for ${testFile.fileName}...`);
+        try {
+            await prisma_1.prisma.$transaction(async (tx) => {
+                const execution = await tx.testExecution.create({
+                    data: {
+                        testFile: { connect: { id: testFile.id } },
+                        passed: false,
+                        duration: 0,
+                        errorMessage: error.message || String(error),
+                        testResults: { error: error.message || String(error) },
+                        environment: process.env.NODE_ENV || "development",
+                        executedAt: new Date(),
+                    },
+                });
+                console.log(`✓ Created failure record: ${execution.id}`);
+                await tx.testFile.update({
+                    where: { id: testFile.id },
+                    data: {
+                        lastFailureReason: error.message || String(error),
+                        lastUpdated: new Date(),
+                        totalRuns: { increment: 1 },
+                    },
+                });
+                console.log(`✓ Updated test file with failure info`);
+            });
+            console.log(`✓ Failure recording completed for ${testFile.fileName}`);
+        }
+        catch (dbError) {
+            console.error(`✗ Failed to record analysis failure for ${testFile.fileName}:`, dbError);
+            console.error("Detailed error:", {
+                error: dbError,
+                testFile: {
+                    id: testFile.id,
+                    fileName: testFile.fileName,
+                },
+                originalError: error,
+            });
+        }
+    }
+    async upsertAnalysisResult(testFile, result, context) {
+        const timestamp = new Date();
+        console.log(`\nStarting database operations for ${testFile.fileName}...`);
+        try {
+            // Create analysis record with extended timeout
+            console.log(`- Creating analysis record for ${testFile.fileName}`);
+            const analysis = await prisma_1.prisma.$transaction(async (tx) => {
+                return tx.testAnalysis.create({
+                    data: {
+                        session: { connect: { id: this.currentSessionId } },
+                        testFile: { connect: { id: testFile.id } },
+                        patterns: result.patterns,
+                        antiPatterns: result.antiPatterns,
+                        suggestions: result.suggestions,
+                        context: context,
+                        timestamp,
+                    },
+                });
+            }, {
+                timeout: 30000, // 30 second timeout
+            });
+            console.log(`✓ Created analysis record: ${analysis.id}`);
+            // Update metrics in a separate transaction
+            console.log(`- Updating metrics for ${testFile.fileName}`);
+            const updatedFile = await prisma_1.prisma.$transaction(async (tx) => {
+                return tx.testFile.update({
+                    where: { id: testFile.id },
+                    data: {
+                        currentCoverage: result.metrics.coverage,
+                        avgCoverage: (testFile.avgCoverage + result.metrics.coverage) / 2,
+                        currentPassRate: result.metrics.passRate,
+                        avgPassRate: (testFile.avgPassRate + result.metrics.passRate) / 2,
+                        avgDuration: result.metrics.avgDuration,
+                        healthScore: result.metrics.healthScore,
+                        lastUpdated: timestamp,
+                        totalRuns: { increment: 1 },
+                    },
+                });
+            }, {
+                timeout: 30000,
+            });
+            console.log(`✓ Updated test file metrics: ${updatedFile.id}`);
+            // Record execution in a separate transaction
+            console.log(`- Recording execution for ${testFile.fileName}`);
+            const execution = await prisma_1.prisma.$transaction(async (tx) => {
+                return tx.testExecution.create({
+                    data: {
+                        testFile: { connect: { id: testFile.id } },
+                        passed: result.metrics.passRate === 100,
+                        duration: result.metrics.avgDuration,
+                        testResults: result.patterns,
+                        environment: process.env.NODE_ENV || "development",
+                        executedAt: timestamp,
+                    },
+                });
+            }, {
+                timeout: 30000,
+            });
+            console.log(`✓ Created execution record: ${execution.id}`);
+            // Record coverage in a separate transaction
+            console.log(`- Recording coverage for ${testFile.fileName}`);
+            const coverage = await prisma_1.prisma.$transaction(async (tx) => {
+                return tx.testCoverage.create({
+                    data: {
+                        testFile: { connect: { id: testFile.id } },
+                        coveragePercent: result.metrics.coverage,
+                        linesCovered: [], // Would need actual coverage data
+                        linesUncovered: [], // Would need actual coverage data
+                        coverageType: "static",
+                        measuredAt: timestamp,
+                    },
+                });
+            }, {
+                timeout: 30000,
+            });
+            console.log(`✓ All database operations completed for ${testFile.fileName}`);
+        }
+        catch (error) {
+            console.error(`✗ Database error for ${testFile.fileName}:`, error);
+            console.error("Detailed error:", {
+                error: error,
+                testFile: {
+                    id: testFile.id,
+                    fileName: testFile.fileName,
+                },
+                sessionId: this.currentSessionId,
+                timestamp: timestamp,
+            });
+            throw error;
+        }
     }
     async gatherTestContext(testFile) {
         const testContent = await fs.readFile(testFile.filePath, "utf-8");
@@ -220,7 +395,7 @@ class TestAnalyzer {
         return this.deepseek.analyzeCoverageGaps(sourceContent, coverageData, existingTests);
     }
     async analyzeReliability(testFile, testContent) {
-        const executionHistory = await prisma.testExecution.findMany({
+        const executionHistory = await prisma_1.prisma.testExecution.findMany({
             where: { testFileId: testFile.id },
             orderBy: { executedAt: "desc" },
             take: 20, // Look at last 20 executions
@@ -259,7 +434,7 @@ class TestAnalyzer {
         return suggestions;
     }
     async updateTestFileMetrics(testFile, metrics) {
-        await prisma.testFile.update({
+        await prisma_1.prisma.testFile.update({
             where: { id: testFile.id },
             data: {
                 currentCoverage: metrics.coverage,
@@ -303,7 +478,7 @@ class TestAnalyzer {
         return testBlocks.map((block) => block.match(/['"](.+?)['"]/)?.[1] || "");
     }
     async getCoverageData(testFile) {
-        const latestCoverage = await prisma.testCoverage.findFirst({
+        const latestCoverage = await prisma_1.prisma.testCoverage.findFirst({
             where: { testFileId: testFile.id },
             orderBy: { measuredAt: "desc" },
         });
@@ -331,5 +506,6 @@ exports.TestAnalyzer = TestAnalyzer;
 async function analyzeTest(testFile, context = {}) {
     const analyzer = TestAnalyzer.getInstance();
     const sessionId = await analyzer.startAnalysis(testFile, context);
-    return analyzer.analyzeTest(sessionId, testFile);
+    const results = await analyzer.analyzeTests([testFile]);
+    return results.get(testFile.filePath);
 }

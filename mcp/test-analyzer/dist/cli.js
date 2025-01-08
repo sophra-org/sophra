@@ -45,7 +45,7 @@ const test_analyzer_client_1 = require("../../../prisma/test-analyzer-client");
 const analyzer_1 = require("./services/analyzer");
 const fixer_1 = require("./services/fixer");
 const generator_1 = require("./services/generator");
-const prisma = new test_analyzer_client_1.PrismaClient();
+const prisma_1 = require("./utils/prisma");
 const commands = new Map();
 commands.set("analyze", async (state, options) => {
     const spinner = (0, ora_1.default)("Analyzing test files...").start();
@@ -65,11 +65,8 @@ commands.set("analyze", async (state, options) => {
             ]);
             state.selectedFiles = selectedFiles;
         }
-        for (const filePath of state.selectedFiles) {
-            spinner.text = `Analyzing ${path.basename(filePath)}...`;
-            const testFile = await analyzeTestFile(filePath);
-            state.analysisResults.set(filePath, testFile);
-        }
+        const results = await analyzeTestFiles(state.selectedFiles);
+        state.analysisResults = results;
         spinner.succeed("Analysis complete");
         return state;
     }
@@ -336,7 +333,7 @@ async function scanTestFiles() {
             const fileName = path.basename(filePath);
             const testCount = (content.match(/\b(it|test|describe)\s*\(/g) || [])
                 .length;
-            const existingFile = await prisma.testFile.findUnique({
+            const existingFile = await prisma_1.prisma.testFile.findUnique({
                 where: { filePath },
             });
             results.push({
@@ -355,47 +352,52 @@ async function scanTestFiles() {
         throw error;
     }
 }
-async function analyzeTestFile(filePath) {
-    const spinner = (0, ora_1.default)(`Analyzing ${path.basename(filePath)}...`).start();
+async function analyzeTestFiles(filePaths) {
+    const spinner = (0, ora_1.default)(`Analyzing ${filePaths.length} test files...`).start();
     try {
-        const testFile = await prisma.testFile.upsert({
-            where: { filePath },
-            create: {
-                filePath,
-                fileName: path.basename(filePath),
-                firstSeen: new Date(),
-                lastUpdated: new Date(),
-                totalRuns: 0,
-                avgPassRate: 0,
-                currentPassRate: 0,
-                avgDuration: 0,
-                currentCoverage: 0,
-                avgCoverage: 0,
-                totalFixes: 0,
-                flakyTests: 0,
-                totalTests: 0,
-                criticalTests: 0,
-                healthScore: test_analyzer_client_1.TestHealthScore.POOR,
-            },
-            update: {
-                lastUpdated: new Date(),
-            },
-        });
-        const typedTestFile = await convertPrismaTestFileToType(testFile);
+        const testFiles = await Promise.all(filePaths.map(async (filePath) => {
+            const testFile = await prisma_1.prisma.testFile.upsert({
+                where: { filePath },
+                create: {
+                    filePath,
+                    fileName: path.basename(filePath),
+                    firstSeen: new Date(),
+                    lastUpdated: new Date(),
+                    totalRuns: 0,
+                    avgPassRate: 0,
+                    currentPassRate: 0,
+                    avgDuration: 0,
+                    currentCoverage: 0,
+                    avgCoverage: 0,
+                    totalFixes: 0,
+                    flakyTests: 0,
+                    totalTests: 0,
+                    criticalTests: 0,
+                    healthScore: test_analyzer_client_1.TestHealthScore.POOR,
+                },
+                update: {
+                    lastUpdated: new Date(),
+                },
+            });
+            return convertPrismaTestFileToType(testFile);
+        }));
         const analyzer = analyzer_1.TestAnalyzer.getInstance();
-        const sessionId = await analyzer.startAnalysis(typedTestFile);
-        const result = await analyzer.analyzeTest(sessionId, typedTestFile);
-        spinner.succeed(`Analysis complete for ${path.basename(filePath)}`);
-        return result;
+        // Start a session for the first test file (we'll use this session for all files)
+        if (testFiles.length > 0) {
+            await analyzer.startAnalysis(testFiles[0]);
+        }
+        const results = await analyzer.analyzeTests(testFiles);
+        spinner.succeed(`Analysis complete for ${filePaths.length} files`);
+        return results;
     }
     catch (error) {
-        spinner.fail(`Error analyzing ${path.basename(filePath)}`);
+        spinner.fail(`Error analyzing test files`);
         throw error;
     }
 }
 async function applyFixes(filePath, analysis, options) {
     const fixer = fixer_1.TestFixer.getInstance();
-    const testFile = await convertPrismaTestFileToType(await prisma.testFile.findUnique({ where: { filePath } }));
+    const testFile = await convertPrismaTestFileToType(await prisma_1.prisma.testFile.findUnique({ where: { filePath } }));
     if (!testFile)
         throw new Error(`Test file not found: ${filePath}`);
     const issues = analysis.suggestions
@@ -412,7 +414,7 @@ async function applyFixes(filePath, analysis, options) {
 }
 async function generateTests(filePath, analysis, options) {
     const generator = generator_1.TestGenerator.getInstance();
-    const testFile = await convertPrismaTestFileToType(await prisma.testFile.findUnique({ where: { filePath } }));
+    const testFile = await convertPrismaTestFileToType(await prisma_1.prisma.testFile.findUnique({ where: { filePath } }));
     if (!testFile)
         throw new Error(`Test file not found: ${filePath}`);
     const type = options.type || "coverage";

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionManager = void 0;
 const test_analyzer_client_1 = require("../../../../prisma/test-analyzer-client");
-const prisma = new test_analyzer_client_1.PrismaClient();
+const prisma_1 = require("../utils/prisma");
 class SessionManager {
     constructor() { }
     static getInstance() {
@@ -12,7 +12,7 @@ class SessionManager {
         return SessionManager.instance;
     }
     async createSession(context = {}) {
-        const session = await prisma.analysisSession.create({
+        const session = await prisma_1.prisma.analysisSession.create({
             data: {
                 status: test_analyzer_client_1.SessionStatus.ACTIVE,
                 context: context,
@@ -23,7 +23,7 @@ class SessionManager {
         return session;
     }
     async getSession(sessionId) {
-        return prisma.analysisSession.findUnique({
+        return prisma_1.prisma.analysisSession.findUnique({
             where: { id: sessionId },
             include: {
                 testFiles: true,
@@ -32,7 +32,7 @@ class SessionManager {
         });
     }
     async addTestFile(sessionId, testFile) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 testFiles: {
@@ -42,7 +42,7 @@ class SessionManager {
         });
     }
     async recordOperation(sessionId, operation) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 operations: {
@@ -52,7 +52,7 @@ class SessionManager {
         });
     }
     async recordDecision(sessionId, decision) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 decisions: {
@@ -65,7 +65,7 @@ class SessionManager {
         });
     }
     async pauseSession(sessionId) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 status: test_analyzer_client_1.SessionStatus.PAUSED,
@@ -73,7 +73,7 @@ class SessionManager {
         });
     }
     async resumeSession(sessionId) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 status: test_analyzer_client_1.SessionStatus.ACTIVE,
@@ -81,7 +81,7 @@ class SessionManager {
         });
     }
     async completeSession(sessionId) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 status: test_analyzer_client_1.SessionStatus.COMPLETED,
@@ -90,7 +90,7 @@ class SessionManager {
         });
     }
     async failSession(sessionId, error) {
-        await prisma.analysisSession.update({
+        await prisma_1.prisma.analysisSession.update({
             where: { id: sessionId },
             data: {
                 status: test_analyzer_client_1.SessionStatus.FAILED,
@@ -105,7 +105,7 @@ class SessionManager {
         });
     }
     async getSessionHistory(testFileId) {
-        return prisma.analysisSession.findMany({
+        return prisma_1.prisma.analysisSession.findMany({
             where: {
                 testFiles: {
                     some: {
@@ -122,19 +122,19 @@ class SessionManager {
         });
     }
     async getSessionOperations(sessionId) {
-        const session = await prisma.analysisSession.findUnique({
+        const session = await prisma_1.prisma.analysisSession.findUnique({
             where: { id: sessionId },
         });
         return (session?.operations || []);
     }
     async getSessionDecisions(sessionId) {
-        const session = await prisma.analysisSession.findUnique({
+        const session = await prisma_1.prisma.analysisSession.findUnique({
             where: { id: sessionId },
         });
         return (session?.decisions || []);
     }
     async getActiveSessionsForTestFile(testFileId) {
-        return prisma.analysisSession.findMany({
+        return prisma_1.prisma.analysisSession.findMany({
             where: {
                 testFiles: {
                     some: {
@@ -151,7 +151,7 @@ class SessionManager {
     async cleanupStaleSessions(maxAgeHours = 24) {
         const cutoff = new Date();
         cutoff.setHours(cutoff.getHours() - maxAgeHours);
-        await prisma.analysisSession.updateMany({
+        await prisma_1.prisma.analysisSession.updateMany({
             where: {
                 status: test_analyzer_client_1.SessionStatus.ACTIVE,
                 startedAt: {

@@ -86,7 +86,8 @@ class TestFixer {
             },
         });
         // Re-analyze the test to get updated metrics
-        const analysis = await this.analyzer.analyzeTest(sessionId, testFile);
+        const analysisResults = await this.analyzer.analyzeTests([testFile]);
+        const analysis = analysisResults.get(testFile.filePath);
         // Record operation
         const operation = {
             type: "APPLY_FIX",

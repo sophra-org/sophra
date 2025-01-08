@@ -1,46 +1,46 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import logger from "@lib/shared/logger";
 import { NextRequest } from "next/server";
-import logger from '@lib/shared/logger';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock modules
-vi.mock('@lib/shared/logger', () => ({
+vi.mock("@lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
-    info: vi.fn()
-  }
+    info: vi.fn(),
+  },
 }));
 
-vi.mock('next/server', () => ({
+vi.mock("next/server", () => ({
   NextRequest: vi.fn().mockImplementation((url) => ({
     url,
     nextUrl: new URL(url),
     headers: new Headers(),
     searchParams: new URL(url).searchParams,
-    json: vi.fn()
+    json: vi.fn(),
   })),
   NextResponse: {
     json: vi.fn().mockImplementation((data, init) => ({
       status: init?.status || 200,
       ok: init?.status ? init.status >= 200 && init.status < 300 : true,
       headers: new Headers(),
-      json: async () => data
-    }))
-  }
+      json: async () => data,
+    })),
+  },
 }));
 
-vi.mock('@lib/shared/database/client', () => {
+vi.mock("@lib/shared/database/client", () => {
   const mockPrisma = {
     feedbackRequest: {
       findMany: vi.fn(),
-      $queryRaw: vi.fn()
-    }
+      $queryRaw: vi.fn(),
+    },
   };
   return { prisma: mockPrisma };
 });
 
 // Import after mocks
-import { prisma } from '@lib/shared/database/client';
-import { GET } from './route';
+import { prisma } from "@lib/shared/database/client";
+import { GET } from "./route";
 
 describe("Feedback Patterns Route Handler", () => {
   const mockFeedback = [
@@ -54,7 +54,7 @@ describe("Feedback Patterns Route Handler", () => {
             userAction: "CLICK",
             engagementType: "CLICK",
           },
-        }
+        },
       ],
       timestamp: new Date("2023-01-01T00:00:00.000Z"),
     },
@@ -72,7 +72,9 @@ describe("Feedback Patterns Route Handler", () => {
 
   describe("GET /api/nous/learn/feedback/patterns", () => {
     it("should fetch patterns with default parameters", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
+      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(
+        mockFeedback
+      );
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns"
@@ -107,15 +109,17 @@ describe("Feedback Patterns Route Handler", () => {
         error: "Failed to fetch feedback patterns",
         meta: {
           took: expect.any(Number),
-          generated_at: expect.any(String)
-        }
+          generated_at: expect.any(String),
+        },
       });
       expect(data.meta.took).toBeGreaterThanOrEqual(0);
       expect(logger.error).toHaveBeenCalled();
     });
 
     it("should handle custom timeframe and limit", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
+      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(
+        mockFeedback
+      );
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns?timeframe=7d&limit=50"
@@ -207,7 +211,9 @@ describe("Feedback Patterns Route Handler", () => {
         },
       ];
 
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedbackWithDuplicates);
+      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(
+        mockFeedbackWithDuplicates
+      );
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/feedback/patterns"
@@ -217,18 +223,20 @@ describe("Feedback Patterns Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.patterns[0]).toEqual(expect.objectContaining({
-        query_id: "1",
-        pattern_type: "FEEDBACK",
-        confidence: expect.any(Number),
-        metadata: expect.objectContaining({
-          averageRating: 0.85,
-          uniqueQueries: 1,
-          actions: ["CLICK", "VIEW"],
-          engagementTypes: ["CLICK", "VIEW"],
-        }),
-        timestamp: expect.any(String),
-      }));
+      expect(data.patterns[0]).toEqual(
+        expect.objectContaining({
+          query_id: "1",
+          pattern_type: "FEEDBACK",
+          confidence: expect.any(Number),
+          metadata: expect.objectContaining({
+            averageRating: 0.85,
+            uniqueQueries: 1,
+            actions: ["CLICK", "VIEW"],
+            engagementTypes: ["CLICK", "VIEW"],
+          }),
+          timestamp: expect.any(String),
+        })
+      );
     });
 
     it("should handle empty results", async () => {

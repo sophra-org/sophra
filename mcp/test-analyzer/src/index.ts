@@ -115,7 +115,8 @@ server.post(
       const sessionId = await analyzer.startAnalysis(testFile, context);
 
       // Run analysis
-      const result = await analyzer.analyzeTest(sessionId, testFile);
+      const analysisResults = await analyzer.analyzeTests([testFile]);
+      const result = analysisResults.get(testFile.filePath)!;
 
       return reply.send({
         sessionId,

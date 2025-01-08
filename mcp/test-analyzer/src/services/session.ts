@@ -1,10 +1,6 @@
-import {
-  PrismaClient,
-  SessionStatus,
-} from "../../../../prisma/test-analyzer-client";
+import { SessionStatus } from "../../../../prisma/test-analyzer-client";
 import { TestFile } from "../types";
-
-const prisma = new PrismaClient();
+import { prisma } from "../utils/prisma";
 
 export interface SessionContext {
   testPattern?: string;
