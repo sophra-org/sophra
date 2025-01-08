@@ -8,7 +8,6 @@ export const runtime = "nodejs";
 
 
 const ModelCreateSchema = z.object({
-  name: z.string(),
   type: z.nativeEnum(ModelType),
   hyperparameters: z.record(z.unknown()),
   features: z.array(z.string()),
@@ -32,35 +31,23 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
     });
 
+    if (!models) {
+      throw new Error("Failed to fetch models");
+    }
+
     logger.info("Retrieved models from database", {
       modelCount: models.length,
       took: Date.now() - startTime,
     });
 
-    const transformedModels = models.map((model) => ({
-      id: model.id,
-      type: model.type,
-      isTrained: model.modelVersions[0]?.artifactPath !== null,
-      trainingProgress: 0,
-      lastTrainingError: null,
-      metrics: model.modelVersions[0]?.metrics || {},
-      createdAt: model.modelVersions[0]?.createdAt,
-      updatedAt: model.modelVersions[0]?.createdAt,
-    }));
-
-    logger.info("Transformed models response", {
-      modelCount: transformedModels.length,
-      took: Date.now() - startTime,
-    });
-
     return NextResponse.json({
       success: true,
-      data: transformedModels,
-      metadata: {
-        took: Date.now() - startTime,
-        count: transformedModels.length,
-        timestamp: new Date().toISOString(),
-      },
+      data: models,
+      meta: {
+        total: models.length,
+        page: 1,
+        pageSize: 10
+      }
     });
   } catch (error) {
     const latency = Date.now() - startTime;
@@ -78,6 +65,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       {
         success: false,
         error: "Failed to fetch models",
+        details: error instanceof Error ? error.message : "Unknown error",
         metadata: {
           took: latency,
           timestamp: new Date().toISOString(),
@@ -129,17 +117,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       success: true,
-      data: {
-        id: model.id,
-        type: model.type,
-        isTrained: false,
-        trainingProgress: 0,
-        createdAt: model.modelVersions?.[0]?.createdAt ?? new Date(),
-        updatedAt: model.modelVersions?.[0]?.createdAt ?? new Date(),
-      },
+      data: model
     });
   } catch (error) {
     logger.error("Failed to create model", { error });
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { success: false, error: "Failed to create model", details: error.message },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { success: false, error: "Failed to create model" },
       { status: 500 }

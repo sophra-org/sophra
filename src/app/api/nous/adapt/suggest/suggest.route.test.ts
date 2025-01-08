@@ -1,19 +1,46 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mockPrisma } from "~/vitest.setup";
-import { POST } from './route';
 import { NextRequest } from 'next/server';
+import logger from '@lib/shared/logger';
 import type { AdaptationSuggestion } from '@prisma/client';
 
-vi.mock('@/lib/shared/database/client', () => ({
-  default: mockPrisma
-}));
-
-vi.mock('@/lib/shared/logger', () => ({
+// Mock modules
+vi.mock('@lib/shared/logger', () => ({
   default: {
     error: vi.fn(),
     info: vi.fn()
   }
 }));
+
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    json: vi.fn()
+  })),
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data
+    }))
+  }
+}));
+
+vi.mock('@lib/shared/database/client', () => {
+  const mockPrisma = {
+    adaptationSuggestion: {
+      findMany: vi.fn(),
+      create: vi.fn()
+    }
+  };
+  return { prisma: mockPrisma };
+});
+
+// Import after mocks
+import { prisma } from '@lib/shared/database/client';
+import { POST } from './route';
 
 describe('Adaptation Suggestions API', () => {
   beforeEach(() => {
@@ -45,12 +72,10 @@ describe('Adaptation Suggestions API', () => {
         updatedAt: new Date()
       }] satisfies AdaptationSuggestion[];
 
-      vi.mocked(mockPrisma.adaptationSuggestion.findMany).mockResolvedValue(mockSuggestion);
+      vi.mocked(prisma.adaptationSuggestion.findMany).mockResolvedValue(mockSuggestion);
 
-      const request = new NextRequest('http://localhost:3000/api/nous/adapt/suggest', {
-        method: 'POST',
-        body: JSON.stringify(validPayload)
-      });
+      const request = new NextRequest('http://localhost:3000/api/nous/adapt/suggest');
+      request.json = vi.fn().mockResolvedValue(validPayload);
 
       const response = await POST(request);
       const data = await response.json();
@@ -66,10 +91,8 @@ describe('Adaptation Suggestions API', () => {
         queryHash: "hash123"
       };
 
-      const request = new NextRequest('http://localhost:3000/api/nous/adapt/suggest', {
-        method: 'POST',
-        body: JSON.stringify(invalidPayload)
-      });
+      const request = new NextRequest('http://localhost:3000/api/nous/adapt/suggest');
+      request.json = vi.fn().mockResolvedValue(invalidPayload);
 
       const response = await POST(request);
       const data = await response.json();
@@ -92,12 +115,10 @@ describe('Adaptation Suggestions API', () => {
         confidence: 0.95
       };
 
-      vi.mocked(mockPrisma.adaptationSuggestion.findMany).mockRejectedValue(new Error('DB Error'));
+      vi.mocked(prisma.adaptationSuggestion.findMany).mockRejectedValue(new Error('DB Error'));
 
-      const request = new NextRequest('http://localhost:3000/api/nous/adapt/suggest', {
-        method: 'POST',
-        body: JSON.stringify(validPayload)
-      });
+      const request = new NextRequest('http://localhost:3000/api/nous/adapt/suggest');
+      request.json = vi.fn().mockResolvedValue(validPayload);
 
       const response = await POST(request);
       const data = await response.json();

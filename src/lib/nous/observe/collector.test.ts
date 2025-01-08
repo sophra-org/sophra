@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { EventCollector, EventObserver } from './collector'
 import { Event, EventType } from '../types/core'
+import logger from '@/lib/shared/logger'
 
 const createTestEvent = (overrides: Partial<Event> = {}): Event => ({
   type: EventType.SEARCH,
@@ -65,7 +66,6 @@ describe('EventCollector', () => {
         on_event: vi.fn()
       } as unknown as EventObserver
       collector.register(eventType, observer2)
-
       const event = createTestEvent()
       await collector.collect(event)
       expect(mockObserver.on_event).toHaveBeenCalledWith(event)
@@ -76,11 +76,15 @@ describe('EventCollector', () => {
       vi.mocked(mockObserver.on_event).mockImplementation(() => {
         throw error
       })
-
       const event = createTestEvent()
       await collector.collect(event)
-      // Error handling is implementation specific
-      // Add appropriate assertions based on how errors should be handled
+      
+      expect(mockObserver.on_event).toHaveBeenCalledWith(event)
+      expect(logger.error).toHaveBeenCalledWith('Error in observer', {
+        error,
+        event,
+        observer: mockObserver
+      })
     })
   })
 
