@@ -298,7 +298,7 @@ describe('MetricsService', () => {
           interval: '1h',
           sessionId: undefined,
           modelId: undefined,
-          metadata: null,
+          metadata: undefined,
           timestamp: expect.any(Date),
           timeframe: '1h',
           aggregated: false,
@@ -386,4 +386,4 @@ describe('MetricsService', () => {
       )
     })
   })
-}) 
+})

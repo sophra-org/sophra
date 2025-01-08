@@ -29,8 +29,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'pnpm'
-          cache-dependency-path: '**/pnpm-lock.yaml'
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install
@@ -47,9 +58,8 @@ jobs:
           files: ./coverage/lcov.info,./coverage/coverage-final.json,./coverage/cobertura-coverage.xml
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: false  # Don't fail CI if Codecov upload fails
+          fail_ci_if_error: false
           verbose: true
-          codecov_yml_path: ./codecov.yml  # If you have a custom codecov config
           directory: ./coverage/
           root_dir: .
           working-directory: .

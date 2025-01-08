@@ -59,16 +59,26 @@ export class SignalCoordinator {
     }
   }
 
-  detect_patterns(signals: Signal[]): {
-    patternId: any; type: string; confidence: number; description: string; value: number; 
-}[] {
-    return signals.map(signal => ({
-      patternId: signal.id,
-      type: "SEARCH", 
-      confidence: 1.0,
-      description: `Search pattern for ${signal.id}`,
-      value: signal.strength
-    }));
+  detect_patterns(signals: Signal[]): SignalPattern[] {
+    try {
+      const all_patterns: SignalPattern[] = [];
+      
+      for (const processor of this.processors.values()) {
+        try {
+          const patterns = processor.detect_patterns(signals);
+          if (patterns && Array.isArray(patterns)) {
+            all_patterns.push(...patterns);
+          }
+        } catch (error) {
+          logger.error('Error detecting patterns in processor', { error, processor_id: processor.processor_id });
+        }
+      }
+      
+      return all_patterns;
+    } catch (error) {
+      logger.error('Error in detect_patterns', { error });
+      return [];
+    }
   }
 
   register_processor(

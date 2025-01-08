@@ -8,7 +8,6 @@ vi.mock('./store')
 vi.mock('./metadata')
 vi.mock('./version')
 vi.mock('@/lib/shared/logger')
-vi.mock('cuid', () => ({ default: () => 'test-id' }))
 
 describe('Registry', () => {
   let registry: Registry
@@ -42,14 +41,15 @@ describe('Registry', () => {
     it('should successfully register a model', async () => {
       const result = await registry.registerModel(mockConfig)
       
-      expect(result).toEqual({
-        id: 'test-id',
+      expect(result).toMatchObject({
         configId: 'config-1',
         createdAt: expect.any(Date),
         metrics: {},
         artifactPath: expect.stringMatching(/^models\/model_\d+$/),
         parentVersion: null
       })
+      // Verify id is a valid cuid
+      expect(result.id).toMatch(/^c[a-z0-9]{24}$/)
     })
 
     it('should throw error for invalid config', async () => {
@@ -89,4 +89,4 @@ describe('Registry', () => {
       expect(result).toEqual([])
     })
   })
-}) 
+})
