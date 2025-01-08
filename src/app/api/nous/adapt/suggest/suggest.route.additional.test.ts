@@ -1,47 +1,49 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST, runtime } from './route';
-import { prisma } from '@lib/shared/database/client';
-import logger from '@lib/shared/logger';
-import { NextRequest } from 'next/server';
-import crypto from 'crypto';
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
+import crypto from "crypto";
+import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { POST, runtime } from "./route";
 
-// Mock dependencies
-vi.mock('@lib/shared/database/client', () => ({
+// Enhanced mock configurations
+vi.mock("@lib/shared/database/client", () => ({
   prisma: {
-    $queryRaw: vi.fn(),
+    $queryRaw: vi.fn().mockImplementation(() => Promise.resolve([])),
   },
 }));
 
-vi.mock('@lib/shared/logger', () => ({
+vi.mock("@lib/shared/logger", () => ({
   default: {
-    error: vi.fn(),
-    info: vi.fn(),
+    error: vi.fn().mockImplementation(() => {}),
+    info: vi.fn().mockImplementation(() => {}),
   },
 }));
 
-vi.mock('crypto', () => ({
+vi.mock("crypto", () => ({
   default: {
-    randomUUID: vi.fn(),
+    randomUUID: vi
+      .fn()
+      .mockImplementation(() => "123e4567-e89b-12d3-a456-426614174000"),
   },
 }));
 
-describe('Suggest Route Additional Tests', () => {
-  const mockUUID = '123e4567-e89b-12d3-a456-426614174000';
+describe("Suggest Route Additional Tests", () => {
+  const mockUUID = "123e4567-e89b-12d3-a456-426614174000";
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(crypto.randomUUID).mockReturnValue(mockUUID);
   });
 
-  describe('Configuration', () => {
-    it('should use Node.js runtime', () => {
-      expect(runtime).toBe('nodejs');
+  describe("Configuration", () => {
+    it("should use Node.js runtime", () => {
+      expect(runtime).toBe("nodejs");
     });
   });
 
-  describe('POST Endpoint', () => {
+  describe("POST Endpoint", () => {
     const validSuggestion = {
-      queryHash: 'test-hash',
+      queryHash: "test-hash",
       patterns: {
         averageRelevance: 0.8,
         clickThroughRate: 0.6,
@@ -52,9 +54,9 @@ describe('Suggest Route Additional Tests', () => {
       confidence: 0.85,
     };
 
-    it('should process valid suggestion', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+    it("should process valid suggestion", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(validSuggestion),
       });
 
@@ -63,13 +65,22 @@ describe('Suggest Route Additional Tests', () => {
         queryHash: validSuggestion.queryHash,
         patterns: validSuggestion.patterns,
         confidence: validSuggestion.confidence,
-        status: 'PENDING',
+        status: "PENDING",
       };
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValue([mockSuggestion]);
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockSuggestion]);
 
       const response = await POST(request);
       const data = await response.json();
+
+      expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+      expect(prisma.$queryRaw).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO "AdaptationSuggestion"'),
+        expect.any(String), // queryHash
+        expect.any(Object), // patterns
+        expect.any(Number), // confidence
+        "PENDING"
+      );
 
       expect(response.status).toBe(200);
       expect(data).toEqual({
@@ -77,8 +88,8 @@ describe('Suggest Route Additional Tests', () => {
         data: {
           suggestionId: mockUUID,
         },
-        message: 'Rule suggestion submitted successfully',
-        code: 'ADAPT000',
+        message: "Rule suggestion submitted successfully",
+        code: "ADAPT000",
         metadata: expect.objectContaining({
           took: expect.any(Number),
           timestamp: expect.any(String),
@@ -86,7 +97,7 @@ describe('Suggest Route Additional Tests', () => {
       });
 
       expect(logger.info).toHaveBeenCalledWith(
-        'Stored adaptation suggestion',
+        "Stored adaptation suggestion",
         expect.objectContaining({
           suggestionId: mockUUID,
           queryHash: validSuggestion.queryHash,
@@ -95,10 +106,10 @@ describe('Suggest Route Additional Tests', () => {
       );
     });
 
-    it('should handle invalid JSON', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
-        body: 'invalid-json',
+    it("should handle invalid JSON", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
+        body: "invalid-json",
       });
 
       const response = await POST(request);
@@ -107,8 +118,8 @@ describe('Suggest Route Additional Tests', () => {
       expect(response.status).toBe(400);
       expect(data).toEqual({
         success: false,
-        error: 'Invalid JSON format',
-        code: 'ADAPT002',
+        error: "Invalid JSON format",
+        code: "ADAPT002",
         metadata: expect.objectContaining({
           took: expect.any(Number),
           timestamp: expect.any(String),
@@ -116,9 +127,9 @@ describe('Suggest Route Additional Tests', () => {
       });
     });
 
-    it('should validate request schema', async () => {
+    it("should validate request schema", async () => {
       const invalidSuggestion = {
-        queryHash: 'test-hash',
+        queryHash: "test-hash",
         patterns: {
           averageRelevance: 2, // Invalid: > 1
           clickThroughRate: 0.6,
@@ -129,8 +140,8 @@ describe('Suggest Route Additional Tests', () => {
         confidence: 0.85,
       };
 
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(invalidSuggestion),
       });
 
@@ -140,9 +151,9 @@ describe('Suggest Route Additional Tests', () => {
       expect(response.status).toBe(400);
       expect(data).toEqual({
         success: false,
-        error: 'Invalid rule suggestion format',
+        error: "Invalid rule suggestion format",
         details: expect.any(Object),
-        code: 'ADAPT001',
+        code: "ADAPT001",
         metadata: expect.objectContaining({
           took: expect.any(Number),
           timestamp: expect.any(String),
@@ -150,46 +161,49 @@ describe('Suggest Route Additional Tests', () => {
       });
 
       expect(logger.error).toHaveBeenCalledWith(
-        'Invalid rule suggestion format',
+        "Invalid rule suggestion format",
         expect.any(Object)
       );
     });
 
-    it('should handle database errors', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+    it("should handle database errors", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(validSuggestion),
       });
 
-      const dbError = new Error('Database error');
-      dbError.name = 'PrismaClientKnownRequestError';
-      vi.mocked(prisma.$queryRaw).mockRejectedValue(dbError);
+      const dbError = new Error("Database error");
+      dbError.name = "PrismaClientKnownRequestError";
+      vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(dbError);
 
       const response = await POST(request);
-      const data = await response.json();
+
+      expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+      expect(logger.error).toHaveBeenCalledWith(
+        "Failed to process adaptation suggestion",
+        expect.objectContaining({
+          error: expect.any(Error),
+          errorType: "PrismaClientKnownRequestError",
+        })
+      );
 
       expect(response.status).toBe(500);
-      expect(data).toEqual({
+      expect(response.json()).resolves.toEqual({
         success: false,
-        error: 'Database operation failed',
-        code: 'ADAPT999',
-        details: 'Database error',
+        error: "Database operation failed",
+        code: "ADAPT999",
+        details: "Database error",
         metadata: expect.objectContaining({
           took: expect.any(Number),
           timestamp: expect.any(String),
-          errorType: 'PrismaClientKnownRequestError',
+          errorType: "PrismaClientKnownRequestError",
         }),
       });
-
-      expect(logger.error).toHaveBeenCalledWith(
-        'Failed to process adaptation suggestion',
-        expect.any(Object)
-      );
     });
 
-    it('should handle empty database response', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+    it("should handle empty database response", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(validSuggestion),
       });
 
@@ -201,25 +215,25 @@ describe('Suggest Route Additional Tests', () => {
       expect(response.status).toBe(500);
       expect(data).toEqual({
         success: false,
-        error: 'Failed to process adaptation suggestion',
-        code: 'ADAPT999',
-        details: 'Failed to create adaptation suggestion - no rows returned',
+        error: "Failed to process adaptation suggestion",
+        code: "ADAPT999",
+        details: "Failed to create adaptation suggestion - no rows returned",
         metadata: expect.objectContaining({
           took: expect.any(Number),
           timestamp: expect.any(String),
-          errorType: 'Error',
+          errorType: "Error",
         }),
       });
     });
 
-    it('should handle unknown errors', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+    it("should handle unknown errors", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(validSuggestion),
       });
 
       vi.mocked(prisma.$queryRaw).mockImplementation(() => {
-        throw 'Unknown error'; // Non-Error object
+        throw "Unknown error"; // Non-Error object
       });
 
       const response = await POST(request);
@@ -228,28 +242,40 @@ describe('Suggest Route Additional Tests', () => {
       expect(response.status).toBe(500);
       expect(data).toEqual({
         success: false,
-        error: 'Failed to process adaptation suggestion',
-        code: 'ADAPT999',
-        details: 'Unknown error',
+        error: "Failed to process adaptation suggestion",
+        code: "ADAPT999",
+        details: "Unknown error",
         metadata: expect.objectContaining({
           took: expect.any(Number),
           timestamp: expect.any(String),
-          errorType: 'string',
+          errorType: "string",
         }),
       });
     });
 
-    it('should validate pattern values', async () => {
+    it("should validate pattern values", async () => {
       const invalidPatterns = [
-        { ...validSuggestion, patterns: { ...validSuggestion.patterns, averageRelevance: -0.1 } },
-        { ...validSuggestion, patterns: { ...validSuggestion.patterns, clickThroughRate: 1.1 } },
-        { ...validSuggestion, patterns: { ...validSuggestion.patterns, conversionRate: 2 } },
-        { ...validSuggestion, patterns: { ...validSuggestion.patterns, confidence: -1 } },
+        {
+          ...validSuggestion,
+          patterns: { ...validSuggestion.patterns, averageRelevance: -0.1 },
+        },
+        {
+          ...validSuggestion,
+          patterns: { ...validSuggestion.patterns, clickThroughRate: 1.1 },
+        },
+        {
+          ...validSuggestion,
+          patterns: { ...validSuggestion.patterns, conversionRate: 2 },
+        },
+        {
+          ...validSuggestion,
+          patterns: { ...validSuggestion.patterns, confidence: -1 },
+        },
       ];
 
       for (const invalidPattern of invalidPatterns) {
-        const request = new NextRequest('http://localhost/api/adapt/suggest', {
-          method: 'POST',
+        const request = new NextRequest("http://localhost/api/adapt/suggest", {
+          method: "POST",
           body: JSON.stringify(invalidPattern),
         });
 
@@ -258,44 +284,44 @@ describe('Suggest Route Additional Tests', () => {
 
         expect(response.status).toBe(400);
         expect(data.success).toBe(false);
-        expect(data.code).toBe('ADAPT001');
+        expect(data.code).toBe("ADAPT001");
       }
     });
 
-    it('should log request details', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+    it("should log request details", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(validSuggestion),
         headers: {
-          'x-test-header': 'test-value',
+          "x-test-header": "test-value",
         },
       });
 
       vi.mocked(prisma.$queryRaw).mockResolvedValue([
-        { ...validSuggestion, id: mockUUID, status: 'PENDING' },
+        { ...validSuggestion, id: mockUUID, status: "PENDING" },
       ]);
 
       await POST(request);
 
       expect(logger.info).toHaveBeenCalledWith(
-        'Received adaptation suggestion request',
+        "Received adaptation suggestion request",
         expect.objectContaining({
           url: expect.any(String),
           headers: expect.objectContaining({
-            'x-test-header': 'test-value',
+            "x-test-header": "test-value",
           }),
         })
       );
     });
 
-    it('should include timing information', async () => {
-      const request = new NextRequest('http://localhost/api/adapt/suggest', {
-        method: 'POST',
+    it("should include timing information", async () => {
+      const request = new NextRequest("http://localhost/api/adapt/suggest", {
+        method: "POST",
         body: JSON.stringify(validSuggestion),
       });
 
       vi.mocked(prisma.$queryRaw).mockResolvedValue([
-        { ...validSuggestion, id: mockUUID, status: 'PENDING' },
+        { ...validSuggestion, id: mockUUID, status: "PENDING" },
       ]);
 
       const response = await POST(request);

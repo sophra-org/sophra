@@ -1,5 +1,5 @@
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
-import type { SearchEvent } from "@/lib/shared/database/validation/generated";
+import type { SearchEvent } from "@prisma/client";
 import logger from "@/lib/shared/logger";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";

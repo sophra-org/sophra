@@ -13,9 +13,12 @@ const AdaptationRequestSchema = z.object({
   metrics: z.record(z.number()).optional(),
 });
 
-const engine = new AdaptationEngine(logger);
+let engine: AdaptationEngine;
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (!engine) {
+    engine = new AdaptationEngine(logger);
+  }
   const startTime = Date.now();
 
   try {

@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, POST } from './route';
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/shared/database/client';
-import logger from '@/lib/shared/logger';
-import { SignalType, Prisma } from '@prisma/client';
+import { prisma } from "@/lib/shared/database/client";
+import logger from "@/lib/shared/logger";
+import { Prisma, SignalType } from "@prisma/client";
+import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GET, POST } from "./route";
 
 // Mock dependencies
-vi.mock('@/lib/shared/database/client', () => ({
+vi.mock("@/lib/shared/database/client", () => ({
   prisma: {
     signal: {
       findMany: vi.fn(),
@@ -16,13 +16,13 @@ vi.mock('@/lib/shared/database/client', () => ({
   },
 }));
 
-vi.mock('@/lib/shared/logger', () => ({
+vi.mock("@/lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
   },
 }));
 
-describe('Signals API Additional Tests', () => {
+describe("Signals API Additional Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -30,8 +30,8 @@ describe('Signals API Additional Tests', () => {
   const createMockSignal = (id: string) => ({
     id,
     type: SignalType.SEARCH,
-    source: 'test-source',
-    value: { data: 'test' } as Prisma.JsonValue,
+    source: "test-source",
+    value: { data: "test" } as Prisma.JsonValue,
     strength: 1.0,
     timestamp: new Date(),
     createdAt: new Date(),
@@ -45,14 +45,14 @@ describe('Signals API Additional Tests', () => {
     priority: null,
   });
 
-  describe('GET Endpoint', () => {
-    describe('Pagination', () => {
-      it('should handle default pagination parameters', async () => {
-        const mockSignals = [createMockSignal('signal-1')];
+  describe("GET Endpoint", () => {
+    describe("Pagination", () => {
+      it("should handle default pagination parameters", async () => {
+        const mockSignals = [createMockSignal("signal-1")];
         vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
         vi.mocked(prisma.signal.count).mockResolvedValue(1);
 
-        const request = new NextRequest('http://localhost/api/signals');
+        const request = new NextRequest("http://localhost/api/signals");
         const response = await GET(request);
         const data = await response.json();
 
@@ -70,12 +70,16 @@ describe('Signals API Additional Tests', () => {
         );
       });
 
-      it('should handle custom pagination parameters', async () => {
-        const mockSignals = Array(10).fill(null).map((_, i) => createMockSignal(`signal-${i}`));
+      it("should handle custom pagination parameters", async () => {
+        const mockSignals = Array(10)
+          .fill(null)
+          .map((_, i) => createMockSignal(`signal-${i}`));
         vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
         vi.mocked(prisma.signal.count).mockResolvedValue(20);
 
-        const request = new NextRequest('http://localhost/api/signals?page=2&pageSize=10');
+        const request = new NextRequest(
+          "http://localhost/api/signals?page=2&pageSize=10"
+        );
         const response = await GET(request);
         const data = await response.json();
 
@@ -95,30 +99,34 @@ describe('Signals API Additional Tests', () => {
       });
     });
 
-    describe('Filtering', () => {
-      it('should filter by source', async () => {
-        const mockSignals = [createMockSignal('signal-1')];
+    describe("Filtering", () => {
+      it("should filter by source", async () => {
+        const mockSignals = [createMockSignal("signal-1")];
         vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
         vi.mocked(prisma.signal.count).mockResolvedValue(1);
 
-        const request = new NextRequest('http://localhost/api/signals?source=test-source');
+        const request = new NextRequest(
+          "http://localhost/api/signals?source=test-source"
+        );
         await GET(request);
 
         expect(prisma.signal.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             where: expect.objectContaining({
-              source: 'test-source',
+              source: "test-source",
             }),
           })
         );
       });
 
-      it('should filter by type', async () => {
-        const mockSignals = [createMockSignal('signal-1')];
+      it("should filter by type", async () => {
+        const mockSignals = [createMockSignal("signal-1")];
         vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
         vi.mocked(prisma.signal.count).mockResolvedValue(1);
 
-        const request = new NextRequest(`http://localhost/api/signals?type=${SignalType.SEARCH}`);
+        const request = new NextRequest(
+          `http://localhost/api/signals?type=${SignalType.SEARCH}`
+        );
         await GET(request);
 
         expect(prisma.signal.findMany).toHaveBeenCalledWith(
@@ -130,8 +138,8 @@ describe('Signals API Additional Tests', () => {
         );
       });
 
-      it('should combine source and type filters', async () => {
-        const mockSignals = [createMockSignal('signal-1')];
+      it("should combine source and type filters", async () => {
+        const mockSignals = [createMockSignal("signal-1")];
         vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
         vi.mocked(prisma.signal.count).mockResolvedValue(1);
 
@@ -143,7 +151,7 @@ describe('Signals API Additional Tests', () => {
         expect(prisma.signal.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             where: expect.objectContaining({
-              source: 'test-source',
+              source: "test-source",
               type: SignalType.SEARCH,
             }),
           })
@@ -151,30 +159,32 @@ describe('Signals API Additional Tests', () => {
       });
     });
 
-    describe('Error Handling', () => {
-      it('should handle database errors', async () => {
-        vi.mocked(prisma.signal.findMany).mockRejectedValue(new Error('Database error'));
+    describe("Error Handling", () => {
+      it("should handle database errors", async () => {
+        vi.mocked(prisma.signal.findMany).mockRejectedValue(
+          new Error("Database error")
+        );
 
-        const request = new NextRequest('http://localhost/api/signals');
+        const request = new NextRequest("http://localhost/api/signals");
         const response = await GET(request);
         const data = await response.json();
 
         expect(response.status).toBe(500);
         expect(data.success).toBe(false);
-        expect(data.error).toBe('Failed to fetch signals');
+        expect(data.error).toBe("Failed to fetch signals");
         expect(logger.error).toHaveBeenCalledWith(
-          'Failed to fetch signals',
+          "Failed to fetch signals",
           expect.any(Object)
         );
       });
     });
   });
 
-  describe('POST Endpoint', () => {
-    describe('Request Validation', () => {
-      it('should validate required fields', async () => {
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
+  describe("POST Endpoint", () => {
+    describe("Request Validation", () => {
+      it("should validate required fields", async () => {
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
           body: JSON.stringify({
             // Missing required fields
           }),
@@ -185,16 +195,16 @@ describe('Signals API Additional Tests', () => {
 
         expect(response.status).toBe(400);
         expect(data.success).toBe(false);
-        expect(data.error).toBe('Invalid request format');
+        expect(data.error).toBe("Invalid request format");
       });
 
-      it('should handle invalid signal type', async () => {
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
+      it("should handle invalid signal type", async () => {
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
           body: JSON.stringify({
-            type: 'INVALID_TYPE',
-            source: 'test',
-            value: { data: 'test' },
+            type: "INVALID_TYPE",
+            source: "test",
+            value: { data: "test" },
             strength: 1.0,
           }),
         });
@@ -207,17 +217,17 @@ describe('Signals API Additional Tests', () => {
       });
     });
 
-    describe('Signal Creation', () => {
-      it('should create signal with required fields', async () => {
-        const mockSignal = createMockSignal('signal-1');
+    describe("Signal Creation", () => {
+      it("should create signal with required fields", async () => {
+        const mockSignal = createMockSignal("signal-1");
         vi.mocked(prisma.signal.create).mockResolvedValue(mockSignal);
 
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
           body: JSON.stringify({
             type: SignalType.SEARCH,
-            source: 'test-source',
-            value: { data: 'test' },
+            source: "test-source",
+            value: { data: "test" },
             strength: 1.0,
           }),
         });
@@ -225,21 +235,21 @@ describe('Signals API Additional Tests', () => {
         const response = await POST(request);
         const data = await response.json();
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(201);
         expect(data.success).toBe(true);
         expect(data.data).toEqual(mockSignal);
       });
 
-      it('should handle optional fields with defaults', async () => {
-        const mockSignal = createMockSignal('signal-1');
+      it("should handle optional fields with defaults", async () => {
+        const mockSignal = createMockSignal("signal-1");
         vi.mocked(prisma.signal.create).mockResolvedValue(mockSignal);
 
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
           body: JSON.stringify({
             type: SignalType.SEARCH,
-            source: 'test-source',
-            value: { data: 'test' },
+            source: "test-source",
+            value: { data: "test" },
             strength: 1.0,
             // No optional fields
           }),
@@ -248,7 +258,7 @@ describe('Signals API Additional Tests', () => {
         const response = await POST(request);
         const data = await response.json();
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(201);
         expect(prisma.signal.create).toHaveBeenCalledWith(
           expect.objectContaining({
             data: expect.objectContaining({
@@ -264,20 +274,20 @@ describe('Signals API Additional Tests', () => {
         );
       });
 
-      it('should handle custom timestamps', async () => {
-        const customTimestamp = new Date('2024-01-01T00:00:00Z');
+      it("should handle custom timestamps", async () => {
+        const customTimestamp = new Date("2024-01-01T00:00:00Z");
         const mockSignal = {
-          ...createMockSignal('signal-1'),
+          ...createMockSignal("signal-1"),
           timestamp: customTimestamp,
         };
         vi.mocked(prisma.signal.create).mockResolvedValue(mockSignal);
 
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
           body: JSON.stringify({
             type: SignalType.SEARCH,
-            source: 'test-source',
-            value: { data: 'test' },
+            source: "test-source",
+            value: { data: "test" },
             strength: 1.0,
             timestamp: customTimestamp.toISOString(),
           }),
@@ -290,11 +300,11 @@ describe('Signals API Additional Tests', () => {
       });
     });
 
-    describe('Error Handling', () => {
-      it('should handle invalid JSON', async () => {
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
-          body: 'invalid json',
+    describe("Error Handling", () => {
+      it("should handle invalid JSON", async () => {
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
+          body: "invalid json",
         });
 
         const response = await POST(request);
@@ -304,15 +314,17 @@ describe('Signals API Additional Tests', () => {
         expect(data.success).toBe(false);
       });
 
-      it('should handle database errors', async () => {
-        vi.mocked(prisma.signal.create).mockRejectedValue(new Error('Database error'));
+      it("should handle database errors", async () => {
+        vi.mocked(prisma.signal.create).mockRejectedValue(
+          new Error("Database error")
+        );
 
-        const request = new NextRequest('http://localhost/api/signals', {
-          method: 'POST',
+        const request = new NextRequest("http://localhost/api/signals", {
+          method: "POST",
           body: JSON.stringify({
             type: SignalType.SEARCH,
-            source: 'test-source',
-            value: { data: 'test' },
+            source: "test-source",
+            value: { data: "test" },
             strength: 1.0,
           }),
         });
@@ -322,9 +334,9 @@ describe('Signals API Additional Tests', () => {
 
         expect(response.status).toBe(500);
         expect(data.success).toBe(false);
-        expect(data.error).toBe('Failed to create signal');
+        expect(data.error).toBe("Failed to create signal");
         expect(logger.error).toHaveBeenCalledWith(
-          'Failed to create signal',
+          "Failed to create signal",
           expect.any(Object)
         );
       });

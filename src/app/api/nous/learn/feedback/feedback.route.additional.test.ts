@@ -4,20 +4,20 @@ import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST, runtime } from "./route";
 
-// Mock dependencies
+// Mock dependencies withexplicit return values
 vi.mock("@lib/shared/database/client", () => ({
   prisma: {
     feedbackRequest: {
-      findMany: vi.fn(),
-      create: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({}),
     },
   },
 }));
 
 vi.mock("@lib/shared/logger", () => ({
   default: {
-    error: vi.fn(),
-    info: vi.fn(),
+    error: vi.fn().mockImplementation(() => {}),
+    info: vi.fn().mockImplementation(() => {}),
   },
 }));
 
@@ -38,7 +38,7 @@ describe("Feedback Route Additional Tests", () => {
         feedback: [
           {
             queryId: "q1",
-            rating: 2.0, // Invalid rating > 1
+            rating: 2.0,
             metadata: {
               userAction: SignalType.USER_BEHAVIOR_CLICK,
               resultId: "r1",
@@ -62,10 +62,14 @@ describe("Feedback Route Additional Tests", () => {
       expect(data.success).toBe(false);
       expect(data.error).toBe("Invalid request format");
       expect(data.details).toBeDefined();
+
+      // Verify mock calls
+      expect(logger.error).toHaveBeenCalledTimes(1);
       expect(logger.error).toHaveBeenCalledWith(
         "Invalid feedback request",
         expect.any(Object)
       );
+      expect(request.json).toHaveBeenCalledTimes(1);
     });
 
     it("should handle empty feedback array", async () => {

@@ -1,6 +1,8 @@
+import type { ModelConfig, ModelVersion } from "@prisma/client";
 import { ModelType } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mockPrisma } from "~/vitest.setup";
 
 // Mock modules
 vi.mock("@lib/shared/logger", () => ({
@@ -28,27 +30,12 @@ vi.mock("next/server", () => ({
 }));
 
 vi.mock("@lib/shared/database/client", () => {
-  const mockPrisma = {
-    modelConfig: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      count: vi.fn(),
-      upsert: vi.fn(),
-    },
-    modelVersion: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    $queryRaw: vi.fn(),
-    $transaction: vi.fn((callback) => callback(mockPrisma)),
+  const typedMockPrisma = {
+    ...mockPrisma,
+    modelConfig: mockPrisma.modelConfig as unknown as ModelConfig,
+    modelVersion: mockPrisma.modelVersion as unknown as ModelVersion,
   };
-  return { prisma: mockPrisma };
+  return { prisma: typedMockPrisma };
 });
 
 // Import after mocks
