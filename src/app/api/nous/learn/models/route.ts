@@ -1,11 +1,11 @@
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
 import { Prisma, ModelType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 const ModelCreateSchema = z.object({
   type: z.nativeEnum(ModelType),
@@ -36,36 +36,29 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     logger.info("Retrieved models from database", {
-      modelCount: models.length,
+      modelCount: models?.length || 0,
       took: Date.now() - startTime,
     });
 
     return NextResponse.json({
       success: true,
-      data: models,
+      data: models || [],
       meta: {
-        total: models.length,
+        total: models?.length || 0,
         page: 1,
         pageSize: 10
       }
-    });
+    }, { status: 200 });
   } catch (error) {
     const latency = Date.now() - startTime;
     logger.error("Failed to fetch models", {
-      error:
-        error instanceof Error
-          ? {
-              message: error.message,
-              stack: error.stack,
-            }
-          : error,
+      error: error instanceof Error ? error : new Error(String(error)),
       took: latency,
     });
     return NextResponse.json(
       {
         success: false,
         error: "Failed to fetch models",
-        details: error instanceof Error ? error.message : "Unknown error",
         metadata: {
           took: latency,
           timestamp: new Date().toISOString(),
@@ -77,6 +70,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const startTime = Date.now();
   try {
     const body = await req.json();
     const validation = ModelCreateSchema.safeParse(body);
@@ -87,6 +81,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           success: false,
           error: "Invalid request format",
           details: validation.error.format(),
+          meta: {
+            took: Date.now() - startTime
+          }
         },
         { status: 400 }
       );
@@ -117,18 +114,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       success: true,
-      data: model
+      data: {
+        id: model.id,
+        type: model.type,
+        isTrained: false,
+        trainingProgress: 0,
+        createdAt: model.modelVersions?.[0]?.createdAt ?? new Date(),
+        updatedAt: model.modelVersions?.[0]?.createdAt ?? new Date(),
+      },
     });
   } catch (error) {
     logger.error("Failed to create model", { error });
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { success: false, error: "Failed to create model", details: error.message },
-        { status: 500 }
-      );
-    }
     return NextResponse.json(
-      { success: false, error: "Failed to create model" },
+      {
+        success: false,
+        error: "Failed to create model",
+        details: error instanceof Error ? error.message : "Unknown error",
+        meta: {
+          took: Date.now() - startTime
+        }
+      },
       { status: 500 }
     );
   }

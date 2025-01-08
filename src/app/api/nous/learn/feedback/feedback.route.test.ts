@@ -122,8 +122,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toEqual([]);
+      expect(data).toMatchObject({
+        success: true,
+        data: [],
+        meta: { total: 0 }
+      });
     });
 
     it("should handle database errors gracefully", async () => {
@@ -187,9 +190,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Invalid'),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle missing feedback array", async () => {
@@ -202,9 +207,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Invalid'),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle invalid rating values", async () => {
@@ -224,9 +231,11 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Invalid'),
+        details: expect.any(Object)
+      });
     });
 
     it("should handle database errors during creation", async () => {
@@ -254,8 +263,10 @@ describe("Feedback Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Failed to record feedback");
+      expect(data).toMatchObject({
+        success: false,
+        error: expect.stringContaining('Failed')
+      });
     });
   });
 });

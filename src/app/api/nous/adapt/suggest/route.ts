@@ -6,7 +6,6 @@ import { z } from "zod";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
-
 const SuggestRuleSchema = z.object({
   queryHash: z.string(),
   patterns: z.object({
@@ -27,7 +26,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       headers: Object.fromEntries(req.headers),
     });
 
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid JSON format",
+          code: "ADAPT002",
+          metadata: {
+            took: Date.now() - startTime,
+            timestamp: new Date().toISOString(),
+          },
+        },
+        { status: 400 }
+      );
+    }
     const validationResult = SuggestRuleSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -52,32 +67,46 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { queryHash, patterns, confidence } = validationResult.data;
 
     // Store suggestion in database
-    const suggestion = await prisma.$queryRaw<AdaptationSuggestion[]>`
-      INSERT INTO "AdaptationSuggestion" (
-        "id",
-        "queryHash",
-        "patterns",
-        "confidence",
-        "status",
-        "metadata",
-        "createdAt",
-        "updatedAt"
-      )
-      VALUES (
-        ${crypto.randomUUID()},
-        ${queryHash},
-        ${patterns}::jsonb,
-        ${confidence},
-        'PENDING',
-        ${JSON.stringify({
-          timestamp: new Date().toISOString(),
-          source: "API",
-        })}::jsonb,
-        CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP
-      )
-      RETURNING *
-    `;
+    let suggestion;
+    try {
+      suggestion = await prisma.$queryRaw<AdaptationSuggestion[]>`
+        INSERT INTO "AdaptationSuggestion" (
+          "id",
+          "queryHash",
+          "patterns",
+          "confidence",
+          "status",
+          "metadata",
+          "createdAt",
+          "updatedAt"
+        )
+        VALUES (
+          ${crypto.randomUUID()},
+          ${queryHash},
+          ${patterns}::jsonb,
+          ${confidence},
+          'PENDING',
+          ${JSON.stringify({
+            timestamp: new Date().toISOString(),
+            source: "API",
+          })}::jsonb,
+          CURRENT_TIMESTAMP,
+          CURRENT_TIMESTAMP
+        )
+        RETURNING *
+      `;
+
+      if (!suggestion || suggestion.length === 0) {
+        throw new Error(
+          "Failed to create adaptation suggestion - no rows returned"
+        );
+      }
+    } catch (error) {
+      logger.error("Database operation failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      throw error; // Rethrow to be caught by outer error handler
+    }
 
     // Use suggestion[0] for the first (and only) result
     const createdSuggestion = suggestion[0];
@@ -120,6 +149,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           : error,
       code: "ADAPT999",
     });
+
+    if (
+      error instanceof Error &&
+      (error.message.includes("Database operation failed") ||
+        error.constructor.name.includes("Prisma") ||
+        error.name === "PrismaClientKnownRequestError")
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Database operation failed",
+          code: "ADAPT999",
+          details: error.message,
+          metadata: {
+            took: latency,
+            timestamp: new Date().toISOString(),
+            errorType: error.name,
+          },
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
       {

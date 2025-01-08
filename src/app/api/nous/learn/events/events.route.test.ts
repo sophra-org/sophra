@@ -28,32 +28,33 @@ vi.mock('next/server', () => ({
   }
 }));
 
-vi.mock('@lib/shared/database/client', () => {
-  const mockPrisma = {
-    learningEvent: {
-      findMany: vi.fn(),
-      count: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      findUnique: vi.fn(),
-      findFirst: vi.fn(),
-      upsert: vi.fn(),
-    },
-    $queryRaw: vi.fn().mockImplementation((query) => Promise.resolve([])),
-    $transaction: vi.fn((operations) =>
-      Array.isArray(operations)
-        ? Promise.all(operations)
-        : Promise.resolve(operations())
-    ),
-    $disconnect: vi.fn(),
-    $connect: vi.fn(),
-    raw: jest.fn().mockImplementation((query) => Promise.resolve([])),
-    findMany: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockImplementation((data) => Promise.resolve(data)),
-  }
-  return { prisma: mockPrisma }
-});
+const mockPrisma = {
+  learningEvent: {
+    findMany: vi.fn(),
+    count: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    upsert: vi.fn(),
+  },
+  $queryRaw: vi.fn(),
+  $transaction: vi.fn((operations) =>
+    Array.isArray(operations)
+      ? Promise.all(operations)
+      : Promise.resolve(operations())
+  ),
+  $disconnect: vi.fn(),
+  $connect: vi.fn(),
+  raw: vi.fn().mockImplementation((query) => Promise.resolve([])),
+  findMany: vi.fn().mockResolvedValue([]),
+  create: vi.fn().mockImplementation((data) => Promise.resolve(data)),
+};
+
+vi.mock('@lib/shared/database/client', () => ({
+  prisma: mockPrisma
+}));
 
 // Import after mocks
 import { prisma } from '@lib/shared/database/client';
@@ -101,19 +102,11 @@ describe("Learning Events Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual([{
-        ...mockEvent,
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String),
-        startDate: expect.any(String),
-        endDate: expect.any(String)
-      }]);
+      expect(data.data).toEqual([mockEvent]);
       expect(data.meta).toEqual({
-        pagination: {
-          total: 1,
-          page: 1,
-          pageSize: 10
-        }
+        total: 1,
+        page: 1,
+        pageSize: 10
       });
     });
 
@@ -129,19 +122,11 @@ describe("Learning Events Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual([{
-        ...mockEvent,
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String),
-        startDate: expect.any(String),
-        endDate: expect.any(String)
-      }]);
+      expect(data.data).toEqual([mockEvent]);
       expect(data.meta).toEqual({
-        pagination: {
-          total: 1,
-          page: 1,
-          pageSize: 10
-        }
+        total: 1,
+        page: 1,
+        pageSize: 10
       });
     });
 
@@ -154,11 +139,8 @@ describe("Learning Events Route Handler", () => {
 
       expect(response.status).toBe(422);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Validation error");
-      expect(data.meta).toEqual({
-        timestamp: expect.any(String),
-        details: expect.any(Object)
-      });
+      expect(data.error).toBe("Invalid query parameters");
+      expect(data.details).toBeDefined();
     });
 
     it("should handle database connection failure", async () => {
@@ -170,11 +152,8 @@ describe("Learning Events Route Handler", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Internal server error");
-      expect(data.meta).toEqual({
-        timestamp: expect.any(String),
-        errorDetails: expect.any(String)
-      });
+      expect(data.error).toBe("Database connection failed");
+      expect(data.meta.timestamp).toBeDefined();
     });
 
     it("should handle database query errors gracefully", async () => {
@@ -185,8 +164,8 @@ describe("Learning Events Route Handler", () => {
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
       expect(data.data).toEqual([]);
       expect(data.error).toBe("Failed to retrieve learning events");
       expect(data.meta).toEqual({

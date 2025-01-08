@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
 
     try {
       logger.info("Testing DB connection...");
-      await prisma.$queryRaw`SELECT 1`;
+      const result = await prisma.$queryRaw`SELECT 1`;
+      if (!result) throw new Error("DB connection failed");
       logger.info("DB connection successful");
     } catch (e) {
       logger.error("DB connection failed:", e);
@@ -37,6 +38,7 @@ export async function GET(req: NextRequest) {
           error: "Database connection failed",
           meta: {
             timestamp: new Date().toISOString(),
+            errorDetails: e instanceof Error ? e.message : String(e)
           },
         },
         { status: 503 }
@@ -55,6 +57,10 @@ export async function GET(req: NextRequest) {
           success: false,
           error: "Invalid query parameters",
           details: validation.error.format(),
+          meta: {
+            timestamp: new Date().toISOString(),
+            details: validation.error.format()
+          }
         },
         { status: 400 }
       );
@@ -71,7 +77,7 @@ export async function GET(req: NextRequest) {
       LIMIT ${limit}
     `;
 
-    if (!events) {
+    if (!events || !Array.isArray(events) || events.length === 0) {
       return NextResponse.json({
         success: true,
         data: [],
@@ -82,8 +88,9 @@ export async function GET(req: NextRequest) {
         },
       });
     }
+
     logger.info("Retrieved learning events", {
-      count: Array.isArray(events) ? events.length : 0,
+      count: events.length,
       type,
       limit,
       startDate,
@@ -92,25 +99,28 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: Array.isArray(events)
-        ? events.map((event) => ({
-            id: event.id,
-            type: event.type,
-            timestamp: event.timestamp,
-            metadata: event.metadata,
-            correlationId: event.correlationId,
-            sessionId: event.sessionId,
-            userId: event.userId,
-            clientId: event.clientId,
-            environment: event.environment,
-            version: event.version,
-            status: event.status,
-            priority: event.priority,
-            retryCount: event.retryCount,
-          }))
-        : [],
+      data: events.map((event) => ({
+        id: event.id,
+        type: event.type,
+        priority: event.priority,
+        timestamp: event.timestamp,
+        processedAt: event.processedAt,
+        metadata: event.metadata,
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt,
+        status: event.status,
+        correlationId: event.correlationId,
+        sessionId: event.sessionId,
+        userId: event.userId,
+        clientId: event.clientId,
+        environment: event.environment,
+        version: event.version,
+        tags: event.tags,
+        error: event.error,
+        retryCount: event.retryCount
+      })),
       meta: {
-        total: Array.isArray(events) ? events.length : 0,
+        total: events.length,
         timestamp: new Date().toISOString(),
         limit,
       },
@@ -124,8 +134,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        success: true,
-        data: [],
+        success: false,
         error: "Failed to retrieve learning events",
         meta: {
           timestamp: new Date().toISOString(),
@@ -135,9 +144,9 @@ export async function GET(req: NextRequest) {
             new URL(req.url).searchParams.get("limit") || "100",
             10
           ),
-        },
+        }
       },
-      { status: 200 }
+      { status: 500 }
     );
   }
 }

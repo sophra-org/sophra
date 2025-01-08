@@ -2,6 +2,7 @@
 
 # Dependencies
 /node_modules
+/mcp/test-analyzer/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -35,7 +36,6 @@ ENV/
 
 # IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 .DS_Store
@@ -80,3 +80,7 @@ parts/
 sdist/
 var/
 wheels/
+
+#testing
+coverage/
+coverage/lcov-report
