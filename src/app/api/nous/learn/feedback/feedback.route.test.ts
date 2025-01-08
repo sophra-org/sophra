@@ -83,25 +83,22 @@ describe("Feedback Route Handler", () => {
   describe("GET /api/nous/learn/feedback", () => {
     it("should fetch feedback requests successfully", async () => {
       const mockResponse = [{
-        id: "1", 
-        content: mockFeedback.feedback,
-        createdAt: new Date(),
-        metrics: {
-          uniqueUsers: 1,
-          averageRating: 0.8,
-          totalFeedback: 1
-        }
+        id: "1",
+        feedback: [{
+          queryId: "q1",
+          rating: 0.8,
+          metadata: {
+            userAction: SignalType.SEARCH,
+            resultId: "r1",
+            queryHash: "hash1",
+            timestamp: new Date().toISOString(),
+            engagementType: EngagementType.CLICK,
+          }
+        }],
+        timestamp: new Date()
       }];
 
-      const mockFeedbackResponse = mockResponse.map(item => ({
-        id: item.id,
-        timestamp: item.createdAt,
-        feedback: {
-          feedback: item.content
-        }
-      }));
-
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedbackResponse);
+      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockResponse);
       vi.mocked(prisma.$queryRaw).mockResolvedValue([{ count: 1 }]);
 
       const response = await GET();

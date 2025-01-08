@@ -70,20 +70,21 @@ describe("Learning Metrics Route Handler", () => {
     timeframe: "1h",
     modelId: null,
     aggregated: false,
-    totalSearches: 100,
-    averageLatency: 150,
-    successRate: 0.95,
-    errorRate: 0.05,
-    cacheHitRate: 0.8,
-    queryCount: 1000,
-    uniqueQueries: 800,
-    topQueries: ["query1", "query2"],
-    queryPatterns: ["pattern1", "pattern2"],
-    feedbackScore: 4.5,
-    userSatisfaction: 0.9,
     createdAt: new Date(),
     updatedAt: new Date(),
-    metadata: {}
+    metadata: {
+      totalSearches: 100,
+      averageLatency: 150,
+      successRate: 0.95,
+      errorRate: 0.05,
+      cacheHitRate: 0.8,
+      queryCount: 1000,
+      uniqueQueries: 800,
+      topQueries: ["query1", "query2"],
+      queryPatterns: ["pattern1", "pattern2"],
+      feedbackScore: 4.5,
+      userSatisfaction: 0.9
+    }
   };
 
   beforeEach(() => {

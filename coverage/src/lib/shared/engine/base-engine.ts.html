@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,27 +96,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -125,27 +125,27 @@
 import { BaseProcessor } from "./processors";
 &nbsp;
 export class BaseEngine {
-<span class="cstat-no" title="statement not covered" >  protected processors: BaseProcessor[] = [];</span>
+  protected processors: BaseProcessor[] = [];
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(protected <span class="cstat-no" title="statement not covered" >l</span>ogger: Logger) {</span>}
+  constructor(protected logger: Logger) {}
 &nbsp;
-<span class="fstat-no" title="function not covered" >  registerProcessor(p</span>rocessor: BaseProcessor): void {
-<span class="cstat-no" title="statement not covered" >    this.processors.push(processor);</span>
+  registerProcessor(processor: BaseProcessor): void {
+    this.processors.push(processor);
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  unregisterProcessor(p</span>rocessor: BaseProcessor): void {
-    const index = <span class="cstat-no" title="statement not covered" >this.processors.indexOf(processor);</span>
-<span class="cstat-no" title="statement not covered" >    if (index !== -1) {</span>
-<span class="cstat-no" title="statement not covered" >      this.processors.splice(index, 1);</span>
+  unregisterProcessor(processor: BaseProcessor): void {
+    const index = this.processors.indexOf(processor);
+    if (index !== -1) {
+      this.processors.splice(index, 1);
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async r</span>un(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >    for (const processor of this.processors) {</span>
-<span class="cstat-no" title="statement not covered" >      try {</span>
-<span class="cstat-no" title="statement not covered" >        await processor.process();</span>
+  async run(): Promise&lt;void&gt; {
+    for (const processor of this.processors) {
+      try {
+        await processor.process();
       } catch (error) {
-<span class="cstat-no" title="statement not covered" >        console.error("Error running processor:", error);</span>
+        console.error("Error running processor:", error);
       }
     }
   }
@@ -157,7 +157,7 @@ export class BaseEngine {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

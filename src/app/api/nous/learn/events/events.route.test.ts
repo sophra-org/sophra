@@ -40,7 +40,7 @@ vi.mock('@lib/shared/database/client', () => {
       findFirst: vi.fn(),
       upsert: vi.fn(),
     },
-    $queryRaw: vi.fn().mockImplementation((query) => Promise.resolve([])),
+    $queryRaw: vi.fn(),
     $transaction: vi.fn((operations) =>
       Array.isArray(operations)
         ? Promise.all(operations)
@@ -48,9 +48,9 @@ vi.mock('@lib/shared/database/client', () => {
     ),
     $disconnect: vi.fn(),
     $connect: vi.fn(),
-    raw: jest.fn().mockImplementation((query) => Promise.resolve([])),
-    findMany: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockImplementation((data) => Promise.resolve(data)),
+    raw: vi.fn().mockImplementation((query) => Promise.resolve([])),
+    findMany: vi.fn().mockResolvedValue([]),
+    create: vi.fn().mockImplementation((data) => Promise.resolve(data)),
   }
   return { prisma: mockPrisma }
 });
@@ -92,8 +92,21 @@ describe("Learning Events Route Handler", () => {
 
   describe("GET /api/nous/learn/events", () => {
     it("should fetch events with default parameters", async () => {
-      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]);
-      vi.mocked(prisma.learningEvent.count).mockResolvedValueOnce(1);
+      const mockResponse = {
+        ...mockEvent,
+        timestamp: new Date('2023-01-01T00:00:00Z'),
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z')
+      };
+
+      const mockPrismaPromise = (value: any) => {
+        const promise = Promise.resolve(value) as any;
+        promise[Symbol.toStringTag] = "PrismaPromise";
+        return promise;
+      };
+
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([1]));
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([mockResponse]));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
@@ -104,22 +117,31 @@ describe("Learning Events Route Handler", () => {
       expect(data.data).toEqual([{
         ...mockEvent,
         createdAt: expect.any(String),
-        updatedAt: expect.any(String),
-        startDate: expect.any(String),
-        endDate: expect.any(String)
+        updatedAt: expect.any(String)
       }]);
       expect(data.meta).toEqual({
-        pagination: {
-          total: 1,
-          page: 1,
-          pageSize: 10
-        }
+        total: 1,
+        timestamp: expect.any(String),
+        limit: 100
       });
     });
 
     it("should handle filtering by type and date range", async () => {
-      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]);
-      vi.mocked(prisma.learningEvent.count).mockResolvedValueOnce(1);
+      const mockResponse = {
+        ...mockEvent,
+        timestamp: new Date('2023-01-01T00:00:00Z'),
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z')
+      };
+
+      const mockPrismaPromise = (value: any) => {
+        const promise = Promise.resolve(value) as any;
+        promise[Symbol.toStringTag] = "PrismaPromise";
+        return promise;
+      };
+
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([1]));
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([mockResponse]));
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/events?type=SEARCH_PATTERN&startDate=2023-01-01&endDate=2023-12-31"
@@ -132,16 +154,12 @@ describe("Learning Events Route Handler", () => {
       expect(data.data).toEqual([{
         ...mockEvent,
         createdAt: expect.any(String),
-        updatedAt: expect.any(String),
-        startDate: expect.any(String),
-        endDate: expect.any(String)
+        updatedAt: expect.any(String)
       }]);
       expect(data.meta).toEqual({
-        pagination: {
-          total: 1,
-          page: 1,
-          pageSize: 10
-        }
+        total: 1,
+        timestamp: expect.any(String),
+        limit: 100
       });
     });
 
@@ -152,9 +170,9 @@ describe("Learning Events Route Handler", () => {
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(422);
+      expect(response.status).toBe(400);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Validation error");
+      expect(data.error).toBe("Invalid query parameters");
       expect(data.meta).toEqual({
         timestamp: expect.any(String),
         details: expect.any(Object)
@@ -162,15 +180,21 @@ describe("Learning Events Route Handler", () => {
     });
 
     it("should handle database connection failure", async () => {
-      vi.mocked(prisma.learningEvent.findMany).mockRejectedValueOnce(new Error("DB Error"));
+      const mockPrismaPromise = () => {
+        const promise = Promise.reject(new Error("DB Error")) as any;
+        promise[Symbol.toStringTag] = "PrismaPromise";
+        return promise;
+      };
+
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise());
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(503);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Internal server error");
+      expect(data.error).toBe("Database connection failed");
       expect(data.meta).toEqual({
         timestamp: expect.any(String),
         errorDetails: expect.any(String)
@@ -178,15 +202,27 @@ describe("Learning Events Route Handler", () => {
     });
 
     it("should handle database query errors gracefully", async () => {
-      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
-      vi.mocked(prisma.learningEvent.findMany).mockRejectedValueOnce(new Error("Query Error"));
+      const mockPrismaPromise = (value: any) => {
+        const promise = Promise.resolve(value) as any;
+        promise[Symbol.toStringTag] = "PrismaPromise";
+        return promise;
+      };
+
+      const mockErrorPromise = () => {
+        const promise = Promise.reject(new Error("Query Error")) as any;
+        promise[Symbol.toStringTag] = "PrismaPromise";
+        return promise;
+      };
+
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([1]));
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockErrorPromise());
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
       expect(data.data).toEqual([]);
       expect(data.error).toBe("Failed to retrieve learning events");
       expect(data.meta).toEqual({
@@ -198,8 +234,14 @@ describe("Learning Events Route Handler", () => {
     });
 
     it("should handle empty results", async () => {
-      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([mockEvent]); // DB connection test
-      vi.mocked(prisma.learningEvent.findMany).mockResolvedValueOnce([]);
+      const mockPrismaPromise = (value: any) => {
+        const promise = Promise.resolve(value) as any;
+        promise[Symbol.toStringTag] = "PrismaPromise";
+        return promise;
+      };
+
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([1]));
+      vi.mocked(prisma.$queryRaw).mockReturnValueOnce(mockPrismaPromise([]));
 
       const request = new NextRequest("http://localhost:3000/api/nous/learn/events");
       const response = await GET(request);

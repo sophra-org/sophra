@@ -76,10 +76,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         received: JSON.stringify(body),
       });
       return NextResponse.json(
-        {
-          success: false,
+        { 
+          success: false, 
           error: "Invalid request format",
           details: validation.error.errors,
+          meta: {
+            timestamp: new Date().toISOString(),
+            request: body
+          }
         },
         { status: 400 }
       );
@@ -104,7 +108,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         { 
           success: false, 
           error: "Model not found",
-          details: "The specified model ID does not exist"
+          meta: {
+            timestamp: new Date().toISOString(),
+            request: { modelId }
+          }
         },
         { status: 404 }
       );
@@ -182,6 +189,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({
         success: true,
         data: modelState,
+        meta: {
+          timestamp: new Date().toISOString(),
+          request: { modelId, state }
+        }
       }, { status: 201 });
     } catch (dbError) {
       logger.error("Database error during model sync", {
@@ -192,21 +203,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { 
           success: false, 
-          error: "Failed to sync model state", 
-          details: "DB Error"
+          error: "Failed to sync model state",
+          meta: {
+            timestamp: new Date().toISOString(),
+            request: { modelId }
+          }
         },
         { status: 500 }
       );
     }
   } catch (error) {
-    logger.error("Failed to process model sync request", {
-      error: error instanceof Error ? error : new Error(String(error)),
-    });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error("Failed to process model sync request", { error: errorMessage });
     return NextResponse.json(
       { 
         success: false, 
         error: "Failed to process request",
-        details: error instanceof Error ? error.message : "Unknown error"
+        meta: {
+          timestamp: new Date().toISOString(),
+          error: errorMessage
+        }
       },
       { status: 500 }
     );

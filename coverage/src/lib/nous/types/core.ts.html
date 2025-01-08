@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -135,25 +135,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,25 +203,25 @@
 &nbsp;
 export { SignalType } from "./signals";
 &nbsp;
-export <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >enum <span class="cstat-no" title="statement not covered" >E</span>ventType {</span></span>
-<span class="cstat-no" title="statement not covered" >  SYSTEM = "system",</span>
-<span class="cstat-no" title="statement not covered" >  USER = "user",</span>
-<span class="cstat-no" title="statement not covered" >  STATE_CHANGE = "state_change",</span>
-<span class="cstat-no" title="statement not covered" >  SEARCH = "search",</span>
-<span class="cstat-no" title="statement not covered" >  MODEL = "model",</span>
-<span class="cstat-no" title="statement not covered" >  FEEDBACK = "feedback",</span>
-<span class="cstat-no" title="statement not covered" >  ADAPTATION = "adaptation",</span>
-<span class="cstat-no" title="statement not covered" >  LEARNING = "learning",</span>
+export enum EventType {
+  SYSTEM = "system",
+  USER = "user",
+  STATE_CHANGE = "state_change",
+  SEARCH = "search",
+  MODEL = "model",
+  FEEDBACK = "feedback",
+  ADAPTATION = "adaptation",
+  LEARNING = "learning",
 }
 &nbsp;
 /**
  * Severity levels for notifications and logging
  */
-export <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >enum <span class="cstat-no" title="statement not covered" >S</span>everity {</span></span>
-<span class="cstat-no" title="statement not covered" >  INFO = "info",</span>
-<span class="cstat-no" title="statement not covered" >  WARNING = "warning",</span>
-<span class="cstat-no" title="statement not covered" >  ERROR = "error",</span>
-<span class="cstat-no" title="statement not covered" >  CRITICAL = "critical",</span>
+export enum Severity {
+  INFO = "info",
+  WARNING = "warning",
+  ERROR = "error",
+  CRITICAL = "critical",
 }
 &nbsp;
 /**
@@ -274,7 +274,7 @@ export interface StateTransition {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

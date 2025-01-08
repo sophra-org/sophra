@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>6/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">58.82% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>10/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>2/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>6/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -777,17 +777,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1141,23 +1141,23 @@ export interface SearchResponse&lt;T&gt; {
   aggregations?: Record&lt;string, any&gt;;
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >transformSearchResponse&lt;T&gt;(</span>
+export function transformSearchResponse&lt;T&gt;(
   response: ElasticsearchResponse&lt;T&gt;
 ): SearchResponse&lt;T&gt; {
   // Handle both old and new response formats
-  const hits = <span class="cstat-no" title="statement not covered" >response.body?.hits || response.hits;</span>
-  const took = <span class="cstat-no" title="statement not covered" >response.body?.took || response.took || 0;</span>
-  const aggregations = <span class="cstat-no" title="statement not covered" >response.body?.aggregations || response.aggregations;</span>
+  const hits = response.body?.hits || response.hits;
+  const took = response.body?.took || response.took || <span class="branch-2 cbranch-no" title="branch not covered" >0;</span>
+  const aggregations = response.body?.aggregations || response.aggregations;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!hits) {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!hits) {
 <span class="cstat-no" title="statement not covered" >    throw new Error('Invalid Elasticsearch response: missing hits property');</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return {</span>
+  return {
     hits: {
-      hits: hits.hits.map(<span class="fstat-no" title="function not covered" >(h</span>it) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+      hits: hits.hits.map((hit) =&gt; ({
         _source: hit._source,
-        _score: hit._score || 0,
+        _score: hit._score || <span class="branch-1 cbranch-no" title="branch not covered" >0,</span>
         _id: hit._id,
       })),
       total: hits.total,
@@ -1174,7 +1174,7 @@ export function <span class="fstat-no" title="function not covered" >transformSe
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>9/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>4/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>5/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>9/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -113,9 +113,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -133,21 +133,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -156,10 +156,10 @@
     private body: string;
     method?: string;
     
-<span class="fstat-no" title="function not covered" >    constructor(u</span>rl: string, init?: { method?: string; body?: string }) {
-<span class="cstat-no" title="statement not covered" >        this.url = url;</span>
-<span class="cstat-no" title="statement not covered" >        this.body = init?.body || '';</span>
-<span class="cstat-no" title="statement not covered" >        this.method = init?.method;</span>
+    constructor(url: string, init?: { method?: string; body?: string }) {
+        this.url = url;
+        this.body = init?.body || '';
+        this.method = init?.method;
     }
     
 <span class="fstat-no" title="function not covered" >    text() {</span>
@@ -176,22 +176,22 @@ export class MockNextResponse {
     headers: Headers;
     status: number;
 &nbsp;
-<span class="fstat-no" title="function not covered" >    constructor(d</span>ata: any, init?: ResponseInit) {
-<span class="cstat-no" title="statement not covered" >        this.data = data;</span>
-<span class="cstat-no" title="statement not covered" >        this.headers = new Headers(init?.headers);</span>
-<span class="cstat-no" title="statement not covered" >        this.status = init?.status || 200;</span>
+    constructor(data: any, init?: ResponseInit) {
+        this.data = data;
+        this.headers = new Headers(init?.headers);
+        this.status = init?.status || 200;
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    text() {</span>
-<span class="cstat-no" title="statement not covered" >        return Promise.resolve(this.data);</span>
+    text() {
+        return Promise.resolve(this.data);
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    json() {</span>
-<span class="cstat-no" title="statement not covered" >        return Promise.resolve(this.data);</span>
+    json() {
+        return Promise.resolve(this.data);
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    static j</span>son(data: any, init?: ResponseInit) {
-<span class="cstat-no" title="statement not covered" >        return new MockNextResponse(data, init);</span>
+    static json(data: any, init?: ResponseInit) {
+        return new MockNextResponse(data, init);
     }
 }
 &nbsp;
@@ -202,7 +202,7 @@ export { MockNextRequest as NextRequest, MockNextResponse as NextResponse }; </p
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.809Z
+                at 2025-01-08T06:14:27.682Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>

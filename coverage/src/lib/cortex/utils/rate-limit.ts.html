@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>20/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>9/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>20/20</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -231,39 +231,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -333,40 +333,40 @@ export interface IRateLimiter {
  * @param {RateLimitConfig} config - How to control traffic
  * @returns {IRateLimiter} Your new traffic controller
  */
-export function <span class="fstat-no" title="function not covered" >rateLimit(c</span>onfig: RateLimitConfig): IRateLimiter {
-  const tokenCache = <span class="cstat-no" title="statement not covered" >new Map&lt;string, TokenBucket&gt;();</span>
+export function rateLimit(config: RateLimitConfig): IRateLimiter {
+  const tokenCache = new Map&lt;string, TokenBucket&gt;();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return {</span>
-    check: <span class="fstat-no" title="function not covered" >async (l</span>imit: number, identifier: string): Promise&lt;void&gt; =&gt; {
-      const now = <span class="cstat-no" title="statement not covered" >Date.now();</span>
-      let bucket = <span class="cstat-no" title="statement not covered" >tokenCache.get(identifier);</span>
+  return {
+    check: async (limit: number, identifier: string): Promise&lt;void&gt; =&gt; {
+      const now = Date.now();
+      let bucket = tokenCache.get(identifier);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!bucket) {</span>
-<span class="cstat-no" title="statement not covered" >        bucket = {</span>
+      if (!bucket) {
+        bucket = {
           tokens: limit,
           lastRefill: now,
         };
-<span class="cstat-no" title="statement not covered" >        tokenCache.set(identifier, bucket);</span>
+        tokenCache.set(identifier, bucket);
       }
 &nbsp;
-      const timePassed = <span class="cstat-no" title="statement not covered" >now - bucket.lastRefill;</span>
-      const tokensToAdd = <span class="cstat-no" title="statement not covered" >Math.floor(timePassed / config.interval) * limit;</span>
+      const timePassed = now - bucket.lastRefill;
+      const tokensToAdd = Math.floor(timePassed / config.interval) * limit;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      bucket.tokens = Math.min(limit, bucket.tokens + tokensToAdd);</span>
-<span class="cstat-no" title="statement not covered" >      bucket.lastRefill = now;</span>
+      bucket.tokens = Math.min(limit, bucket.tokens + tokensToAdd);
+      bucket.lastRefill = now;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (bucket.tokens &lt;= 0) {</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error("Rate limit exceeded");</span>
+      if (bucket.tokens &lt;= 0) {
+        throw new Error("Rate limit exceeded");
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      bucket.tokens -= 1;</span>
-<span class="cstat-no" title="statement not covered" >      tokenCache.set(identifier, bucket);</span>
+      bucket.tokens -= 1;
+      tokenCache.set(identifier, bucket);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (tokenCache.size &gt; config.uniqueTokenPerInterval) {</span>
-        const iterator = <span class="cstat-no" title="statement not covered" >tokenCache.keys();</span>
-        const firstKey = <span class="cstat-no" title="statement not covered" >iterator.next();</span>
-<span class="cstat-no" title="statement not covered" >        if (!firstKey.done &amp;&amp; firstKey.value) {</span>
-<span class="cstat-no" title="statement not covered" >          tokenCache.delete(firstKey.value);</span>
+      if (tokenCache.size &gt; config.uniqueTokenPerInterval) {
+        const iterator = tokenCache.keys();
+        const firstKey = iterator.next();
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (!firstKey.done &amp;&amp; firstKey.value) {
+          tokenCache.delete(firstKey.value);
         }
       }
     },
@@ -379,7 +379,7 @@ export function <span class="fstat-no" title="function not covered" >rateLimit(c
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

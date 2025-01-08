@@ -42,8 +42,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       meta: {
         total: models?.length || 0,
         page: 1,
-        pageSize: 10,
-        took: Date.now() - startTime
+        pageSize: 10
       }
     }, { status: 200 });
   } catch (error) {

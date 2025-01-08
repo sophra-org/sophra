@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -89,45 +89,45 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { MetricsService } from "@/lib/cortex/monitoring/metrics";
 import { Logger } from "@/lib/shared/types";
 &nbsp;
 export class MetricsAdapter {
-<span class="cstat-no" title="statement not covered" >  sampleRate: number = 1.0;</span>
-<span class="cstat-no" title="statement not covered" >  batchSize: number = 100;</span>
+  sampleRate: number = 1.0;
+  batchSize: number = 100;
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(</span>
-    private <span class="cstat-no" title="statement not covered" >metrics: MetricsService,</span>
-    private <span class="cstat-no" title="statement not covered" >logger: Logger</span>
+  constructor(
+    private metrics: MetricsService,
+    private logger: Logger
   ) {}
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  getAverageLatency = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>his.metrics.getAverageLatency();</span></span>
-<span class="cstat-no" title="statement not covered" >  getThroughput = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>his.metrics.getThroughput();</span></span>
-<span class="cstat-no" title="statement not covered" >  getErrorRate = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>his.metrics.getErrorRate();</span></span>
-<span class="cstat-no" title="statement not covered" >  getCPUUsage = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>his.metrics.getCPUUsage();</span></span>
-<span class="cstat-no" title="statement not covered" >  getMemoryUsage = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >t</span>his.metrics.getMemoryUsage();</span></span>
+  getAverageLatency = () =&gt; this.metrics.getAverageLatency();
+  getThroughput = () =&gt; this.metrics.getThroughput();
+  getErrorRate = () =&gt; this.metrics.getErrorRate();
+  getCPUUsage = () =&gt; this.metrics.getCPUUsage();
+  getMemoryUsage = () =&gt; this.metrics.getMemoryUsage();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  recordEngineMetric = <span class="fstat-no" title="function not covered" >(d</span>ata: any) =&gt; <span class="cstat-no" title="statement not covered" >this.metrics.recordEngineMetric(data);</span></span>
-<span class="cstat-no" title="statement not covered" >  recordLearningMetrics = <span class="fstat-no" title="function not covered" >(d</span>ata: any) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >    this.metrics.recordLearningMetrics(data);</span>
+  recordEngineMetric = (data: any) =&gt; this.metrics.recordEngineMetric(data);
+  recordLearningMetrics = (data: any) =&gt;
+    this.metrics.recordLearningMetrics(data);
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -136,7 +136,7 @@ export class MetricsAdapter {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

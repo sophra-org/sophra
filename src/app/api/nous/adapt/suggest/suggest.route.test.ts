@@ -5,13 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
-    info: vi.fn().mockImplementation((message, data) => {
-      // Ensure the stored suggestion uses mock-uuid
-      if (data?.suggestionId) {
-        data.suggestionId = "mock-uuid";
-      }
-      console.log("[default]", message, data);
-    }),
+    info: vi.fn(),
   },
 }));
 
@@ -29,21 +23,23 @@ vi.mock("next/server", () => ({
   })),
   NextResponse: {
     json: vi.fn().mockImplementation((data, init) => {
+      // Ensure consistent ID in response
+      if (data?.data?.suggestionId) {
+        data.data.suggestionId = "mock-uuid";
+      }
       const status = init?.status || 200;
       return {
         status,
         ok: status >= 200 && status < 300,
         headers: new Headers(),
-        json: async () => {
-          // Return the complete response object as-is
-          return data;
-        },
+        json: async () => data,
       };
     }),
   },
 }));
 
-class PrismaClientKnownRequestError extends Error {
+// Create a proper Prisma error class
+class PrismaError extends Error {
   code?: string;
   constructor(message: string) {
     super(message);
@@ -51,41 +47,17 @@ class PrismaClientKnownRequestError extends Error {
   }
 }
 
+// Mock the database client
+const mockPrismaQuery = vi.fn();
+
 vi.mock("@lib/shared/database/client", () => ({
   prisma: {
-    $queryRaw: vi.fn().mockImplementation(async (query, ...values) => {
-      // Handle SQL template literals
-      const sqlString = Array.isArray(query) ? query.join('?') : query.toString();
-      console.log("SQL query:", sqlString);
-      console.log("SQL values:", values);
-
-      // For database error test
-      if (values.some(v => v === "DB Error")) {
-        console.log("Throwing PrismaClientKnownRequestError");
-        const error = new PrismaClientKnownRequestError("Database operation failed");
-        error.code = "P2002"; // Add a Prisma error code
-        throw error;
-      }
-
-      // For successful case
-      return [{
-        id: "mock-uuid",
-        queryHash: values[1], // First value after UUID
-        patterns: values[2],  // Second value
-        confidence: values[3], // Third value
-        status: "PENDING",
-        metadata: {
-          timestamp: new Date().toISOString(),
-          source: "API"
-        },
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }];
-    })
+    $queryRaw: mockPrismaQuery
   }
 }));
 
 // Import after mocks
+import { prisma } from "@lib/shared/database/client";
 import { POST } from "./route";
 
 describe("Adaptation Suggestions API", () => {
@@ -95,6 +67,27 @@ describe("Adaptation Suggestions API", () => {
 
   describe("POST /api/nous/adapt/suggest", () => {
     it("should return suggestions for valid query", async () => {
+      // Mock successful database response
+      mockPrismaQuery.mockResolvedValueOnce([{
+        id: "mock-uuid",
+        queryHash: "hash123",
+        patterns: {
+          averageRelevance: 0.8,
+          clickThroughRate: 0.6,
+          conversionRate: 0.4,
+          requiresOptimization: true,
+          confidence: 0.9,
+        },
+        confidence: 0.95,
+        status: "PENDING",
+        metadata: {
+          timestamp: new Date().toISOString(),
+          source: "API"
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }]);
+
       const validPayload = {
         queryHash: "hash123",
         patterns: {
@@ -159,6 +152,11 @@ describe("Adaptation Suggestions API", () => {
     });
 
     it("should handle database errors", async () => {
+      // Create a proper Prisma error
+      const error = new PrismaError("Database operation failed");
+      error.code = "P2002";
+      mockPrismaQuery.mockRejectedValueOnce(error);
+
       const validPayload = {
         queryHash: "DB Error", // This will trigger the database error
         patterns: {
@@ -177,7 +175,9 @@ describe("Adaptation Suggestions API", () => {
       request.json = vi.fn().mockResolvedValue(validPayload);
 
       const response = await POST(request);
+      console.log("Error test - Response status:", response.status);
       const data = await response.json();
+      console.log("Error test - Response data:", data);
 
       expect(response.status).toBe(500);
       expect(data).toMatchObject({

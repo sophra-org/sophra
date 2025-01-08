@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>20/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -179,7 +179,7 @@
 <a name='L114'></a><a href='#L114'>114</a>
 <a name='L115'></a><a href='#L115'>115</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -189,7 +189,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -197,7 +197,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -273,27 +273,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { z } from "zod";
 &nbsp;
-export const SignalMetadataSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
+export const SignalMetadataSchema = z.object({
   documentType: z.string(),
   timeToClick: z.number(),
   deviceType: z.string(),
@@ -303,7 +303,7 @@ export const SignalMetadataSchema = <span class="cstat-no" title="statement not 
   }),
 });
 &nbsp;
-export const SignalDataSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
+export const SignalDataSchema = z.object({
   sessionId: z.string(),
   queryId: z.string(),
   resultId: z.string(),
@@ -311,7 +311,7 @@ export const SignalDataSchema = <span class="cstat-no" title="statement not cove
   metadata: SignalMetadataSchema,
 });
 &nbsp;
-export const SignalSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
+export const SignalSchema = z.object({
   id: z.string().cuid().optional(),
   type: z.enum([
     "SEARCH",
@@ -387,23 +387,23 @@ export interface SignalProcessor {
   validate(signal: BaseSignal): boolean;
 }
 &nbsp;
-export <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >enum <span class="cstat-no" title="statement not covered" >S</span>ignalType {</span></span>
-<span class="cstat-no" title="statement not covered" >  SEARCH = "SEARCH",</span>
-<span class="cstat-no" title="statement not covered" >  PERFORMANCE = "PERFORMANCE",</span>
-<span class="cstat-no" title="statement not covered" >  USER_BEHAVIOR_IMPRESSION = "USER_BEHAVIOR_IMPRESSION",</span>
-<span class="cstat-no" title="statement not covered" >  USER_BEHAVIOR_VIEW = "USER_BEHAVIOR_VIEW",</span>
-<span class="cstat-no" title="statement not covered" >  USER_BEHAVIOR_CLICK = "USER_BEHAVIOR_CLICK",</span>
-<span class="cstat-no" title="statement not covered" >  USER_BEHAVIOR_CONVERSION = "USER_BEHAVIOR_CONVERSION",</span>
-<span class="cstat-no" title="statement not covered" >  MODEL_PERFORMANCE = "MODEL_PERFORMANCE",</span>
-<span class="cstat-no" title="statement not covered" >  FEEDBACK = "FEEDBACK",</span>
-<span class="cstat-no" title="statement not covered" >  SYSTEM_HEALTH = "SYSTEM_HEALTH"</span>
+export enum SignalType {
+  SEARCH = "SEARCH",
+  PERFORMANCE = "PERFORMANCE",
+  USER_BEHAVIOR_IMPRESSION = "USER_BEHAVIOR_IMPRESSION",
+  USER_BEHAVIOR_VIEW = "USER_BEHAVIOR_VIEW",
+  USER_BEHAVIOR_CLICK = "USER_BEHAVIOR_CLICK",
+  USER_BEHAVIOR_CONVERSION = "USER_BEHAVIOR_CONVERSION",
+  MODEL_PERFORMANCE = "MODEL_PERFORMANCE",
+  FEEDBACK = "FEEDBACK",
+  SYSTEM_HEALTH = "SYSTEM_HEALTH"
 }
 &nbsp;
-export <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >enum <span class="cstat-no" title="statement not covered" >S</span>ignalStatus {</span></span>
-<span class="cstat-no" title="statement not covered" >  PENDING = "PENDING",</span>
-<span class="cstat-no" title="statement not covered" >  PROCESSING = "PROCESSING",</span>
-<span class="cstat-no" title="statement not covered" >  COMPLETED = "COMPLETED",</span>
-<span class="cstat-no" title="statement not covered" >  FAILED = "FAILED",</span>
+export enum SignalStatus {
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -412,7 +412,7 @@ export <span class="cstat-no" title="statement not covered" ><span class="fstat-
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.809Z
+                at 2025-01-08T06:14:27.682Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">46.15% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>18/39</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">11.53% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/26</span>
+                <span class='fraction'>3/26</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>4/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">46.15% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>18/39</span>
             </div>
         
             
@@ -315,44 +315,44 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -507,44 +507,44 @@ export interface PostgresHealth {
 export class PostgresDataService extends BaseService {
   protected logger: Logger;
   protected metrics?: MetricsService;
-<span class="cstat-no" title="statement not covered" >  private isInitialized = false;</span>
+  private isInitialized = false;
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(l</span>ogger: Logger) {
-<span class="cstat-no" title="statement not covered" >    super();</span>
-<span class="cstat-no" title="statement not covered" >    this.logger = logger;</span>
+  constructor(logger: Logger) {
+    super();
+    this.logger = logger;
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  public async i</span>nitialize(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >    if (this.isInitialized) {</span>
+  public async initialize(): Promise&lt;void&gt; {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.isInitialized) {
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      await prisma.$connect();</span>
-<span class="cstat-no" title="statement not covered" >      this.isInitialized = true;</span>
-<span class="cstat-no" title="statement not covered" >      this.logger.info("PostgreSQL connection initialized");</span>
+    try {
+      await prisma.$connect();
+      this.isInitialized = true;
+      this.logger.info("PostgreSQL connection initialized");
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      this.logger.error("Failed to initialize PostgreSQL connection", {</span>
+      this.logger.error("Failed to initialize PostgreSQL connection", {
         error,
       });
-<span class="cstat-no" title="statement not covered" >      throw new CustomError("DB_INITIALIZATION_FAILED", error as Error);</span>
+      throw new CustomError("DB_INITIALIZATION_FAILED", error as Error);
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  public async h</span>ealthCheck(): Promise&lt;boolean&gt; {
-<span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      await prisma.$queryRaw`SELECT 1`;</span>
-<span class="cstat-no" title="statement not covered" >      return true;</span>
+  public async healthCheck(): Promise&lt;boolean&gt; {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      return true;
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      this.logger.error("Health check failed", { error });</span>
-<span class="cstat-no" title="statement not covered" >      return false;</span>
+      this.logger.error("Health check failed", { error });
+      return false;
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  public async d</span>isconnect(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >    if (this.isInitialized) {</span>
-<span class="cstat-no" title="statement not covered" >      await prisma.$disconnect();</span>
-<span class="cstat-no" title="statement not covered" >      this.isInitialized = false;</span>
+  public async disconnect(): Promise&lt;void&gt; {
+    if (this.isInitialized) {
+      await prisma.$disconnect();
+      this.isInitialized = false;
     }
   }
 &nbsp;
@@ -646,7 +646,7 @@ export class PostgresDataService extends BaseService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

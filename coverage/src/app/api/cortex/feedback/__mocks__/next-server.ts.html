@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -99,28 +99,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export class MockNextRequest {
@@ -128,29 +128,29 @@
     private body: string;
     method?: string;
     
-<span class="fstat-no" title="function not covered" >    constructor(u</span>rl: string, init?: { method?: string; body?: string }) {
-<span class="cstat-no" title="statement not covered" >        this.url = url;</span>
-<span class="cstat-no" title="statement not covered" >        this.body = init?.body || '';</span>
-<span class="cstat-no" title="statement not covered" >        this.method = init?.method;</span>
+    constructor(url: string, init?: { method?: string; body?: string }) {
+        this.url = url;
+        this.body = init?.body || '';
+        this.method = init?.method;
     }
     
-<span class="fstat-no" title="function not covered" >    text() {</span>
-<span class="cstat-no" title="statement not covered" >        return Promise.resolve(this.body);</span>
+    text() {
+        return Promise.resolve(this.body);
     }
 }
 &nbsp;
-export const mockResponse = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(d</span>ata: any, init?: ResponseInit) =&gt; {</span>
-    const response = <span class="cstat-no" title="statement not covered" >{</span>
+export const mockResponse = (data: any, init?: ResponseInit) =&gt; {
+    const response = {
         status: init?.status || 200,
         headers: new Headers(init?.headers),
         ok: init?.status ? init.status &gt;= 200 &amp;&amp; init.status &lt; 300 : true,
-        json: <span class="fstat-no" title="function not covered" >async () =&gt; <span class="cstat-no" title="statement not covered" >d</span>ata</span>
+        json: async () =&gt; data
     };
-<span class="cstat-no" title="statement not covered" >    return response;</span>
+    return response;
 };
 &nbsp;
-export const NextResponse = <span class="cstat-no" title="statement not covered" >{</span>
-    json: <span class="fstat-no" title="function not covered" >(d</span>ata: any, init?: ResponseInit) =&gt; <span class="cstat-no" title="statement not covered" >mockResponse(data, init)</span>
+export const NextResponse = {
+    json: (data: any, init?: ResponseInit) =&gt; mockResponse(data, init)
 };
 &nbsp;
 export { MockNextRequest as NextRequest }; </pre></td></tr></table></pre>
@@ -160,7 +160,7 @@ export { MockNextRequest as NextRequest }; </pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>

@@ -93,16 +93,29 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       id: metric.id,
       type: metric.type,
       value: metric.value,
+      count: metric.count,
       timestamp: metric.timestamp,
+      sessionId: metric.sessionId,
       interval: metric.interval,
       timeframe: metric.timeframe,
-      sessionId: metric.sessionId,
       modelId: metric.modelId,
       aggregated: metric.aggregated,
-      metadata: metric.metadata,
-      count: metric.count,
       createdAt: metric.createdAt,
       updatedAt: metric.updatedAt,
+      metadata: {
+        ...(metric.metadata as Record<string, unknown>),
+        totalSearches: (metric.metadata as any)?.totalSearches ?? 0,
+        averageLatency: (metric.metadata as any)?.averageLatency ?? 0,
+        successRate: (metric.metadata as any)?.successRate ?? 0,
+        errorRate: (metric.metadata as any)?.errorRate ?? 0,
+        cacheHitRate: (metric.metadata as any)?.cacheHitRate ?? 0,
+        queryCount: (metric.metadata as any)?.queryCount ?? 0,
+        uniqueQueries: (metric.metadata as any)?.uniqueQueries ?? 0,
+        topQueries: (metric.metadata as any)?.topQueries ?? [],
+        queryPatterns: (metric.metadata as any)?.queryPatterns ?? [],
+        feedbackScore: (metric.metadata as any)?.feedbackScore ?? 0,
+        userSatisfaction: (metric.metadata as any)?.userSatisfaction ?? 0
+      }
     }));
 
     return NextResponse.json({

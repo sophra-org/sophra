@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">95% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>19/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">76.92% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>10/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">94.73% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>18/19</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -125,38 +125,38 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -176,39 +176,39 @@ interface EventMetadata {
 }
 &nbsp;
 export class PerformanceProcessor extends BaseProcessor {
-<span class="fstat-no" title="function not covered" >  async a</span>nalyze(events: LearningEvent[]): Promise&lt;LearningPattern[]&gt; {
-    const patterns: LearningPattern[] = <span class="cstat-no" title="statement not covered" >[];</span>
-    const performanceEvents = <span class="cstat-no" title="statement not covered" >events.filter(<span class="fstat-no" title="function not covered" >e =&gt; </span></span>
-<span class="cstat-no" title="statement not covered" >      e.type === LearningEventType.METRIC_THRESHOLD || e.type === LearningEventType.SYSTEM_STATE</span>
+  async analyze(events: LearningEvent[]): Promise&lt;LearningPattern[]&gt; {
+    const patterns: LearningPattern[] = [];
+    const performanceEvents = events.filter(e =&gt; 
+      e.type === LearningEventType.METRIC_THRESHOLD || <span class="branch-1 cbranch-no" title="branch not covered" >e.type === LearningEventType.SYSTEM_STATE</span>
     );
 &nbsp;
     // Group events by metric type
-    const groupedEvents = <span class="cstat-no" title="statement not covered" >this.groupEventsByMetric(performanceEvents);</span>
+    const groupedEvents = this.groupEventsByMetric(performanceEvents);
 &nbsp;
     // Analyze each metric group for patterns
-<span class="cstat-no" title="statement not covered" >    for (const [metric, metricEvents] of Object.entries(groupedEvents)) {</span>
-      const pattern = <span class="cstat-no" title="statement not covered" >await this.analyzeMetricPattern(metric, metricEvents);</span>
-<span class="cstat-no" title="statement not covered" >      if (pattern) <span class="cstat-no" title="statement not covered" >patterns.push(pattern);</span></span>
+    for (const [metric, metricEvents] of Object.entries(groupedEvents)) {
+      const pattern = await this.analyzeMetricPattern(metric, metricEvents);
+      if (pattern) patterns.push(pattern);
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return patterns;</span>
+    return patterns;
   }
 &nbsp;
-  private <span class="fstat-no" title="function not covered" >groupEventsByMetric(e</span>vents: LearningEvent[]): Record&lt;string, LearningEvent[]&gt; {
-<span class="cstat-no" title="statement not covered" >    return events.reduce(<span class="fstat-no" title="function not covered" >(g</span>roups, event) =&gt; {</span>
-      const metadata = <span class="cstat-no" title="statement not covered" >event.metadata as Prisma.JsonValue;</span>
-      let metricType = <span class="cstat-no" title="statement not covered" >'unknown';</span>
+  private groupEventsByMetric(events: LearningEvent[]): Record&lt;string, LearningEvent[]&gt; {
+    return events.reduce((groups, event) =&gt; {
+      const metadata = event.metadata as Prisma.JsonValue;
+      let metricType = 'unknown';
       
-<span class="cstat-no" title="statement not covered" >      if (metadata &amp;&amp; typeof metadata === 'object' &amp;&amp; !Array.isArray(metadata)) {</span>
-        const typedMetadata = <span class="cstat-no" title="statement not covered" >metadata as EventMetadata;</span>
-<span class="cstat-no" title="statement not covered" >        metricType = typedMetadata.metricType || 'unknown';</span>
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (metadata &amp;&amp; typeof metadata === 'object' &amp;&amp; !Array.isArray(metadata)) {
+        const typedMetadata = metadata as EventMetadata;
+        metricType = typedMetadata.metricType || 'unknown';
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!groups[metricType]) {</span>
-<span class="cstat-no" title="statement not covered" >        groups[metricType] = [];</span>
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (!groups[metricType]) {
+        groups[metricType] = [];
       }
-<span class="cstat-no" title="statement not covered" >      groups[metricType].push(event);</span>
-<span class="cstat-no" title="statement not covered" >      return groups;</span>
+      groups[metricType].push(event);
+      return groups;
     }, {} as Record&lt;string, LearningEvent[]&gt;);
   }
 &nbsp;
@@ -226,7 +226,7 @@ export class PerformanceProcessor extends BaseProcessor {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.809Z
+                at 2025-01-08T06:14:27.682Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

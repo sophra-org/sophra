@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>4/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -111,41 +111,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -155,41 +155,41 @@
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 // Declare Node.js runtime
-export const runtime = <span class="cstat-no" title="statement not covered" >"nodejs";</span>
+export const runtime = "nodejs";
 &nbsp;
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >GET(_</span>req: NextRequest): Promise&lt;NextResponse&gt; {
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const services = <span class="cstat-no" title="statement not covered" >await serviceManager.getServices();</span>
-    const metrics = <span class="cstat-no" title="statement not covered" >services.metrics;</span>
+export async function GET(_req: NextRequest): Promise&lt;NextResponse&gt; {
+  try {
+    const services = await serviceManager.getServices();
+    const metrics = services.metrics;
 &nbsp;
     // Get all metrics
-    const allMetrics = <span class="cstat-no" title="statement not covered" >await metrics.getMetrics();</span>
+    const allMetrics = await metrics.getMetrics();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!allMetrics) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error("No metrics data available");</span>
+    if (!allMetrics) {
+      throw new Error("No metrics data available");
     }
 &nbsp;
     // Log metrics for debugging
-<span class="cstat-no" title="statement not covered" >    logger.debug("Retrieved metrics", {</span>
+    logger.debug("Retrieved metrics", {
       metricsLength: allMetrics.length,
       availableMetrics: allMetrics
         .split("\n")
-        .filter(<span class="fstat-no" title="function not covered" >(l</span>ine: string) =&gt; <span class="cstat-no" title="statement not covered" >line.startsWith("sophra_"))</span>,
+        .filter((line: string) =&gt; line.startsWith("sophra_")),
     });
 &nbsp;
     // Return raw Prometheus format
-<span class="cstat-no" title="statement not covered" >    return new NextResponse(allMetrics, {</span>
+    return new NextResponse(allMetrics, {
       headers: {
         "Content-Type": "text/plain; version=0.0.4",
       },
     });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    logger.error("Failed to get metrics", {</span>
-      error: error instanceof Error ? error.message : error,
-      stack: error instanceof Error ? error.stack : undefined,
+    logger.error("Failed to get metrics", {
+      error: error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >error,</span>
+      stack: error instanceof Error ? error.stack : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
     });
-<span class="cstat-no" title="statement not covered" >    return NextResponse.json(</span>
+    return NextResponse.json(
       { success: false, error: "Failed to get metrics" },
       { status: 500 }
     );
@@ -202,7 +202,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(_
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.809Z
+                at 2025-01-08T06:14:27.682Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

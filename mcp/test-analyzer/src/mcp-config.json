@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "test-analyzer": {
+      "command": "node",
+      "args": ["/workspaces/sophra/mcp/test-analyzer/build/index.js"],
+      "env": {},
+      "timeout": 600000
+    }
+  }
+}

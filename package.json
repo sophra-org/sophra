@@ -26,7 +26,9 @@
     "test:watch:cortex": "npx vitest watch \"cortex/.*\\.test\\.[jt]sx?$\"",
     "test:watch:nous": "npx vitest watch \"nous/.*\\.test\\.[jt]sx?$\"",
     "test:changed": "npx vitest related --changed",
-    "test:threading": "npx vitest run tests/services/nous/utils/threading.test.ts"
+    "test:threading": "npx vitest run tests/services/nous/utils/threading.test.ts",
+    "build:test-analyzer": "cd mcp/test-analyzer && npm run build",
+    "start:test-analyzer": "cd mcp/test-analyzer && npm start"
   },
   "prisma": {
     "seed": "ts-node prisma/tokenseed.ts"

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -109,8 +109,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -119,23 +119,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -148,8 +148,8 @@ import Redis from "ioredis";
 export class RedisAdapter {
   private client: Redis;
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(private <span class="cstat-no" title="statement not covered" >m</span>etrics: MetricsService) {</span>
-<span class="cstat-no" title="statement not covered" >    this.client = new Redis({</span>
+  constructor(private metrics: MetricsService) {
+    this.client = new Redis({
       host: process.env.REDIS_HOST || "localhost",
       port: parseInt(process.env.REDIS_PORT || "6379"),
       password: process.env.REDIS_PASSWORD,
@@ -157,24 +157,24 @@ export class RedisAdapter {
     });
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async g</span>et(key: string): Promise&lt;string | null&gt; {
-    const start = <span class="cstat-no" title="statement not covered" >Date.now();</span>
-<span class="cstat-no" title="statement not covered" >    try {</span>
-      const result = <span class="cstat-no" title="statement not covered" >await this.client.get(key);</span>
-<span class="cstat-no" title="statement not covered" >      this.metrics.recordEngineMetric({</span>
+  async get(key: string): Promise&lt;string | null&gt; {
+    const start = Date.now();
+    try {
+      const result = await this.client.get(key);
+      this.metrics.recordEngineMetric({
         type: MetricType.REDIS_GET,
         value: Date.now() - start,
         confidence: 1,
       });
-<span class="cstat-no" title="statement not covered" >      return result;</span>
+      return result;
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      this.metrics.recordEngineMetric({</span>
+      this.metrics.recordEngineMetric({
         type: MetricType.REDIS_ERROR,
         value: 1,
         confidence: 1,
         metadata: { error: String(error) },
       });
-<span class="cstat-no" title="statement not covered" >      throw error;</span>
+      throw error;
     }
   }
 &nbsp;
@@ -187,7 +187,7 @@ export class RedisAdapter {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.511Z
+                at 2025-01-08T06:14:27.464Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

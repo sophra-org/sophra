@@ -100,12 +100,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { feedback } = validation.data;
     const timestamp = new Date();
 
-    const feedbackRecord = await prisma.feedbackRequest.create({
+    const feedbackRequest = await prisma.feedbackRequest.create({
       data: {
         feedback: feedback as Prisma.InputJsonValue,
         timestamp,
       },
     });
+
+    const averageRating = feedback.reduce((acc, f) => acc + f.rating, 0) / feedback.length;
+    const uniqueQueries = new Set(feedback.map((f) => f.queryId)).size;
 
     logger.info("Recorded feedback", {
       feedbackCount: feedback.length,
@@ -115,23 +118,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       data: {
-        id: feedbackRecord.id,
-        timestamp: timestamp,
-        feedbackCount: feedback.length,
-        feedback: feedback.map((item) => ({
-          queryId: item.queryId,
-          rating: item.rating,
-          action: item.metadata.userAction,
-          timestamp: item.metadata.timestamp,
-        })),
+        id: feedbackRequest.id,
+        feedback,
+        timestamp,
         meta: {
-          averageRating: feedback.reduce((acc, f) => acc + f.rating, 0) / feedback.length,
-          feedbackCount: feedback.length,
-          uniqueQueries: new Set(feedback.map((f) => f.queryId)).size,
+          uniqueQueries,
+          averageRating,
+          feedbackCount: feedback.length
         }
       },
       meta: {
-        total: 1
+        total: feedback.length
       }
     }, { status: 201 });
   } catch (error) {

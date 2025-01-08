@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>6/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -117,85 +117,85 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import logger from "@/lib/shared/logger";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >validateToken(</span>
+export function validateToken(
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  const token = <span class="cstat-no" title="statement not covered" >req.headers.authorization?.split(" ")[1];</span>
-  const jwtSecret = <span class="cstat-no" title="statement not covered" >process.env.JWT_SECRET;</span>
+  const token = req.headers.authorization?.split(" ")[1];
+  const jwtSecret = process.env.JWT_SECRET;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  logger.debug("Environment check", {</span>
+  logger.debug("Environment check", {
     environment: process.env.NODE_ENV,
     hasJwtSecret: !!jwtSecret,
   });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!token) {</span>
-<span class="cstat-no" title="statement not covered" >    res.status(401).json({ error: "No token provided" });</span>
-<span class="cstat-no" title="statement not covered" >    return;</span>
+  if (!token) {
+    res.status(401).json({ error: "No token provided" });
+    return;
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!jwtSecret) {</span>
-<span class="cstat-no" title="statement not covered" >    logger.error("JWT_SECRET not configured");</span>
-<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: "Server configuration error" });</span>
-<span class="cstat-no" title="statement not covered" >    return;</span>
+  if (!jwtSecret) {
+    logger.error("JWT_SECRET not configured");
+    res.status(500).json({ error: "Server configuration error" });
+    return;
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const decoded = <span class="cstat-no" title="statement not covered" >jwt.verify(token, jwtSecret);</span>
-    (<span class="cstat-no" title="statement not covered" >req as any).user = decoded;</span>
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    (req as any).user = decoded;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    logger.debug("Token validated successfully", {</span>
-      userId: typeof decoded === "object" ? decoded.sub : "unknown",
+    logger.debug("Token validated successfully", {
+      userId: typeof decoded === "object" ? decoded.sub : <span class="branch-1 cbranch-no" title="branch not covered" >"unknown",</span>
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    next();</span>
+    next();
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    logger.error("Token validation error", {</span>
+    logger.error("Token validation error", {
       error,
-      secretPreview: jwtSecret ? `${jwtSecret.slice(0, 8)}...` : "undefined",
+      secretPreview: jwtSecret ? `${jwtSecret.slice(0, 8)}...` : <span class="branch-1 cbranch-no" title="branch not covered" >"undefined",</span>
     });
-<span class="cstat-no" title="statement not covered" >    res.status(401).json({ error: "Invalid token" });</span>
+    res.status(401).json({ error: "Invalid token" });
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -205,7 +205,7 @@ export function <span class="fstat-no" title="function not covered" >validateTok
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.809Z
+                at 2025-01-08T06:14:27.682Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

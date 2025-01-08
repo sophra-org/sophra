@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">62.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>5/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -107,33 +107,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,18 +147,18 @@
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 // Declare Node.js runtime
-export const runtime = <span class="cstat-no" title="statement not covered" >"nodejs";</span>
+export const runtime = "nodejs";
 &nbsp;
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >GET(r</span>eq: NextRequest): Promise&lt;NextResponse&gt; {
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const services = <span class="cstat-no" title="statement not covered" >await serviceManager.getServices();</span>
-    const { searchParams } = <span class="cstat-no" title="statement not covered" >new URL(req.url);</span>
-    const timeWindow = <span class="cstat-no" title="statement not covered" >searchParams.get("timeWindow") || "24h";</span>
+export async function GET(req: NextRequest): Promise&lt;NextResponse&gt; {
+  try {
+    const services = await serviceManager.getServices();
+    const { searchParams } = new URL(req.url);
+    const timeWindow = searchParams.get("timeWindow") || "24h";
 &nbsp;
-    const report = <span class="cstat-no" title="statement not covered" >await services.analytics.generateReport(timeWindow);</span>
+    const report = await services.analytics.generateReport(timeWindow);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return NextResponse.json({</span>
+    return NextResponse.json({
       success: true,
       data: report,
       meta: {
@@ -167,17 +167,17 @@ export async function <span class="fstat-no" title="function not covered" >GET(r
       },
     });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    logger.error("Failed to generate analytics report", {</span>
+    logger.error("Failed to generate analytics report", {
       error,
-      errorType: error instanceof Error ? error.name : typeof error,
-      errorMessage: error instanceof Error ? error.message : String(error),
+      errorType: error instanceof Error ? error.name : <span class="branch-1 cbranch-no" title="branch not covered" >typeof error,</span>
+      errorMessage: error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >String(error),</span>
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return NextResponse.json(</span>
+    return NextResponse.json(
       {
         success: false,
         error: "Failed to generate analytics report",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >"Unknown error",</span>
       },
       { status: 500 }
     );
@@ -190,7 +190,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(r
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T04:46:27.809Z
+                at 2025-01-08T06:14:27.682Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
