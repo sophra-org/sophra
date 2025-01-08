@@ -6,7 +6,6 @@ import { z } from "zod";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
-
 dotenv.config();
 
 const HealthCheckResponseSchema = z.object({
@@ -30,6 +29,10 @@ export async function GET(): Promise<NextResponse> {
     const openaiStatus = { connected: false };
 
     try {
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error("API key not configured");
+      }
+
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
@@ -40,31 +43,33 @@ export async function GET(): Promise<NextResponse> {
         .slice(0, 5)
         .map((m) => m.id);
     } catch (error) {
+      openaiStatus.connected = false;
       (openaiStatus as any).error =
-        error instanceof Error ? error.message : "OpenAI connection failed";
-      logger.error("OpenAI connection error:", { error });
+        error instanceof Error && error.message.includes("API key")
+          ? "API key not configured"
+          : "API Error";
+      logger.error("OpenAI connection error:", error);
     }
 
     const response = HealthCheckResponseSchema.parse({
       success: true,
-      status: "ok",
-      version: process.env.npm_package_version || "0.9.0",
+      status: openaiStatus.connected ? "ok" : "degraded",
+      version: process.env.npm_package_version || "0.0.0",
       timestamp: new Date().toISOString(),
       openai_status: openaiStatus,
     });
 
     return NextResponse.json(response);
   } catch (error) {
-    logger.error("Health check failed:", { error });
-
-    const errorResponse = HealthCheckResponseSchema.parse({
-      success: false,
-      status: "error",
-      message: error instanceof Error ? error.message : "Health check failed",
-      version: process.env.npm_package_version || "0.9.0",
-      timestamp: new Date().toISOString(),
-    });
-
-    return NextResponse.json(errorResponse, { status: 500 });
+    logger.error("Unexpected error in health check:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        status: "error",
+        message: "Internal server error",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    );
   }
 }

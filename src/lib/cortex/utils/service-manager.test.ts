@@ -32,7 +32,14 @@ const mockEnv = {
 describe('ServiceManager', () => {
   beforeEach(() => {
     // Setup environment variables
-    process.env = { ...mockEnv };
+    process.env = {
+      ...process.env, // Preserve existing env vars
+      NODE_ENV: 'test' as 'test' | 'development' | 'production',
+      SOPHRA_REDIS_URL: mockEnv.SOPHRA_REDIS_URL,
+      ELASTICSEARCH_URL: mockEnv.ELASTICSEARCH_URL, 
+      SOPHRA_ES_API_KEY: mockEnv.SOPHRA_ES_API_KEY,
+      OPENAI_API_KEY: mockEnv.OPENAI_API_KEY
+    };
     
     // Clear all mocks
     vi.clearAllMocks();
@@ -169,3 +176,4 @@ describe('ServiceManager', () => {
       expect(mockRedis.on).toHaveBeenCalledWith('error', expect.any(Function));
     });
   });
+});

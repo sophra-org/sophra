@@ -1,6 +1,6 @@
 import { prisma } from "@lib/shared/database/client";
 import logger from "@lib/shared/logger";
-import { EngagementType, Prisma, SignalType } from "@prisma/client";
+import { EngagementType, SignalType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -19,7 +19,7 @@ const FeedbackSchema = z.object({
         customMetadata: z.record(z.unknown()).optional(),
         timestamp: z.string().datetime(),
         engagementType: z.nativeEnum(EngagementType).optional(),
-      })
+      }),
     })
   ),
 });
@@ -31,9 +31,9 @@ export async function GET(): Promise<NextResponse> {
       take: 100,
     });
 
-    const formattedFeedback = feedback.map(f => ({
+    const formattedFeedback = feedback.map((f) => ({
       id: f.id,
-      content: (f.feedback as any[]).map(item => ({
+      feedback: (f.feedback as any[]).map((item) => ({
         queryId: item.queryId,
         rating: item.rating,
         metadata: {
@@ -42,32 +42,34 @@ export async function GET(): Promise<NextResponse> {
           queryHash: item.metadata.queryHash,
           timestamp: item.metadata.timestamp,
           engagementType: item.metadata.engagementType,
-        }
+        },
       })),
-      createdAt: f.timestamp,
-      metrics: {
-        averageRating: (f.feedback as any[]).reduce((acc, item) => acc + item.rating, 0) / (f.feedback as any[]).length,
-        totalFeedback: (f.feedback as any[]).length,
-        uniqueUsers: new Set((f.feedback as any[]).map(item => item.queryId)).size,
-      }
+      timestamp: f.timestamp,
+      meta: {
+        feedbackCount: (f.feedback as any[]).length,
+        averageRating:
+          (f.feedback as any[]).reduce((acc, item) => acc + item.rating, 0) /
+          (f.feedback as any[]).length,
+        uniqueQueries: new Set(
+          (f.feedback as any[]).map((item) => item.queryId)
+        ).size,
+      },
     }));
 
     return NextResponse.json({
       success: true,
       data: formattedFeedback,
       meta: {
-        total: formattedFeedback.length
-      }
+        total: formattedFeedback.length,
+      },
     });
   } catch (error) {
-    logger.error("Failed to fetch feedback", { error });
+    logger.error("Failed to fetch feedback:", error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: "Failed to fetch feedback",
-        meta: {
-          total: 0
-        }
+        meta: { total: 0 },
       },
       { status: 500 }
     );
@@ -77,69 +79,56 @@ export async function GET(): Promise<NextResponse> {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
-    const validation = FeedbackSchema.safeParse(body);
+    const validationResult = FeedbackSchema.safeParse(body);
 
-    if (!validation.success) {
-      logger.error("Invalid feedback request", {
-        errors: validation.error.format(),
-        received: body,
-      });
+    if (!validationResult.success) {
       return NextResponse.json(
         {
           success: false,
           error: "Invalid request format",
-          details: validation.error.format(),
-          meta: {
-            total: 0
-          }
+          details: validationResult.error,
         },
         { status: 400 }
       );
     }
 
-    const { feedback } = validation.data;
-    const timestamp = new Date();
-
-    const feedbackRequest = await prisma.feedbackRequest.create({
+    const feedback = validationResult.data;
+    const result = await prisma.feedbackRequest.create({
       data: {
-        feedback: feedback as Prisma.InputJsonValue,
-        timestamp,
+        feedback: JSON.stringify(feedback.feedback),
+        timestamp: new Date(),
       },
     });
 
-    const averageRating = feedback.reduce((acc, f) => acc + f.rating, 0) / feedback.length;
-    const uniqueQueries = new Set(feedback.map((f) => f.queryId)).size;
+    const metrics = {
+      averageRating:
+        feedback.feedback.reduce((acc, item) => acc + item.rating, 0) /
+        feedback.feedback.length,
+      feedbackCount: feedback.feedback.length,
+      uniqueQueries: new Set(feedback.feedback.map((item) => item.queryId))
+        .size,
+    };
 
-    logger.info("Recorded feedback", {
-      feedbackCount: feedback.length,
-      timestamp: timestamp.toISOString(),
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: feedbackRequest.id,
-        feedback,
-        timestamp,
-        meta: {
-          uniqueQueries,
-          averageRating,
-          feedbackCount: feedback.length
-        }
-      },
-      meta: {
-        total: feedback.length
-      }
-    }, { status: 201 });
-  } catch (error) {
-    logger.error("Failed to record feedback", { error });
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: true,
+        data: {
+          id: result.id,
+          feedback: feedback.feedback,
+          timestamp: result.timestamp,
+          meta: metrics,
+        },
+        meta: { total: 1 },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    logger.error("Failed to record feedback:", error);
+    return NextResponse.json(
+      {
+        success: false,
         error: "Failed to record feedback",
-        meta: {
-          total: 0
-        }
+        meta: { total: 0 },
       },
       { status: 500 }
     );

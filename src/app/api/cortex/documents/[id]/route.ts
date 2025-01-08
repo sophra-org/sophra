@@ -7,7 +7,6 @@ import { z } from "zod";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
-
 // Document update schema
 const UpdateDocumentSchema = z.object({
   title: z.string().optional(),
@@ -42,7 +41,7 @@ export async function PUT(
     if (!validationResult.success) {
       logger.error("Validation error", {
         error: validationResult.error.format(),
-        documentId: params.id
+        documentId: params.id,
       });
       return NextResponse.json(
         {
@@ -54,130 +53,91 @@ export async function PUT(
       );
     }
 
-    const updateFields = validationResult.data;
-    const formattedDocId = params.id.includes("-")
-      ? params.id
-      : params.id.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
+    const updateData = validationResult.data;
+    const documentId = params.id;
 
-    logger.debug("Attempting document update", {
-      docId: formattedDocId,
-      index,
-      fields: Object.keys(updateFields),
-    });
+    // Prepare document content for vectorization
+    const documentContent = `Title: ${updateData.title || ""}\nAbstract: ${updateData.abstract || ""}\nContent: ${updateData.content || ""}`;
 
-    // Vectorize content if present
-    if (validationResult.data.content) {
-      try {
-        await services.vectorization.vectorizeDocument({
-          id: params.id,
-          title: validationResult.data.title || '',
-          content: validationResult.data.content,
-          abstract: validationResult.data.abstract || '',
-          authors: validationResult.data.authors || [],
-          metadata: {
-            documentId: params.id,
-            index,
-            ...validationResult.data.metadata
-          },
-          tags: validationResult.data.tags || [],
-          source: validationResult.data.source || '',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          processing_status: '',
-          embeddings: [],
-          evaluationScore: {
-            actionability: 0,
-            aggregate: 0,
-            clarity: 0,
-            credibility: 0,
-            relevance: 0
-          },
-          evaluation_score: {
-            actionability: 0,
-            aggregate: 0,
-            clarity: 0,
-            credibility: 0,
-            relevance: 0
-          },
-          type: ''
-        });
-      } catch (error) {
-        logger.error("Vectorization failed", {
-          error,
-          documentId: params.id
-        });
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Failed to process document",
-            details: error instanceof Error ? error.message : "Unknown error"
-          },
-          { status: 500 }
-        );
-      }
-    }
-
-    const updateResponse = await fetch(
-      `${process.env.ELASTICSEARCH_URL}/${index}/_update/${formattedDocId}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `ApiKey ${process.env.SOPHRA_ES_API_KEY}`,
-          "Content-Type": "application/json",
+    try {
+      const vectorizedDoc = await services.vectorization.vectorizeDocument({
+        id: documentId,
+        title: updateData.title || "",
+        content: documentContent,
+        abstract: updateData.abstract || "",
+        authors: updateData.authors || [],
+        metadata: updateData.metadata || {},
+        tags: updateData.tags || [],
+        source: updateData.source || "",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        processing_status: "pending",
+        embeddings: [],
+        type: "document",
+        evaluationScore: {
+          actionability: 0,
+          aggregate: 0,
+          clarity: 0,
+          credibility: 0,
+          relevance: 0,
         },
-        body: JSON.stringify({
-          doc: updateFields,
-          doc_as_upsert: true,
-          detect_noop: false,
-        }),
-      }
-    );
-
-    if (!updateResponse.ok) {
-      const errorData = await updateResponse.json();
-      logger.error("ES update failed", {
-        status: updateResponse.status,
-        error: errorData,
+        evaluation_score: {
+          actionability: 0,
+          aggregate: 0,
+          clarity: 0,
+          credibility: 0,
+          relevance: 0,
+        },
       });
-      throw new Error(`ES update failed: ${JSON.stringify(errorData)}`);
+
+      const response = await fetch(
+        `${process.env.ELASTICSEARCH_URL}/${index}/_doc/${documentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `ApiKey ${process.env.SOPHRA_ES_API_KEY}`,
+          },
+          body: JSON.stringify({
+            ...updateData,
+            embeddings: vectorizedDoc.embeddings,
+            processing_status: "completed",
+            updated_at: new Date().toISOString(),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update document in Elasticsearch");
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          updated: true,
+          documentId,
+          metadata: updateData.metadata,
+        },
+      });
+    } catch (error) {
+      logger.error("Failed to update document", { error, documentId });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to update document",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+        { status: 500 }
+      );
     }
-
-    const updateResult = await updateResponse.json();
-
-    logger.debug("Document update result", {
-      docId: formattedDocId,
-      index,
-      result: updateResult.result,
-      updatedFields: Object.keys(updateFields),
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: formattedDocId,
-        index,
-        updated: true,
-        updatedFields: Object.keys(updateFields),
-      },
-      meta: {
-        took: Date.now() - startTime,
-      },
-    });
   } catch (error) {
-    logger.error("Document update failed", {
-      error,
-      documentId: params.id,
-      errorDetails: error instanceof Error ? error.message : String(error),
-    });
-
+    const took = Date.now() - startTime;
+    logger.error("Unexpected error in document update", { error, took });
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to update document",
+        error: "Failed to process document",
         details: error instanceof Error ? error.message : "Unknown error",
-        meta: {
-          took: Date.now() - startTime,
-        },
       },
       { status: 500 }
     );
@@ -244,13 +204,13 @@ export async function GET(
       const errorData = await response.json();
       logger.error("Elasticsearch error", {
         status: response.status,
-        error: errorData
+        error: errorData,
       });
       return NextResponse.json(
         {
           success: false,
           error: "Failed to retrieve document",
-          details: errorData
+          details: errorData,
         },
         { status: 500 }
       );

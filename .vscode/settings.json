@@ -18,11 +18,13 @@
   "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
   "typescript.preferences.quoteStyle": "single",
   "typescript.reportStyleChecks": "strict",
-  "typescript.tsserver.maxTsServerMemory": 8192,
+  "typescript.tsserver.maxTsServerMemory": 16384,
+  "typescript.tsserver.nodePath": "C:\\Program Files\\nodejs\\node.exe", // For Windows
   "typescript.tsserver.watchOptions": {
     "watchFile": "useFsEvents",
     "watchDirectory": "useFsEvents",
-    "fallbackPolling": "dynamicPriorityPolling"
+    "fallbackPolling": "dynamicPriorityPolling",
+    "synchronousWatchDirectory": true
   },
 
   // JavaScript Configuration
@@ -30,6 +32,18 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "javascript.suggest.autoImports": true,
   "javascript.preferences.importModuleSpecifier": "non-relative",
+
+  // Enable real-time problem detection across workspace
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "javascript.suggest.completeJSDocs": true,
+  "typescript.suggest.completeJSDocs": true,
+  "typescript.implementationsCodeLens.enabled": true,
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.suggest.enabled": true,
+  "typescript.workspaceSymbols.scope": "allOpenProjects",
+  "typescript.tsserver.enableTracing": true,
+  "typescript.tsserver.log": "verbose",
+  "typescript.disableAutomaticTypeAcquisition": false,
 
   // Editor Configuration
   "editor.codeActionsOnSave": {
