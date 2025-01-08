@@ -3,6 +3,8 @@ import path from 'path'
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 process.env.POSTGRESQL_URL = process.env.POSTGRESQL_URL || 'postgresql://user:password@localhost:5432/mydatabase';
+process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-openai-key';
+process.env.SOPHRA_REDIS_URL = process.env.SOPHRA_REDIS_URL || 'redis://localhost:6379';
 
 export default defineConfig({
   resolve: {
@@ -45,4 +47,4 @@ export default defineConfig({
       }
     }
   }
-}) 
+})

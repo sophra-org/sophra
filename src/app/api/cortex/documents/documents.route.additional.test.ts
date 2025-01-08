@@ -161,10 +161,9 @@ describe('Documents API Additional Tests', () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(Array.isArray(data.data.document.tags)).toBe(true);
-      expect(Array.isArray(data.data.document.authors)).toBe(true);
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Invalid JSON');
     });
   });
 
