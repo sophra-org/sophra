@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import { GET } from "./route";
-import { mockPrisma } from "~/vitest.setup";
 import { MetricType } from "@prisma/client";
-import { MockRequest } from "@/lib/test/next-server.mock";
+import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mockPrisma } from "~/vitest.setup";
+import { GET } from "./route";
 
 vi.mock("next/server", () => {
   return {
@@ -11,9 +10,9 @@ vi.mock("next/server", () => {
       json: (data: any, init?: { status?: number }) => ({
         status: init?.status || 200,
         ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: () => Promise.resolve(data)
-      })
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () => Promise.resolve(data),
+      }),
     },
     NextRequest: class {
       url: string;
@@ -25,7 +24,7 @@ vi.mock("next/server", () => {
         this.nextUrl = new URL(url);
         this.searchParams = new URL(url).searchParams;
       }
-    }
+    },
   };
 });
 
@@ -65,7 +64,7 @@ describe("Learning Metrics Route Handler", () => {
     timeWindow: "1h",
     createdAt: new Date(),
     updatedAt: new Date(),
-    metadata: {}
+    metadata: {},
   };
 
   beforeEach(() => {
@@ -74,8 +73,18 @@ describe("Learning Metrics Route Handler", () => {
 
   describe("GET /api/nous/learn/metrics", () => {
     it("should fetch metrics with default parameters", async () => {
-      vi.mocked(prisma.learningMetric.findMany).mockResolvedValue([mockMetric]);
-      vi.mocked(prisma.learningMetric.count).mockResolvedValue(1);
+      const mockMetricWithRequired = {
+        ...mockMetric,
+        interval: "1h",
+        modelId: null,
+        timeframe: "1h",
+        aggregated: false,
+      };
+
+      vi.mocked(mockPrisma.learningMetric.findMany).mockResolvedValue([
+        mockMetricWithRequired,
+      ]);
+      vi.mocked(mockPrisma.learningMetric.count).mockResolvedValue(1);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics"
@@ -89,7 +98,7 @@ describe("Learning Metrics Route Handler", () => {
       expect(data.meta).toEqual({
         total: 1,
         page: 1,
-        pageSize: 10
+        pageSize: 10,
       });
     });
 
