@@ -80,3 +80,6 @@ parts/
 sdist/
 var/
 wheels/
+
+#testing
+./coverage
