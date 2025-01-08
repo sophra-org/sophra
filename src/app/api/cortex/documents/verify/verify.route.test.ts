@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET } from './route';
-import { NextRequest, NextResponse } from 'next/server';
-import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import { prisma } from '@/lib/shared/database/client';
-import logger from '@/lib/shared/logger';
+import { mockPrisma } from '@/../vitest.setup';
+
+vi.mock('@/lib/shared/database/client', () => ({
+    prisma: mockPrisma
+}));
 
 vi.mock('@/lib/cortex/utils/service-manager', () => ({
     serviceManager: {
@@ -12,14 +12,6 @@ vi.mock('@/lib/cortex/utils/service-manager', () => ({
                 indexExists: vi.fn()
             }
         })
-    }
-}));
-
-vi.mock('@/lib/shared/database/client', () => ({
-    default: {
-        index: {
-            findUnique: vi.fn()
-        }
     }
 }));
 
@@ -65,6 +57,12 @@ vi.mock('next/server', () => ({
     }
 }));
 
+import { GET } from './route';
+import { NextRequest, NextResponse } from 'next/server';
+import { serviceManager } from '@/lib/cortex/utils/service-manager';
+import { prisma } from '@/lib/shared/database/client';
+import logger from '@/lib/shared/logger';
+
 global.fetch = vi.fn();
 
 describe('Document Verification API Route', () => {
@@ -93,7 +91,7 @@ describe('Document Verification API Route', () => {
     });
 
     it('should return 404 when index is not found in database', async () => {
-        vi.mocked(prisma.index.findUnique).mockResolvedValue(null);
+        vi.mocked(mockPrisma.index.findUnique).mockResolvedValue(null);
 
         const request = new NextRequest('http://localhost/api/documents/verify?index=invalid-index&id=123');
         const response = await GET(request);
@@ -105,7 +103,7 @@ describe('Document Verification API Route', () => {
     });
 
     it('should return document verification details when document exists', async () => {
-        vi.mocked(prisma.index.findUnique).mockResolvedValue({
+        vi.mocked(mockPrisma.index.findUnique).mockResolvedValue({
             id: 'test-index-id',
             name: 'test-index',
             status: 'active',
@@ -146,7 +144,7 @@ describe('Document Verification API Route', () => {
     });
 
     it('should handle non-existent document gracefully', async () => {
-        vi.mocked(prisma.index.findUnique).mockResolvedValue({
+        vi.mocked(mockPrisma.index.findUnique).mockResolvedValue({
             id: 'test-index-id',
             name: 'test-index',
             status: 'active',
@@ -181,7 +179,7 @@ describe('Document Verification API Route', () => {
     });
 
     it('should handle elasticsearch service errors', async () => {
-        vi.mocked(prisma.index.findUnique).mockResolvedValue({
+        vi.mocked(mockPrisma.index.findUnique).mockResolvedValue({
             id: 'test-index-id',
             name: 'test-index',
             status: 'active',

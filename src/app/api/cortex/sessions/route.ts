@@ -28,31 +28,42 @@ function convertPrismaSession(prismaSession: {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
-  const services = await serviceManager.getServices();
+  let services;
+  let body;
 
   try {
-    const body = await req.json();
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Invalid JSON body" },
+      { status: 400 }
+    );
+  }
 
-    logger.debug("Creating session with body:", { body });
 
-    if (body.metadata && typeof body.metadata !== "object") {
-      return NextResponse.json(
-        { success: false, error: "Metadata must be an object" },
-        { status: 400 }
-      );
-    }
+  // Validation checks
+  if (body.metadata !== undefined && (typeof body.metadata !== "object" || body.metadata === null)) {
+    return NextResponse.json(
+      { success: false, error: "Metadata must be an object" },
+      { status: 400 }
+    );
+  }
 
-    if (body.userId && typeof body.userId !== "string") {
-      return NextResponse.json(
-        { success: false, error: "User ID must be a string" },
-        { status: 400 }
-      );
-    }
+  if (body.userId !== undefined && typeof body.userId !== "string") {
+    return NextResponse.json(
+      { success: false, error: "User ID must be a string" },
+      { status: 400 }
+    );
+  }
 
+  try {
+    // Service initialization and session creation
+    services = await serviceManager.getServices();
     const session = await services.sessions.createSession({
       userId: body.userId,
       metadata: body.metadata,
     });
+
     const convertedSession = {
       id: session.id,
       userId: session.userId,
@@ -62,14 +73,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       createdAt: session.createdAt,
       updatedAt: new Date()
     };
-    const jsonSafeSession = {
-      ...convertedSession,
-      metadata: convertedSession.metadata || null,
-    };
+
     await services.redis.set(
       `session:${convertedSession.id}`,
-      JSON.stringify(jsonSafeSession),
-      3600,
+      JSON.stringify(convertedSession),
+      3600
     );
 
     services.metrics.recordLatency(
@@ -78,39 +86,32 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       Date.now() - startTime
     );
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: {
-          sessionId: convertedSession.id,
-          ...convertedSession,
-        },
-        cached: true,
-      },
-      { status: 200 }
-    );
+    const response = {
+      success: true,
+      data: {
+        sessionId: session.id,
+        ...convertedSession,
+      }
+    };
 
+    return NextResponse.json(response, { status: 200 });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Failed to create session", {
-        error: {
-          message: error.message,
-          name: error.name,
-          stack: error.stack,
-        },
-        body: req.body,
-      });
-    } else {
-      logger.error("Failed to create session with unknown error type", {
-        error,
+    logger.error("Failed to create session", {
+      error: error instanceof Error ? {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+      } : error,
+      body: req.body,
+    });
+
+    if (services) {
+      services.metrics.incrementSearchError({
+        search_type: "session",
+        index: "sessions",
+        error_type: error instanceof Error ? error.name : "unknown",
       });
     }
-
-    services.metrics.incrementSearchError({
-      search_type: "session",
-      index: "sessions",
-      error_type: error instanceof Error ? error.name : "unknown",
-    });
 
     return NextResponse.json(
       {

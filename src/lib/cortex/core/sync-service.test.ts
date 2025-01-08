@@ -321,8 +321,8 @@ describe('DataSyncService', () => {
     it('should fetch from Elasticsearch if cache miss', async () => {
       mockRedis.get.mockResolvedValue(null);
       const expectedResponse = {
-        hits: [
-          {
+        hits: {
+          hits: [{
             _id: '123',
             _score: 1,
             _source: {
@@ -354,11 +354,14 @@ describe('DataSyncService', () => {
               created_at: '2024-01-01T00:00:00Z',
               updated_at: '2024-01-01T00:00:00Z',
             }
-          }
-        ],
-        total: 1,
+          }],
+          total: {
+            value: 1,
+            relation: 'eq'
+          },
+          max_score: 1
+        },
         took: 1,
-        maxScore: 1,
       };
       mockElastic.search.mockResolvedValue(expectedResponse);
       mockRedis.set.mockResolvedValue(undefined);
@@ -401,7 +404,7 @@ describe('DataSyncService', () => {
       }));
 
       mockElastic = {
-        delete: vi.fn().mockResolvedValue({
+        deleteDocument: vi.fn().mockResolvedValue({
           result: 'deleted',
         }),
       };
@@ -442,10 +445,10 @@ describe('DataSyncService', () => {
       expect(prisma.document.delete).toHaveBeenCalledWith({
         where: { id: '123' },
       });
-      expect(mockElastic.delete).toHaveBeenCalledWith({
-        index: 'documents',
-        id: '123',
-      });
+      expect(mockElastic.deleteDocument).toHaveBeenCalledWith(
+        'documents',
+        '123'
+      );
       expect(mockRedis.del).toHaveBeenCalledWith('doc:documents:123');
     });
 
@@ -471,4 +474,4 @@ describe('DataSyncService', () => {
       );
     });
   });
-}); 
+});

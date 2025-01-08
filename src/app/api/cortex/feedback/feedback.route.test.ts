@@ -1,26 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, POST } from './route';
-import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import { Services } from '@/lib/cortex/types/services';
-import { PrismaClient } from '@prisma/client';
-import { prisma } from '@/lib/shared/database/client';
-import logger from '@/lib/shared/logger';
-import { NextRequest, NextResponse } from 'next/server';
-import { MockNextRequest } from './__mocks__/next-server';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { mockPrisma } from '@/../vitest.setup';
 
-// Mock setup with proper typing
 vi.mock('@/lib/shared/database/client', () => ({
-    default: {
-        feedbackRequest: {
-            findMany: vi.fn(),
-        },
-        session: {
-            findUnique: vi.fn(),
-        },
-        searchEvent: {
-            create: vi.fn(),
-        },
-    } as unknown as PrismaClient,
+    prisma: mockPrisma
 }));
 
 vi.mock('@/lib/cortex/utils/service-manager', () => ({
@@ -39,6 +21,14 @@ vi.mock('@/lib/shared/logger', () => ({
 vi.mock('next/server', () => {
     return vi.importActual<typeof import('./__mocks__/next-server')>('./__mocks__/next-server');
 });
+
+import { GET, POST } from './route';
+import { serviceManager } from '@/lib/cortex/utils/service-manager';
+import { Services } from '@/lib/cortex/types/services';
+import { prisma } from '@/lib/shared/database/client';
+import logger from '@/lib/shared/logger';
+import { NextRequest, NextResponse } from 'next/server';
+import { MockNextRequest } from './__mocks__/next-server';
 
 // Helper function to create URL object
 const mockRequest = (params = {}) => {
@@ -66,7 +56,7 @@ describe('GET /api/cortex/feedback', () => {
 
     it('should return feedback data with default parameters', async () => {
         const mockFeedback = [{ id: '1', feedback: { rating: 1 }, timestamp: new Date() }];
-        vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
+        vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
 
         const req = mockRequest();
         const res = await GET(req as unknown as NextRequest);
@@ -80,7 +70,7 @@ describe('GET /api/cortex/feedback', () => {
 
     it('should handle custom timeframe and limit parameters', async () => {
         const mockFeedback = [{ id: '1', feedback: { rating: 1 }, timestamp: new Date() }];
-        vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
+        vi.mocked(mockPrisma.feedbackRequest.findMany).mockResolvedValue(mockFeedback);
 
         const req = mockRequest({ timeframe: '7d', limit: '50' });
         const res = await GET(req as unknown as NextRequest);
@@ -89,7 +79,7 @@ describe('GET /api/cortex/feedback', () => {
         expect(data.success).toBe(true);
         expect(data.metadata.timeframe).toBe('7d');
         expect(data.metadata.took).toBeGreaterThan(0);
-        expect(vi.mocked(prisma.feedbackRequest.findMany)).toHaveBeenCalledWith(
+        expect(vi.mocked(mockPrisma.feedbackRequest.findMany)).toHaveBeenCalledWith(
             expect.objectContaining({
                 take: 50
             })
@@ -97,7 +87,7 @@ describe('GET /api/cortex/feedback', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-        vi.mocked(prisma.feedbackRequest.findMany).mockRejectedValue(new Error('Database error'));
+        vi.mocked(mockPrisma.feedbackRequest.findMany).mockRejectedValue(new Error('Database error'));
 
         const req = mockRequest();
         const res = await GET(req as unknown as NextRequest);
@@ -141,7 +131,7 @@ describe('POST /api/cortex/feedback', () => {
             return now;
         });
         
-        vi.mocked(prisma.session.findUnique).mockResolvedValue({
+        vi.mocked(mockPrisma.session.findUnique).mockResolvedValue({
             id: 'test-session',
             data: {},
             metadata: {},
@@ -152,7 +142,7 @@ describe('POST /api/cortex/feedback', () => {
             createdAt: new Date(),
             updatedAt: new Date()
         });
-        vi.mocked(prisma.searchEvent.create).mockResolvedValue({ 
+        vi.mocked(mockPrisma.searchEvent.create).mockResolvedValue({ 
             id: 'search123',
             timestamp: new Date(),
             filters: {},
@@ -189,7 +179,7 @@ describe('POST /api/cortex/feedback', () => {
     });
 
     it('should reject invalid session IDs', async () => {
-        vi.mocked(prisma.session.findUnique).mockResolvedValue(null);
+        vi.mocked(mockPrisma.session.findUnique).mockResolvedValue(null);
 
         const req = new MockNextRequest('http://localhost/api/cortex/feedback', {
             method: 'POST',

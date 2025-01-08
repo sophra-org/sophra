@@ -1,12 +1,22 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { GET, POST } from './route';
-import { serviceManager } from '@/lib/cortex/utils/service-manager';
-import { NextRequest, NextResponse } from 'next/server';
-import logger from '@/lib/shared/logger';
-import { Services } from '@/lib/cortex/types/services';
+import { mockPrisma } from '@/../vitest.setup';
 
-vi.mock('@/lib/cortex/utils/service-manager');
-vi.mock('@/lib/shared/logger');
+vi.mock('@/lib/shared/database/client', () => ({
+    prisma: mockPrisma
+}));
+
+vi.mock('@/lib/cortex/utils/service-manager', () => ({
+    serviceManager: {
+        getServices: vi.fn()
+    }
+}));
+
+vi.mock('@/lib/shared/logger', () => ({
+    default: {
+        error: vi.fn()
+    }
+}));
+
 vi.mock('next/server', () => ({
     NextRequest: vi.fn().mockImplementation((url, options = {}) => ({
         url,
@@ -28,6 +38,13 @@ vi.mock('next/server', () => ({
     },
 }));
 
+import { GET, POST } from './route';
+import { serviceManager } from '@/lib/cortex/utils/service-manager';
+import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/lib/shared/logger';
+import { Services } from '@/lib/cortex/types/services';
+import { prisma } from '@/lib/shared/database/client';
+
 describe('Sessions API', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -47,12 +64,20 @@ describe('Sessions API', () => {
 
             const mockServices = {
                 sessions: {
-                    createSession: vi.fn().mockResolvedValue(mockSession),
-                    cacheSession: vi.fn().mockResolvedValue(undefined)
+                    createSession: vi.fn().mockResolvedValue({
+                        id: mockSession.id,
+                        userId: mockSession.userId,
+                        metadata: mockSession.metadata,
+                        createdAt: mockSession.createdAt
+                    })
                 },
                 metrics: {
                     recordLatency: vi.fn(),
                     incrementSearchError: vi.fn()
+                },
+                redis: {
+                    set: vi.fn().mockResolvedValue(undefined),
+                    get: vi.fn().mockResolvedValue(null)
                 }
             };
 
@@ -75,9 +100,31 @@ describe('Sessions API', () => {
                 userId: 'user-123',
                 metadata: { key: 'value' }
             });
+            expect(mockServices.redis.set).toHaveBeenCalledWith(
+                'session:test-id',
+                expect.any(String),
+                3600
+            );
         });
 
         it('should return 400 for invalid metadata type', async () => {
+            const mockServices = {
+                sessions: {
+                    createSession: vi.fn(),
+                    cacheSession: vi.fn()
+                },
+                metrics: {
+                    recordLatency: vi.fn(),
+                    incrementSearchError: vi.fn()
+                },
+                redis: {
+                    set: vi.fn().mockResolvedValue(undefined),
+                    get: vi.fn().mockResolvedValue(null)
+                }
+            };
+
+            vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
+
             const req = new NextRequest('http://localhost/api/sessions', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -91,9 +138,27 @@ describe('Sessions API', () => {
             expect(response.status).toBe(400);
             expect(data.success).toBe(false);
             expect(data.error).toBe('Metadata must be an object');
+            expect(mockServices.sessions.createSession).not.toHaveBeenCalled();
         });
 
         it('should return 400 for invalid userId type', async () => {
+            const mockServices = {
+                sessions: {
+                    createSession: vi.fn(),
+                    cacheSession: vi.fn()
+                },
+                metrics: {
+                    recordLatency: vi.fn(),
+                    incrementSearchError: vi.fn()
+                },
+                redis: {
+                    set: vi.fn().mockResolvedValue(undefined),
+                    get: vi.fn().mockResolvedValue(null)
+                }
+            };
+
+            vi.mocked(serviceManager.getServices).mockResolvedValue(mockServices as unknown as Services);
+
             const req = new NextRequest('http://localhost/api/sessions', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -107,6 +172,7 @@ describe('Sessions API', () => {
             expect(response.status).toBe(400);
             expect(data.success).toBe(false);
             expect(data.error).toBe('User ID must be a string');
+            expect(mockServices.sessions.createSession).not.toHaveBeenCalled();
         });
     });
 

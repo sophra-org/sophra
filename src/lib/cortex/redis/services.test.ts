@@ -129,7 +129,7 @@ describe('RedisCacheService', () => {
 
     it('should handle set errors', async () => {
       mockClient.setEx = vi.fn().mockRejectedValue(new Error('Set failed'));
-      await cacheService.set('test-key', 'test-value', 3600);
+      await expect(cacheService.set('test-key', 'test-value', 3600)).rejects.toThrow('Set failed');
       expect(mockLogger.error).toHaveBeenCalled();
       expect(mockMetrics.incrementMetric).toHaveBeenCalledWith('redis_set_failed', expect.any(Object));
     });

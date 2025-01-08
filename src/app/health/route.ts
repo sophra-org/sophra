@@ -13,9 +13,9 @@ export async function GET(_req: NextRequest): Promise<NextResponse> {
     const [esHealth, pgHealth, redisHealth] = await Promise.all([
       services.elasticsearch.ping().then((result) => {
         logger.info("Elasticsearch health check:", {
-          status: result ? "connected" : "disconnected",
+          status: result.operational ? "connected" : "disconnected",
         });
-        return result;
+        return result.operational;
       }),
       services.postgres.ping().then((result) => {
         logger.info("PostgreSQL health check:", {

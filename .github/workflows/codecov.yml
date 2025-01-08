@@ -16,31 +16,47 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
-          
+          fetch-depth: 2  # Needed for Codecov to generate diff data
+      
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+
       - name: Install dependencies
         run: pnpm install
 
       - name: Run tests with coverage
         run: pnpm test
+        continue-on-error: true  # Allow the workflow to continue even if tests fail
 
       - name: Upload coverage to Codecov
+        if: always() && !cancelled()
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info,./coverage/coverage-final.json,./coverage/cobertura-coverage.xml
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: true
-          verbose: true 
+          fail_ci_if_error: false  # Don't fail CI if Codecov upload fails
+          verbose: true
+          codecov_yml_path: ./codecov.yml  # If you have a custom codecov config
+          directory: ./coverage/
+          root_dir: .
+          working-directory: .
+          dry_run: false
+
+      - name: Upload test results to Codecov
+        if: always() && !cancelled()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

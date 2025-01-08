@@ -76,8 +76,16 @@ export class RedisCacheService extends BaseService {
    * @param {number} [ttl] - How long to keep it
    */
   async set(key: string, value: unknown, ttl: number): Promise<void> {
-    const serializedValue = JSON.stringify(value);
-    await this.client.setEx(key, ttl, serializedValue);
+    try {
+      const serializedValue = JSON.stringify(value);
+      await this.client.setEx(key, ttl, serializedValue);
+    } catch (error) {
+      this.logger.error('Redis set failed', { error, key });
+      this.metrics.incrementMetric('redis_set_failed', {
+        error_type: error instanceof Error ? error.name : 'unknown'
+      });
+      throw error;
+    }
   }
 
   /**

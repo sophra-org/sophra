@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/shared/database/client";
+import { prisma } from "../../../lib/shared/database/client";
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { adminMiddleware } from "./admin.middleware";
