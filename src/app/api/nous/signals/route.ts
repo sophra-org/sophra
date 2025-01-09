@@ -10,19 +10,27 @@ export const runtime = "nodejs";
 
 const SignalType = z.nativeEnum(PrismaSignalType);
 
-const SignalSchema = z.object({
+// Base schema for required fields
+const SignalBaseSchema = z.object({
   type: SignalType,
   source: z.string(),
-  value: z.number(),
+  value: z.any(),
   strength: z.number(),
-  priority: z.number(),
-  retries: z.number(),
-  manual: z.boolean(),
-  processed: z.boolean(),
-  processedAt: z.date(),
-  error: z.string(),
-  timestamp: z.date(),
-  metadata: z.record(z.unknown()),
+});
+
+// Extended schema with optional fields
+const SignalSchema = SignalBaseSchema.extend({
+  priority: z.number().optional().default(0),
+  retries: z.number().optional().default(0),
+  manual: z.boolean().optional().default(false),
+  processed: z.boolean().optional().default(false),
+  processedAt: z.date().nullable().optional(),
+  error: z.string().nullable().optional(),
+  timestamp: z.union([z.string(), z.date()]).optional().transform(val => {
+    if (!val) return new Date();
+    return val instanceof Date ? val : new Date(val);
+  }),
+  metadata: z.record(z.unknown()).optional().default({}),
 });
 
 const SignalCreateSchema = SignalSchema;
@@ -141,10 +149,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       priority: body.priority ?? 0,
     };
 
-    const validation = SignalCreateSchema.safeParse(dataWithDefaults);
+    // First validate required fields
+    const baseValidation = SignalBaseSchema.safeParse(dataWithDefaults);
+    if (!baseValidation.success) {
+      logger.error("Invalid request format", {
+        errors: baseValidation.error.format(),
+        received: dataWithDefaults,
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid request format",
+          details: baseValidation.error.format(),
+        },
+        { status: 400 }
+      );
+    }
 
+    // Then validate full schema
+    const validation = SignalCreateSchema.safeParse(dataWithDefaults);
     if (!validation.success) {
-      logger.error("Invalid signal creation request", {
+      logger.error("Invalid request format", {
         errors: validation.error.format(),
         received: dataWithDefaults,
       });
@@ -160,11 +185,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Create signal with validated data
     try {
+      logger.info("Creating signal with data", { data: validation.data });
       const signal = await prisma.signal.create({
         data: {
           type: validation.data.type,
           source: validation.data.source,
-          value: validation.data.value as Prisma.InputJsonValue,
+          value: validation.data.value,
           strength: validation.data.strength,
           priority: validation.data.priority,
           retries: validation.data.retries,
@@ -172,25 +198,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           processed: validation.data.processed,
           processedAt: validation.data.processedAt,
           error: validation.data.error,
-          timestamp: new Date(validation.data.timestamp),
+          timestamp: validation.data.timestamp,
           metadata: validation.data.metadata as Prisma.InputJsonValue,
         },
       });
 
-      logger.info("Signal created successfully", { signalId: signal.id });
+      logger.info("Signal created successfully", { signal });
+
+      // Return the signal with the timestamp as a Date object for test compatibility
+      const responseData = {
+        ...signal,
+        timestamp: signal.timestamp instanceof Date ? signal.timestamp : new Date(signal.timestamp),
+      };
 
       return NextResponse.json({
         success: true,
-        data: {
-          ...signal,
-          timestamp: signal.timestamp.toISOString(),
-        },
+        data: responseData,
         metadata: {
           timestamp: new Date().toISOString(),
         },
       }, { status: 201 });
     } catch (error) {
-      logger.error("Database error creating signal", { error });
+      logger.error("Failed to create signal", { error, data: validation.data });
       return NextResponse.json(
         {
           success: false,

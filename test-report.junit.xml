@@ -1,132 +1,106 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="31" failures="6" errors="0" time="8.666">
-    <testsuite name="src/app/api/nous/signals/route.test.ts" timestamp="2025-01-08T23:43:17.341Z" hostname="sophra" tests="5" failures="2" errors="0" skipped="0" time="0.0749126">
-        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; GET /api/nous/signals &gt; should fetch signals with default pagination" time="0.0426025">
+<testsuites name="vitest tests" tests="31" failures="3" errors="0" time="5.638">
+    <testsuite name="src/app/api/nous/signals/route.test.ts" timestamp="2025-01-09T01:21:46.387Z" hostname="sophra" tests="5" failures="0" errors="0" skipped="0" time="0.0472828">
+        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; GET /api/nous/signals &gt; should fetch signals with default pagination" time="0.0294565">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; GET /api/nous/signals &gt; should handle filtering by source and type" time="0.0050994">
+        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; GET /api/nous/signals &gt; should handle filtering by source and type" time="0.004607">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; GET /api/nous/signals &gt; should handle database errors gracefully" time="0.0013845">
+        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; GET /api/nous/signals &gt; should handle database errors gracefully" time="0.0014034">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; POST /api/nous/signals &gt; should create a new signal with valid data" time="0.0188343">
-            <failure message="expected 400 to be 201 // Object.is equality" type="AssertionError">
-AssertionError: expected 400 to be 201 // Object.is equality
+        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; POST /api/nous/signals &gt; should create a new signal with valid data" time="0.0085527">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; POST /api/nous/signals &gt; should handle database errors during creation" time="0.0014093">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/signals/signals.route.additional.test.ts" timestamp="2025-01-09T01:21:46.392Z" hostname="sophra" tests="13" failures="3" errors="0" skipped="0" time="0.0663341">
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle default pagination parameters" time="0.013979">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle custom pagination parameters" time="0.0028288">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should filter by source" time="0.0015618">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should filter by type" time="0.0019531">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should combine source and type filters" time="0.0024081">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Error Handling &gt; should handle database errors" time="0.0028504">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should validate required fields" time="0.0045132">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should handle invalid signal type" time="0.002545">
+        </testcase>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should create signal with required fields" time="0.01622">
+            <failure message="expected 500 to be 201 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 201 // Object.is equality
 
 - Expected
 + Received
 
 - 201
-+ 400
++ 500
 
- ❯ src/app/api/nous/signals/route.test.ts:244:31
+ ❯ src/app/api/nous/signals/signals.route.additional.test.ts:256:33
             </failure>
         </testcase>
-        <testcase classname="src/app/api/nous/signals/route.test.ts" name="Signals Route Handler &gt; POST /api/nous/signals &gt; should handle database errors during creation" time="0.0041342">
-            <failure message="expected 400 to be 500 // Object.is equality" type="AssertionError">
-AssertionError: expected 400 to be 500 // Object.is equality
-
-- Expected
-+ Received
-
-- 500
-+ 400
-
- ❯ src/app/api/nous/signals/route.test.ts:298:31
-            </failure>
-        </testcase>
-    </testsuite>
-    <testsuite name="src/app/api/nous/signals/signals.route.additional.test.ts" timestamp="2025-01-08T23:43:17.353Z" hostname="sophra" tests="13" failures="4" errors="0" skipped="0" time="0.1010358">
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle default pagination parameters" time="0.023782">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle custom pagination parameters" time="0.0040389">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should filter by source" time="0.0024054">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should filter by type" time="0.0031961">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should combine source and type filters" time="0.003769">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Error Handling &gt; should handle database errors" time="0.0033995">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should validate required fields" time="0.0066569">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should handle invalid signal type" time="0.0025341">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should create signal with required fields" time="0.0170446">
-            <failure message="expected 400 to be 201 // Object.is equality" type="AssertionError">
-AssertionError: expected 400 to be 201 // Object.is equality
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should handle optional fields with defaults" time="0.006099">
+            <failure message="expected 500 to be 201 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 201 // Object.is equality
 
 - Expected
 + Received
 
 - 201
-+ 400
++ 500
 
- ❯ src/app/api/nous/signals/signals.route.additional.test.ts:238:33
+ ❯ src/app/api/nous/signals/signals.route.additional.test.ts:292:33
             </failure>
         </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should handle optional fields with defaults" time="0.0117256">
-            <failure message="expected 400 to be 201 // Object.is equality" type="AssertionError">
-AssertionError: expected 400 to be 201 // Object.is equality
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should handle custom timestamps" time="0.0039993">
+            <failure message="expected 500 to be 201 // Object.is equality" type="AssertionError">
+AssertionError: expected 500 to be 201 // Object.is equality
 
 - Expected
 + Received
 
 - 201
-+ 400
++ 500
 
- ❯ src/app/api/nous/signals/signals.route.additional.test.ts:261:33
+ ❯ src/app/api/nous/signals/signals.route.additional.test.ts:343:33
             </failure>
         </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should handle custom timestamps" time="0.0082144">
-            <failure message="Cannot read properties of undefined (reading &apos;timestamp&apos;)" type="TypeError">
-TypeError: Cannot read properties of undefined (reading &apos;timestamp&apos;)
- ❯ src/app/api/nous/signals/signals.route.additional.test.ts:299:26
-            </failure>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Error Handling &gt; should handle invalid JSON" time="0.0015335">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Error Handling &gt; should handle invalid JSON" time="0.0021444">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Error Handling &gt; should handle database errors" time="0.007249">
-            <failure message="expected 400 to be 500 // Object.is equality" type="AssertionError">
-AssertionError: expected 400 to be 500 // Object.is equality
-
-- Expected
-+ Received
-
-- 500
-+ 400
-
- ❯ src/app/api/nous/signals/signals.route.additional.test.ts:335:33
-            </failure>
+        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Error Handling &gt; should handle database errors" time="0.0027485">
         </testcase>
     </testsuite>
-    <testsuite name="src/app/api/nous/signals/observe/observe.route.test.ts" timestamp="2025-01-08T23:43:17.363Z" hostname="sophra" tests="6" failures="0" errors="0" skipped="0" time="0.0784006">
-        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; GET /api/nous/signals/observe &gt; should fetch signal stats without filters" time="0.0508446">
+    <testsuite name="src/app/api/nous/signals/observe/observe.route.test.ts" timestamp="2025-01-09T01:21:46.399Z" hostname="sophra" tests="6" failures="0" errors="0" skipped="0" time="0.0411896">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; GET /api/nous/signals/observe &gt; should fetch signal stats without filters" time="0.0253678">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; GET /api/nous/signals/observe &gt; should handle filtering by source and type" time="0.0063484">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; GET /api/nous/signals/observe &gt; should handle filtering by source and type" time="0.0027728">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; GET /api/nous/signals/observe &gt; should handle database errors gracefully" time="0.0014991">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; GET /api/nous/signals/observe &gt; should handle database errors gracefully" time="0.0010427">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; POST /api/nous/signals/observe &gt; should fetch detailed signal stats with valid query" time="0.0086423">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; POST /api/nous/signals/observe &gt; should fetch detailed signal stats with valid query" time="0.0050493">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; POST /api/nous/signals/observe &gt; should reject invalid query format" time="0.0036891">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; POST /api/nous/signals/observe &gt; should reject invalid query format" time="0.0029635">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; POST /api/nous/signals/observe &gt; should handle database errors gracefully" time="0.0030543">
+        <testcase classname="src/app/api/nous/signals/observe/observe.route.test.ts" name="Signals Observe Route Handler &gt; POST /api/nous/signals/observe &gt; should handle database errors gracefully" time="0.0016278">
         </testcase>
     </testsuite>
-    <testsuite name="src/app/api/nous/signals/process/process.route.test.ts" timestamp="2025-01-08T23:43:17.366Z" hostname="sophra" tests="7" failures="0" errors="0" skipped="0" time="0.0794809">
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; GET /api/nous/signals/process &gt; should fetch pending signals with default parameters" time="0.0433699">
+    <testsuite name="src/app/api/nous/signals/process/process.route.test.ts" timestamp="2025-01-09T01:21:46.400Z" hostname="sophra" tests="7" failures="0" errors="0" skipped="0" time="0.0613224">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; GET /api/nous/signals/process &gt; should fetch pending signals with default parameters" time="0.0319375">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; GET /api/nous/signals/process &gt; should handle specific status filtering" time="0.0025244">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; GET /api/nous/signals/process &gt; should handle specific status filtering" time="0.0018931">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; GET /api/nous/signals/process &gt; should handle database errors gracefully" time="0.0014129">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; GET /api/nous/signals/process &gt; should handle database errors gracefully" time="0.0013917">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should update signal processing status with valid data" time="0.0070488">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should update signal processing status with valid data" time="0.0075775">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should reject invalid update format" time="0.0033112">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should reject invalid update format" time="0.0025592">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should handle processing errors gracefully" time="0.0116519">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should handle processing errors gracefully" time="0.0075853">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should handle complex metadata updates" time="0.0071891">
+        <testcase classname="src/app/api/nous/signals/process/process.route.test.ts" name="Signals Process Route Handler &gt; POST /api/nous/signals/process &gt; should handle complex metadata updates" time="0.0062953">
         </testcase>
     </testsuite>
 </testsuites>

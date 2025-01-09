@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET, POST } from './route';
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/shared/database/client';
-import logger from '@/lib/shared/logger';
+import { prisma } from '@lib/shared/database/client';
+import logger from '@lib/shared/logger';
 import { ModelType, Prisma } from '@prisma/client';
 
 // Mock dependencies
-vi.mock('@/lib/shared/database/client', () => ({
+vi.mock('@lib/shared/database/client', () => ({
   prisma: {
     modelConfig: {
       findMany: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock('@/lib/shared/database/client', () => ({
   },
 }));
 
-vi.mock('@/lib/shared/logger', () => ({
+vi.mock('@lib/shared/logger', () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),

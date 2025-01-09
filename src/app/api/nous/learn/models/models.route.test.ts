@@ -1,8 +1,6 @@
-import type { ModelConfig, ModelVersion } from "@prisma/client";
-import { ModelType } from "@prisma/client";
+import { ModelConfig, ModelType, ModelVersion, Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mockPrisma } from "~/vitest.setup";
 
 // Mock modules
 vi.mock("@lib/shared/logger", () => ({
@@ -29,39 +27,42 @@ vi.mock("next/server", () => ({
   },
 }));
 
-vi.mock("@lib/shared/database/client", () => {
-  const typedMockPrisma = {
-    ...mockPrisma,
-    modelConfig: mockPrisma.modelConfig as unknown as ModelConfig,
-    modelVersion: mockPrisma.modelVersion as unknown as ModelVersion,
-  };
-  return { prisma: typedMockPrisma };
-});
+const mockPrisma = {
+  modelConfig: {
+    findMany: vi.fn(),
+    create: vi.fn(),
+  },
+  modelVersion: {
+    create: vi.fn(),
+  },
+};
+
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: mockPrisma,
+}));
 
 // Import after mocks
 import { prisma } from "@lib/shared/database/client";
 import { GET, POST } from "./route";
 
 describe("Models Route Handler", () => {
-  const mockModel = {
+  const now = new Date();
+  const mockVersion: ModelVersion = {
+    id: "v1",
+    configId: "test-1",
+    metrics: {} as Prisma.JsonValue,
+    artifactPath: "",
+    parentVersion: null,
+    createdAt: now,
+  };
+
+  const mockModel: ModelConfig & { modelVersions: ModelVersion[] } = {
     id: "test-1",
     type: ModelType.PATTERN_DETECTOR,
-    hyperparameters: { learning_rate: 0.01 },
+    hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
     features: ["feature1", "feature2"],
-    trainingParams: { epochs: 100 },
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    modelVersions: [
-      {
-        id: "v1",
-        modelId: "test-1",
-        metrics: {},
-        artifactPath: "",
-        parentVersion: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
+    trainingParams: { epochs: 100 } as Prisma.JsonValue,
+    modelVersions: [mockVersion],
   };
 
   beforeEach(() => {
@@ -80,7 +81,15 @@ describe("Models Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual([mockModel]);
+      expect(data.data).toEqual([{
+        ...mockModel,
+        createdAt: mockModel.createdAt.toISOString(),
+        updatedAt: mockModel.updatedAt.toISOString(),
+        modelVersions: mockModel.modelVersions.map(version => ({
+          ...version,
+          createdAt: version.createdAt.toISOString(),
+        })),
+      }]);
       expect(data.meta).toEqual({
         total: 1,
         page: 1,
@@ -109,12 +118,14 @@ describe("Models Route Handler", () => {
   });
 
   describe("POST /api/nous/learn/models", () => {
+
+  describe("POST /api/nous/learn/models", () => {
     it("should create model successfully", async () => {
       const modelData = {
         type: ModelType.PATTERN_DETECTOR,
-        hyperparameters: { learning_rate: 0.01 },
+        hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
         features: ["feature1", "feature2"],
-        trainingParams: { epochs: 100 },
+        trainingParams: { epochs: 100 } as Prisma.JsonValue,
       };
 
       vi.mocked(prisma.modelConfig.create).mockResolvedValue({
@@ -132,7 +143,11 @@ describe("Models Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toMatchObject(modelData);
+      expect(data.data).toMatchObject({
+        ...modelData,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+      });
     });
 
     it("should handle invalid request format", async () => {
@@ -158,7 +173,7 @@ describe("Models Route Handler", () => {
     it("should handle database errors during creation", async () => {
       const modelData = {
         type: ModelType.PATTERN_DETECTOR,
-        hyperparameters: { learning_rate: 0.01 },
+        hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
         features: ["feature1", "feature2"],
       };
 

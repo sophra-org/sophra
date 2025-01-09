@@ -35,15 +35,6 @@ vi.mock("../../../../lib/shared/database/client", () => {
   return { prisma: mockPrisma };
 });
 
-vi.mock("../../../../lib/shared/database/validation/generated", () => ({
-  SignalSchema: {
-    omit: () => ({
-      parse: (value: any) => value,
-      safeParse: (value: any) => ({ success: true, data: value }),
-    }),
-  },
-}));
-
 vi.mock("../../../../lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
@@ -100,15 +91,15 @@ describe("Signals Route Handler", () => {
           id: "1",
           type: SignalType.SEARCH,
           source: "test",
-          value: { test: "data" },
+          value: 123,
           strength: 1,
           priority: 1,
           timestamp: new Date(),
           processed: false,
           manual: false,
-          metadata: null,
+          metadata: {},
           error: null,
-          retries: null,
+          retries: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
           processedAt: null,
@@ -117,15 +108,15 @@ describe("Signals Route Handler", () => {
           id: "2",
           type: SignalType.SEARCH,
           source: "test",
-          value: { test: "data" },
+          value: 123,
           strength: 1,
           priority: 1,
           timestamp: new Date(),
           processed: false,
           manual: false,
-          metadata: null,
+          metadata: {},
           error: null,
-          retries: null,
+          retries: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
           processedAt: null,
@@ -153,15 +144,15 @@ describe("Signals Route Handler", () => {
           id: "1",
           type: SignalType.SEARCH,
           source: "test",
-          value: { test: "data" },
+          value: 123,
           strength: 1,
           priority: 1,
           timestamp: new Date(),
           processed: false,
           manual: false,
-          metadata: null,
+          metadata: {},
           error: null,
-          retries: null,
+          retries: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
           processedAt: null,
@@ -205,27 +196,28 @@ describe("Signals Route Handler", () => {
 
   describe("POST /api/nous/signals", () => {
     it("should create a new signal with valid data", async () => {
+      const now = new Date();
       const mockSignal = {
         type: SignalType.SEARCH,
         source: "test",
-        value: { test: "data" },
+        value: 123,
         strength: 1,
         priority: 1,
-        timestamp: new Date().toISOString(),
+        timestamp: now.toISOString(),
         processed: false,
         manual: false,
-        metadata: null,
+        metadata: {},
         error: null,
-        retries: null,
+        retries: 0,
       };
 
       const mockResponse = {
         ...mockSignal,
         id: "1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
         processedAt: null,
-        timestamp: new Date(mockSignal.timestamp),
+        timestamp: now,
       };
 
       vi.mocked(prisma.signal.create).mockResolvedValue(mockResponse);
@@ -243,12 +235,7 @@ describe("Signals Route Handler", () => {
 
       expect(response.status).toBe(201);
       expect(data.success).toBe(true);
-      expect(data.data).toMatchObject(
-        expect.objectContaining({
-          ...mockResponse,
-          value: expect.any(Object),
-        })
-      );
+      expect(data.data).toEqual(mockResponse);
 
       expect(prisma.signal.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -271,15 +258,15 @@ describe("Signals Route Handler", () => {
       const mockSignal = {
         type: SignalType.SEARCH,
         source: "test",
-        value: { test: "data" },
+        value: 123,
         strength: 1,
         priority: 1,
         timestamp: new Date().toISOString(),
         processed: false,
         manual: false,
-        metadata: null,
+        metadata: {},
         error: null,
-        retries: null,
+        retries: 0,
       };
 
       vi.mocked(prisma.signal.create).mockRejectedValue(new Error("DB Error"));

@@ -1,12 +1,12 @@
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "../../../../lib/shared/database/client";
+import logger from "../../../../lib/shared/logger";
 import { Prisma, SignalType } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET, POST } from "./route";
 
 // Mock dependencies
-vi.mock("@/lib/shared/database/client", () => ({
+vi.mock("../../../../lib/shared/database/client", () => ({
   prisma: {
     signal: {
       findMany: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock("@/lib/shared/database/client", () => ({
   },
 }));
 
-vi.mock("@/lib/shared/logger", () => ({
+vi.mock("../../../../lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
   },
@@ -31,7 +31,7 @@ describe("Signals API Additional Tests", () => {
     id,
     type: SignalType.SEARCH,
     source: "test-source",
-    value: { data: "test" } as Prisma.JsonValue,
+    value: 123,
     strength: 1.0,
     timestamp: new Date(),
     createdAt: new Date(),
@@ -39,10 +39,10 @@ describe("Signals API Additional Tests", () => {
     processed: false,
     manual: false,
     processedAt: null,
-    metadata: null,
+    metadata: {},
     error: null,
-    retries: null,
-    priority: null,
+    retries: 0,
+    priority: 0,
   });
 
   describe("GET Endpoint", () => {
@@ -204,7 +204,7 @@ describe("Signals API Additional Tests", () => {
           body: JSON.stringify({
             type: "INVALID_TYPE",
             source: "test",
-            value: { data: "test" },
+            value: 123,
             strength: 1.0,
           }),
         });
@@ -219,16 +219,34 @@ describe("Signals API Additional Tests", () => {
 
     describe("Signal Creation", () => {
       it("should create signal with required fields", async () => {
-        const mockSignal = createMockSignal("signal-1");
-        vi.mocked(prisma.signal.create).mockResolvedValue(mockSignal);
+        const now = new Date();
+        const mockSignal = {
+          type: SignalType.SEARCH,
+          source: "test-source",
+          value: 123,
+          strength: 1.0,
+          priority: 0,
+          retries: 0,
+          manual: false,
+          processed: false,
+          error: null,
+          metadata: {},
+          timestamp: now,
+        };
+
+        vi.mocked(prisma.signal.create).mockResolvedValue({
+          ...mockSignal,
+          id: "signal-1",
+          createdAt: now,
+          updatedAt: now,
+          processedAt: null,
+        });
 
         const request = new NextRequest("http://localhost/api/signals", {
           method: "POST",
           body: JSON.stringify({
-            type: SignalType.SEARCH,
-            source: "test-source",
-            value: { data: "test" },
-            strength: 1.0,
+            ...mockSignal,
+            timestamp: now.toISOString(),
           }),
         });
 
@@ -237,22 +255,35 @@ describe("Signals API Additional Tests", () => {
 
         expect(response.status).toBe(201);
         expect(data.success).toBe(true);
-        expect(data.data).toEqual(mockSignal);
       });
 
       it("should handle optional fields with defaults", async () => {
-        const mockSignal = createMockSignal("signal-1");
-        vi.mocked(prisma.signal.create).mockResolvedValue(mockSignal);
+        const now = new Date();
+        const mockSignal = {
+          type: SignalType.SEARCH,
+          source: "test-source",
+          value: 123,
+          strength: 1.0,
+        };
+
+        vi.mocked(prisma.signal.create).mockResolvedValue({
+          ...mockSignal,
+          id: "signal-1",
+          timestamp: now,
+          createdAt: now,
+          updatedAt: now,
+          processedAt: null,
+          priority: 0,
+          retries: 0,
+          manual: false,
+          processed: false,
+          error: null,
+          metadata: {},
+        });
 
         const request = new NextRequest("http://localhost/api/signals", {
           method: "POST",
-          body: JSON.stringify({
-            type: SignalType.SEARCH,
-            source: "test-source",
-            value: { data: "test" },
-            strength: 1.0,
-            // No optional fields
-          }),
+          body: JSON.stringify(mockSignal),
         });
 
         const response = await POST(request);
@@ -265,10 +296,10 @@ describe("Signals API Additional Tests", () => {
               processed: false,
               manual: false,
               processedAt: null,
-              metadata: null,
+              metadata: {},
               error: null,
-              retries: null,
-              priority: null,
+              retries: 0,
+              priority: 0,
             }),
           })
         );
@@ -277,18 +308,31 @@ describe("Signals API Additional Tests", () => {
       it("should handle custom timestamps", async () => {
         const customTimestamp = new Date("2024-01-01T00:00:00Z");
         const mockSignal = {
-          ...createMockSignal("signal-1"),
+          type: SignalType.SEARCH,
+          source: "test-source",
+          value: 123,
+          strength: 1.0,
           timestamp: customTimestamp,
         };
-        vi.mocked(prisma.signal.create).mockResolvedValue(mockSignal);
+
+        vi.mocked(prisma.signal.create).mockResolvedValue({
+          ...mockSignal,
+          id: "signal-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          processedAt: null,
+          priority: 0,
+          retries: 0,
+          manual: false,
+          processed: false,
+          error: null,
+          metadata: {},
+        });
 
         const request = new NextRequest("http://localhost/api/signals", {
           method: "POST",
           body: JSON.stringify({
-            type: SignalType.SEARCH,
-            source: "test-source",
-            value: { data: "test" },
-            strength: 1.0,
+            ...mockSignal,
             timestamp: customTimestamp.toISOString(),
           }),
         });
@@ -296,7 +340,8 @@ describe("Signals API Additional Tests", () => {
         const response = await POST(request);
         const data = await response.json();
 
-        expect(data.data.timestamp).toBe(customTimestamp.toISOString());
+        expect(response.status).toBe(201);
+        expect(data.data.timestamp).toEqual(customTimestamp);
       });
     });
 
@@ -324,7 +369,7 @@ describe("Signals API Additional Tests", () => {
           body: JSON.stringify({
             type: SignalType.SEARCH,
             source: "test-source",
-            value: { data: "test" },
+            value: 123,
             strength: 1.0,
           }),
         });

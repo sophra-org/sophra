@@ -105,7 +105,6 @@ describe("Metrics Route Additional Tests", () => {
       const response = await GET(request);
       const data = await response.json();
 
-      //Status code is already correct for validation failure (400)
       expect(response.status).toBe(400);
       expect(data).toEqual({
         success: false,
@@ -133,6 +132,48 @@ describe("Metrics Route Additional Tests", () => {
       const response = await GET(request);
       const data = await response.json();
 
+      expect(response.status).toBe(200);
+      expect(data).toEqual({
+        metrics: [
+          {
+            id: mockMetric.id,
+            type: mockMetric.type,
+            value: mockMetric.value,
+            count: mockMetric.count,
+            timestamp: mockMetric.timestamp.toISOString(),
+            sessionId: mockMetric.sessionId,
+            interval: mockMetric.interval,
+            timeframe: mockMetric.timeframe,
+            modelId: mockMetric.modelId,
+            metadata: mockMetric.metadata,
+            aggregated: mockMetric.aggregated,
+            createdAt: mockMetric.createdAt.toISOString(),
+            updatedAt: mockMetric.updatedAt.toISOString(),
+          },
+          {
+            id: "metric-2",
+            type: MetricType.ENGAGEMENT_RATE,
+            value: mockMetric.value,
+            count: mockMetric.count,
+            timestamp: mockMetric.timestamp.toISOString(),
+            sessionId: mockMetric.sessionId,
+            interval: mockMetric.interval,
+            timeframe: mockMetric.timeframe,
+            modelId: mockMetric.modelId,
+            metadata: mockMetric.metadata,
+            aggregated: mockMetric.aggregated,
+            createdAt: mockMetric.createdAt.toISOString(),
+            updatedAt: mockMetric.updatedAt.toISOString(),
+          },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          total: 2,
+          totalPages: 1,
+        },
+      });
+
       expect(prisma.learningMetric.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
@@ -140,7 +181,6 @@ describe("Metrics Route Additional Tests", () => {
           }),
         })
       );
-      expect(data.metrics).toHaveLength(2);
     });
 
     it("should handle different timeframes", async () => {
