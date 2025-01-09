@@ -1,56 +1,52 @@
-import { vi, beforeEach, describe, it, expect } from 'vitest';
-import type { ApiKey } from '@prisma/client';
-import { POST, GET, PUT, DELETE } from './route';
-import * as adminMiddleware from './admin.middleware';
-import { INTERNALS } from 'next/dist/server/web/spec-extension/request';
-import { ResponseCookies } from 'next/dist/server/web/spec-extension/cookies';
-import { NextResponse } from 'next/server';
+import type { ApiKey } from "@prisma/client";
+import { ResponseCookies } from "next/dist/server/web/spec-extension/cookies";
+import { INTERNALS } from "next/dist/server/web/spec-extension/request";
+import { NextResponse } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as adminMiddleware from "./admin.middleware";
+import { DELETE, GET, POST, PUT } from "./route";
 
-// Mock database client
-const mockCreate = vi.fn();
-const mockFindMany = vi.fn();
-const mockUpdate = vi.fn();
-const mockDelete = vi.fn();
+const mockApiKeyOperations = vi.hoisted(() => ({
+  create: vi.fn(),
+  findMany: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+}));
 
-vi.mock('../../../lib/shared/database/client', () => ({
+vi.mock("../../../lib/shared/database/client", () => ({
   prisma: {
-    apiKey: {
-      create: mockCreate,
-      findMany: mockFindMany,
-      update: mockUpdate,
-      delete: mockDelete
-    }
-  }
+    apiKey: mockApiKeyOperations,
+  },
 }));
 
-vi.mock('./admin.middleware', () => ({
-  adminMiddleware: vi.fn()
+vi.mock("./admin.middleware", () => ({
+  adminMiddleware: vi.fn(),
 }));
 
-vi.mock('next/server', () => ({
+vi.mock("next/server", () => ({
   NextRequest: vi.fn().mockImplementation((url, init) => ({
     url,
-    body: init?.body || '',
-    method: init?.method || 'GET',
+    body: init?.body || "",
+    method: init?.method || "GET",
     cookies: {},
     geo: {},
-    ip: '127.0.0.1',
+    ip: "127.0.0.1",
     nextUrl: new URL(url),
     headers: new Headers(),
-    text: async () => init?.body || '',
-    json: async () => init?.body ? JSON.parse(init.body) : {}
+    text: async () => init?.body || "",
+    json: async () => (init?.body ? JSON.parse(init.body) : {}),
   })),
   NextResponse: {
     json: vi.fn().mockImplementation((data, init) => ({
       status: init?.status || 200,
       ok: init?.status ? init.status >= 200 && init.status < 300 : true,
       headers: new Headers(),
-      json: async () => data
-    }))
-  }
+      json: async () => data,
+    })),
+  },
 }));
 
-describe('API Keys Route Handlers', () => {
+describe("API Keys Route Handlers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(adminMiddleware.adminMiddleware).mockResolvedValue({
@@ -60,9 +56,9 @@ describe('API Keys Route Handlers', () => {
       json: async () => ({}),
       cookies: new ResponseCookies(new Headers()),
       redirected: false,
-      statusText: '',
-      type: 'default',
-      url: '',
+      statusText: "",
+      type: "default",
+      url: "",
       clone: function (): Response {
         return structuredClone(this) as Response;
       },
@@ -71,46 +67,49 @@ describe('API Keys Route Handlers', () => {
       arrayBuffer: async () => new ArrayBuffer(0),
       blob: async () => new Blob(),
       formData: async () => new FormData(),
-      text: async () => '',
+      text: async () => "",
       [INTERNALS]: {
         cookies: new Map(),
-        url: 'http://localhost:3000/api/keys',
-        body: null
-      }
+        url: "http://localhost:3000/api/keys",
+        body: null,
+      },
     } as unknown as NextResponse);
   });
 
-  describe('POST /api/keys', () => {
-    it('should create a new API key with valid input', async () => {
+  describe("POST /api/keys", () => {
+    it("should create a new API key with valid input", async () => {
       const mockApiKey = {
-        id: '1',
-        key: 'test-key',
-        name: 'Test Key',
-        clientId: 'client1',
-        description: 'Test description',
+        id: "1",
+        key: "test-key",
+        name: "Test Key",
+        clientId: "client1",
+        description: "Test description",
         rateLimit: 100,
-        allowedIps: ['127.0.0.1'],
+        allowedIps: ["127.0.0.1"],
         expiresAt: new Date(),
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
         lastUsedAt: null,
-        usageCount: 0
+        usageCount: 0,
       } as ApiKey;
 
-      mockCreate.mockResolvedValue(mockApiKey);
+      mockApiKeyOperations.create.mockResolvedValue(mockApiKey);
 
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: 'Test Key',
-          clientId: 'client1',
-          description: 'Test description',
-          rateLimit: 100,
-          allowedIps: ['127.0.0.1'],
-          expiresAt: new Date().toISOString()
-        })
-      });
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Test Key",
+            clientId: "client1",
+            description: "Test description",
+            rateLimit: 100,
+            allowedIps: ["127.0.0.1"],
+            expiresAt: new Date().toISOString(),
+          }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
@@ -120,47 +119,51 @@ describe('API Keys Route Handlers', () => {
       expect(data.key).toBeDefined();
     });
 
-    it('should handle database errors during creation', async () => {
-      mockCreate.mockRejectedValue(new Error('Database error'));
+    it("should handle database errors during creation", async () => {
+      mockApiKeyOperations.create.mockRejectedValue(
+        new Error("Database error")
+      );
 
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys', {
-        method: 'POST',
-        body: JSON.stringify({ name: 'Test Key' })
-      });
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys",
+        {
+          method: "POST",
+          body: JSON.stringify({ name: "Test Key" }),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to create API key');
+      expect(data.error).toBe("Failed to create API key");
     });
   });
 
-  describe('GET /api/keys', () => {
-    it('should return list of API keys without exposing actual keys', async () => {
-      const mockApiKeys = [{
-        id: '1',
-        name: 'Test Key',
-        clientId: 'client1',
-        description: 'Test description',
-        isActive: true,
-        expiresAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastUsedAt: new Date(),
-        allowedIps: ['127.0.0.1'],
-        rateLimit: 100,
-        usageCount: 0
-      }] as ApiKey[];
+  describe("GET /api/keys", () => {
+    it("should return list of API keys without exposing actual keys", async () => {
+      const mockApiKeys = [
+        {
+          id: "1",
+          name: "Test Key",
+          clientId: "client1",
+          description: "Test description",
+          isActive: true,
+          expiresAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastUsedAt: new Date(),
+          allowedIps: ["127.0.0.1"],
+          rateLimit: 100,
+          usageCount: 0,
+        },
+      ] as ApiKey[];
 
-      const mappedApiKeys = mockApiKeys.map(key => ({
-        ...key,
-        key: 'test-key'
-      }));
+      mockApiKeyOperations.findMany.mockResolvedValue(mockApiKeys);
 
-      mockFindMany.mockResolvedValue(mappedApiKeys);
-
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys');
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys"
+      );
       const response = await GET(request);
       const data = await response.json();
 
@@ -170,13 +173,13 @@ describe('API Keys Route Handlers', () => {
     });
   });
 
-  describe('PUT /api/keys', () => {
-    it('should update API key with regenerated key', async () => {
+  describe("PUT /api/keys", () => {
+    it("should update API key with regenerated key", async () => {
       const mockUpdatedKey = {
-        id: '1',
-        key: 'new-key',
-        name: 'Updated Key',
-        clientId: 'client1',
+        id: "1",
+        key: "new-key",
+        name: "Updated Key",
+        clientId: "client1",
         description: null,
         isActive: true,
         expiresAt: null,
@@ -185,49 +188,58 @@ describe('API Keys Route Handlers', () => {
         lastUsedAt: null,
         allowedIps: [],
         rateLimit: null,
-        usageCount: 0
+        usageCount: 0,
       } as ApiKey;
 
-      mockUpdate.mockResolvedValue(mockUpdatedKey);
+      mockApiKeyOperations.update.mockResolvedValue(mockUpdatedKey);
 
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys', {
-        method: 'PUT',
-        body: JSON.stringify({
-          id: '1',
-          name: 'Updated Key',
-          regenerateKey: true
-        })
-      });
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys",
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            id: "1",
+            name: "Updated Key",
+            regenerateKey: true,
+          }),
+        }
+      );
 
       const response = await PUT(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.name).toBe('Updated Key');
+      expect(data.name).toBe("Updated Key");
       expect(data.key).toBeUndefined();
     });
 
-    it('should reject updates without ID', async () => {
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys', {
-        method: 'PUT',
-        body: JSON.stringify({ name: 'Updated Key' })
-      });
+    it("should reject updates without ID", async () => {
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys",
+        {
+          method: "PUT",
+          body: JSON.stringify({ name: "Updated Key" }),
+        }
+      );
 
       const response = await PUT(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('API key ID is required');
+      expect(data.error).toBe("API key ID is required");
     });
   });
 
-  describe('DELETE /api/keys', () => {
-    it('should successfully delete an API key', async () => {
-      mockDelete.mockResolvedValue({} as ApiKey);
+  describe("DELETE /api/keys", () => {
+    it("should successfully delete an API key", async () => {
+      mockApiKeyOperations.delete.mockResolvedValue({} as ApiKey);
 
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys?id=1', {
-        method: 'DELETE'
-      });
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys?id=1",
+        {
+          method: "DELETE",
+        }
+      );
 
       const response = await DELETE(request);
       const data = await response.json();
@@ -236,16 +248,19 @@ describe('API Keys Route Handlers', () => {
       expect(data.success).toBe(true);
     });
 
-    it('should handle missing ID parameter', async () => {
-      const request = new (vi.mocked(require('next/server').NextRequest))('http://localhost/api/keys', {
-        method: 'DELETE'
-      });
+    it("should handle missing ID parameter", async () => {
+      const request = new (vi.mocked(require("next/server").NextRequest))(
+        "http://localhost/api/keys",
+        {
+          method: "DELETE",
+        }
+      );
 
       const response = await DELETE(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('API key ID is required');
+      expect(data.error).toBe("API key ID is required");
     });
   });
 });

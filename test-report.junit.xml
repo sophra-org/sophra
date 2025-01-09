@@ -1,23 +1,68 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="5.849">
-    <testsuite name="src/lib/nous/learn/models.test.ts" timestamp="2025-01-09T18:04:12.848Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0194397">
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; train &gt; should train the model successfully" time="0.0057758">
+<testsuites name="vitest tests" tests="7" failures="0" errors="0" time="4.451">
+    <testsuite name="src/lib/nous/utils/service-manager.test.ts" timestamp="2025-01-09T18:33:08.191Z" hostname="sophra" tests="7" failures="0" errors="0" skipped="0" time="0.0140479">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; initialization &gt; should create singleton instance" time="0.0026032">
         </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; train &gt; should throw error when no features provided" time="0.0017894">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; initialization &gt; should throw if not initialized with config" time="0.0012483">
         </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; predict &gt; should throw error when model is not trained" time="0.0006295">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; service access &gt; should get signal coordinator" time="0.0058041">
+            <system-out>
+[default] Signal Coordinator initialized
+
+            </system-out>
+            <system-err>
+[default] Error registering processor {
+  error: TypeError: Cannot read properties of undefined (reading &apos;logger&apos;)
+      at new SearchSignalProcessor [90m(D:\sophra\[39msrc\lib\nous\observe\processors.ts:115:11[90m)[39m
+      at SignalCoordinator.register_processor [90m(D:\sophra\[39msrc\lib\nous\observe\coordinator.ts:116:9[90m)[39m
+      at SignalCoordinator._register_default_processors [90m(D:\sophra\[39msrc\lib\nous\observe\coordinator.ts:1442:12[90m)[39m
+      at new SignalCoordinator [90m(D:\sophra\[39msrc\lib\nous\observe\coordinator.ts:14:3[90m)[39m
+      at ServiceManager.getSignalCoordinator [90m(D:\sophra\[39msrc\lib\nous\utils\service-manager.ts:90:21[90m)[39m
+      at [90mD:\sophra\[39msrc\lib\nous\utils\service-manager.test.ts:57:35
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m,
+  criteria: {
+    signal_types: [ [32m&apos;SEARCH&apos;[39m ],
+    min_strength: [33m0.1[39m,
+    max_strength: [33m1[39m,
+    required_fields: [ [32m&apos;query&apos;[39m, [32m&apos;results&apos;[39m ]
+  }
+}
+[default] Error registering default processors {
+  error: TypeError: Cannot read properties of undefined (reading &apos;logger&apos;)
+      at new SearchSignalProcessor [90m(D:\sophra\[39msrc\lib\nous\observe\processors.ts:115:11[90m)[39m
+      at SignalCoordinator.register_processor [90m(D:\sophra\[39msrc\lib\nous\observe\coordinator.ts:116:9[90m)[39m
+      at SignalCoordinator._register_default_processors [90m(D:\sophra\[39msrc\lib\nous\observe\coordinator.ts:1442:12[90m)[39m
+      at new SignalCoordinator [90m(D:\sophra\[39msrc\lib\nous\observe\coordinator.ts:14:3[90m)[39m
+      at ServiceManager.getSignalCoordinator [90m(D:\sophra\[39msrc\lib\nous\utils\service-manager.ts:90:21[90m)[39m
+      at [90mD:\sophra\[39msrc\lib\nous\utils\service-manager.test.ts:57:35
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+}
+
+            </system-err>
         </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; predict &gt; should make predictions after training" time="0.0013865">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; service access &gt; should get event collector" time="0.0008015">
+            <system-out>
+[default] Event Collector initialized
+
+            </system-out>
         </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; evaluate &gt; should throw error when model is not trained" time="0.0007677">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; service access &gt; should get prisma client" time="0.0006758">
         </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; evaluate &gt; should calculate metrics after training" time="0.0015529">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; service access &gt; should get redis client" time="0.0004635">
         </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; saveState &gt; should save model state successfully" time="0.0017913">
-        </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; loadState &gt; should load model state successfully" time="0.0024742">
-        </testcase>
-        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; loadState &gt; should throw error when version not found" time="0.0008788">
+        <testcase classname="src/lib/nous/utils/service-manager.test.ts" name="ServiceManager &gt; shutdown &gt; should disconnect all services" time="0.0008326">
+            <system-out>
+[default] Shutting down services...
+[default] Redis disconnected
+[default] Prisma disconnected
+
+            </system-out>
         </testcase>
     </testsuite>
 </testsuites>
