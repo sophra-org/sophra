@@ -58,7 +58,7 @@ export async function GET(
     // Vectorize document
     await services.sync.vectorizeDocument({
       id: params.id,
-      index: index.name
+      index: index.name,
     });
 
     // Get updated document with embeddings
@@ -185,14 +185,10 @@ export async function PUT(
     });
   } catch (error) {
     logger.error("Failed to update document", {
-      error,
+      error: error instanceof Error ? error : new Error(String(error)),
       documentId: params.id,
     });
     return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to update document",
-        details: error instanceof Error ? error.message : "Unknown error",
       {
         success: false,
         error: "Failed to update document",

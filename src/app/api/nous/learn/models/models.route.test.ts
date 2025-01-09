@@ -1,65 +1,41 @@
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
 import { ModelConfig, ModelType, ModelVersion, Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// Define mock objects
-const mockPrisma = {
-  modelConfig: {
-    findMany: vi.fn(),
-    create: vi.fn(),
-  },
-  modelVersion: {
-    create: vi.fn(),
-  },
-};
-
-const mockLogger = {
-  error: vi.fn(),
-  info: vi.fn(),
-};
-
-// Mock modules
-vi.mock("@lib/shared/logger", () => ({
-  default: mockLogger,
-}));
-
-vi.mock("next/server", () => ({
-  NextRequest: vi.fn().mockImplementation((url) => ({
-    url,
-    nextUrl: new URL(url),
-    headers: new Headers(),
-    json: vi.fn(),
-  })),
-  NextResponse: {
-    json: vi.fn().mockImplementation((data, init) => ({
-      status: init?.status || 200,
-      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-      headers: new Headers(),
-      json: async () => data,
-    })),
-  },
-}));
-
-vi.mock("@lib/shared/database/client", () => ({
-  prisma: mockPrisma,
-}));
-
-// Import after mocks
-import { prisma } from "@lib/shared/database/client";
 import { GET, POST } from "./route";
 
-// Extend ModelConfig to include createdAt and updatedAt
+// Define interfaces for type safety
 interface ModelConfigWithTimestamps extends ModelConfig {
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Extend ModelVersion to include createdAt
 interface ModelVersionWithTimestamps extends ModelVersion {
   createdAt: Date;
 }
 
-describe("Models Route Handler", () => {
+// Mock modules
+vi.mock("@lib/shared/logger", () => ({
+  default: {
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: {
+    modelConfig: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+    },
+    modelVersion: {
+      create: vi.fn(),
+    },
+  },
+}));
+
+describe("Models API Endpoints", () => {
   const now = new Date();
   const mockVersion: ModelVersionWithTimestamps = {
     id: "v1",
@@ -70,7 +46,9 @@ describe("Models Route Handler", () => {
     createdAt: now,
   };
 
-  const mockModel: ModelConfigWithTimestamps & { modelVersions: ModelVersionWithTimestamps[] } = {
+  const mockModel: ModelConfigWithTimestamps & {
+    modelVersions: ModelVersionWithTimestamps[];
+  } = {
     id: "test-1",
     type: ModelType.PATTERN_DETECTOR,
     hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
@@ -86,130 +64,312 @@ describe("Models Route Handler", () => {
   });
 
   describe("GET /api/nous/learn/models", () => {
-    it("should fetch models successfully", async () => {
-      vi.mocked(prisma.modelConfig.findMany).mockResolvedValue([mockModel]);
+    describe("successful scenarios", () => {
+      it("should fetch models with proper pagination metadata", async () => {
+        const mockModelWithVersions = {
+          id: "test-1",
+          type: ModelType.PATTERN_DETECTOR,
+          features: ["feature1", "feature2"],
+          hyperparameters: { learning_rate: 0.01 },
+          trainingParams: { epochs: 100 },
+          createdAt: "2025-01-09T11:19:39.510Z",
+          updatedAt: "2025-01-09T11:19:39.510Z",
+          modelVersions: [
+            {
+              id: "v1",
+              configId: "test-1",
+              artifactPath: "",
+              metrics: {},
+              parentVersion: null,
+              createdAt: "2025-01-09T11:19:39.510Z",
+            },
+          ],
+        };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/models"
-      );
-      const response = await GET(request);
-      const data = await response.json();
+        vi.mocked(prisma.modelConfig.findMany).mockResolvedValueOnce([
+          mockModelWithVersions,
+        ]);
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toEqual([
-        {
-          ...mockModel,
-          createdAt: mockModel.createdAt.toISOString(),
-          updatedAt: mockModel.updatedAt.toISOString(),
-          modelVersions: mockModel.modelVersions.map((version) => ({
-            ...version,
-            createdAt: version.createdAt.toISOString(),
-          })),
-        },
-      ]);
-      expect(data.meta).toEqual({
-        total: 1,
-        page: 1,
-        pageSize: 10,
+        const request = new NextRequest(
+          "http://localhost:3000/api/nous/learn/models",
+          {
+            headers: {
+              "x-test-header": "test-value",
+            },
+          }
+        );
+
+        const response = await GET(request);
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data).toMatchObject({
+          success: true,
+          data: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.any(String),
+              type: expect.any(String),
+              features: expect.any(Array),
+              modelVersions: expect.any(Array),
+            }),
+          ]),
+          meta: {
+            total: expect.any(Number),
+            page: expect.any(Number),
+            pageSize: expect.any(Number),
+          },
+        });
+
+        expect(logger.info).toHaveBeenCalledWith(
+          "Received models request",
+          expect.objectContaining({
+            url: request.url,
+            headers: expect.objectContaining({
+              "x-test-header": "test-value",
+            }),
+          })
+        );
+
+        expect(logger.info).toHaveBeenCalledWith(
+          "Retrieved models from database",
+          expect.objectContaining({
+            modelCount: 1,
+            took: expect.any(Number),
+          })
+        );
+
+        expect(prisma.modelConfig.findMany).toHaveBeenCalledWith({
+          include: {
+            modelVersions: {
+              orderBy: { createdAt: "desc" },
+              take: 1,
+            },
+          },
+        });
+      });
+
+      it("should handle empty results with proper metadata", async () => {
+        vi.mocked(prisma.modelConfig.findMany).mockResolvedValueOnce([]);
+
+        const request = new NextRequest(
+          "http://localhost:3000/api/nous/learn/models"
+        );
+        const response = await GET(request);
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data).toMatchObject({
+          success: true,
+          data: [],
+          meta: {
+            total: 0,
+            page: expect.any(Number),
+            pageSize: expect.any(Number),
+          },
+        });
       });
     });
 
-    it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.modelConfig.findMany).mockRejectedValue(
-        new Error("DB Error")
-      );
+    describe("error scenarios", () => {
+      it("should handle database errors with proper error response", async () => {
+        vi.mocked(prisma.modelConfig.findMany).mockRejectedValueOnce(
+          new Error("DB Error")
+        );
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/models"
-      );
-      const response = await GET(request);
-      const data = await response.json();
+        const request = new NextRequest(
+          "http://localhost:3000/api/nous/learn/models"
+        );
+        const response = await GET(request);
+        const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Failed to fetch models");
-      expect(data.details).toBe("DB Error");
-      expect(data.metadata).toBeDefined();
-      expect(data.metadata.took).toBeGreaterThan(0);
+        expect(response.status).toBe(500);
+        expect(data).toMatchObject({
+          success: false,
+          error: expect.any(String),
+          metadata: {
+            took: expect.any(Number),
+            timestamp: expect.any(String),
+          },
+        });
+
+        expect(logger.error).toHaveBeenCalledWith(
+          "Failed to fetch models",
+          expect.objectContaining({
+            error: expect.any(Error),
+            took: expect.any(Number),
+          })
+        );
+      });
     });
   });
 
   describe("POST /api/nous/learn/models", () => {
-    it("should create model successfully", async () => {
-      const modelData = {
-        type: ModelType.PATTERN_DETECTOR,
-        hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
-        features: ["feature1", "feature2"],
-        trainingParams: { epochs: 100 } as Prisma.JsonValue,
-      };
+    const validModelData = {
+      type: ModelType.PATTERN_DETECTOR,
+      hyperparameters: { learning_rate: 0.01 },
+      features: ["feature1", "feature2"],
+      trainingParams: { epochs: 100 },
+    };
 
-      vi.mocked(prisma.modelConfig.create).mockResolvedValue({
-        ...mockModel,
-        ...modelData,
-      });
+    describe("successful scenarios", () => {
+      it("should create model with proper response structure", async () => {
+        const mockCreatedModel = {
+          id: "test-1",
+          type: ModelType.PATTERN_DETECTOR,
+          hyperparameters: { learning_rate: 0.01 },
+          features: ["feature1", "feature2"],
+          trainingParams: { epochs: 100 },
+          isTrained: false,
+          trainingProgress: 0,
+          createdAt: "2025-01-09T11:19:39.510Z",
+          updatedAt: "2025-01-09T11:19:39.510Z",
+        };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/models"
-      );
-      request.json = vi.fn().mockResolvedValue(modelData);
+        vi.mocked(prisma.modelConfig.create).mockResolvedValueOnce(
+          mockCreatedModel
+        );
 
-      const response = await POST(request);
-      const data = await response.json();
+        const request = new NextRequest(
+          "http://localhost/api/nous/learn/models",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+        request.json = vi.fn().mockResolvedValue(validModelData);
 
-      expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toMatchObject({
-        ...modelData,
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String),
+        const response = await POST(request);
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data).toMatchObject({
+          success: true,
+          data: {
+            id: expect.any(String),
+            type: expect.any(String),
+            isTrained: expect.any(Boolean),
+            trainingProgress: expect.any(Number),
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          },
+        });
+
+        expect(prisma.modelConfig.create).toHaveBeenCalledWith({
+          data: {
+            type: ModelType.PATTERN_DETECTOR,
+            hyperparameters: { learning_rate: 0.01 },
+            features: ["feature1", "feature2"],
+            trainingParams: { epochs: 100 },
+            modelVersions: {
+              create: {
+                metrics: {} as Prisma.InputJsonValue,
+                artifactPath: "",
+                parentVersion: null,
+              },
+            },
+          },
+          include: {
+            modelVersions: true,
+          },
+        });
       });
     });
 
-    it("should handle invalid request format", async () => {
-      const invalidData = {
-        type: "INVALID_TYPE",
-        hyperparameters: "not-an-object",
-      };
+    describe("error scenarios", () => {
+      it("should handle invalid request format with validation details", async () => {
+        const invalidData = {
+          type: "INVALID_TYPE",
+          hyperparameters: "not-an-object",
+        };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/models"
-      );
-      request.json = vi.fn().mockResolvedValue(invalidData);
+        const request = new NextRequest(
+          "http://localhost:3000/api/nous/learn/models",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+        request.json = vi.fn().mockResolvedValue(invalidData);
 
-      const response = await POST(request);
-      const data = await response.json();
+        const response = await POST(request);
+        const data = await response.json();
 
-      expect(response.status).toBe(400);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Invalid request format");
-      expect(data.details).toBeDefined();
-    });
+        expect(response.status).toBe(400);
+        expect(data).toEqual({
+          success: false,
+          error: "Invalid request format",
+          details: expect.any(Object),
+          meta: {
+            took: expect.any(Number),
+          },
+        });
+      });
 
-    it("should handle database errors during creation", async () => {
-      const modelData = {
-        type: ModelType.PATTERN_DETECTOR,
-        hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
-        features: ["feature1", "feature2"],
-        trainingParams: { epochs: 100 } as Prisma.JsonValue,
-      };
+      it("should handle invalid JSON with proper error response", async () => {
+        const request = new NextRequest(
+          "http://localhost:3000/api/nous/learn/models",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+        request.json = vi.fn().mockRejectedValue(new Error("Invalid JSON"));
 
-      vi.mocked(prisma.modelConfig.create).mockRejectedValue(
-        new Error("DB Error")
-      );
+        const response = await POST(request);
+        const data = await response.json();
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/nous/learn/models"
-      );
-      request.json = vi.fn().mockResolvedValue(modelData);
+        expect(response.status).toBe(400);
+        expect(data).toMatchObject({
+          success: false,
+          error: expect.any(String),
+          details: expect.any(Object),
+          meta: {
+            took: expect.any(Number),
+          },
+        });
+      });
 
-      const response = await POST(request);
-      const data = await response.json();
+      it("should handle database errors during creation", async () => {
+        vi.mocked(prisma.modelConfig.create).mockRejectedValueOnce(
+          new Error("DB Error")
+        );
 
-      expect(response.status).toBe(500);
-      expect(data.success).toBe(false);
-      expect(data.error).toBe("Failed to create model");
-      expect(data.details).toBe("DB Error");
+        const request = new NextRequest(
+          "http://localhost:3000/api/nous/learn/models",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+        request.json = vi.fn().mockResolvedValue(validModelData);
+
+        const response = await POST(request);
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data).toMatchObject({
+          success: false,
+          error: expect.any(String),
+          meta: {
+            took: expect.any(Number),
+          },
+        });
+
+        expect(logger.error).toHaveBeenCalledWith(
+          "Failed to create model",
+          expect.objectContaining({
+            error: expect.any(Error),
+          })
+        );
+      });
     });
   });
 });

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="16" failures="0" errors="0" time="4.671">
+    <testsuite name="src/app/api/nous/learn/models/models.route.additional.test.ts" timestamp="2025-01-09T11:29:34.566Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0414615">
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; GET /api/learn/models &gt; Success cases &gt; should successfully retrieve models with their latest versions" time="0.016158">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; GET /api/learn/models &gt; Success cases &gt; should handle empty results" time="0.002518">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; GET /api/learn/models &gt; Error cases &gt; should handle database errors" time="0.0045824">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Success cases &gt; should successfully create a model with initial version" time="0.0049573">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Validation &gt; should validate model type" time="0.0029342">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Validation &gt; should validate required fields" time="0.0020382">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Validation &gt; should handle invalid JSON" time="0.0013201">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Error handling &gt; should handle database errors" time="0.0017315">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Error handling &gt; should include timing information in error response" time="0.0028915">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/models/models.route.test.ts" timestamp="2025-01-09T11:29:34.574Z" hostname="sophra" tests="7" failures="0" errors="0" skipped="0" time="0.0371974">
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; GET /api/nous/learn/models &gt; successful scenarios &gt; should fetch models with proper pagination metadata" time="0.0160166">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; GET /api/nous/learn/models &gt; successful scenarios &gt; should handle empty results with proper metadata" time="0.002234">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; GET /api/nous/learn/models &gt; error scenarios &gt; should handle database errors with proper error response" time="0.0044785">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; successful scenarios &gt; should create model with proper response structure" time="0.0060127">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; error scenarios &gt; should handle invalid request format with validation details" time="0.0029536">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; error scenarios &gt; should handle invalid JSON with proper error response" time="0.0015616">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; error scenarios &gt; should handle database errors during creation" time="0.0018396">
+        </testcase>
+    </testsuite>
+</testsuites>

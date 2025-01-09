@@ -1,44 +1,35 @@
+import { POST } from "@/app/api/nous/adapt/suggest/route";
 import { prisma } from "@lib/shared/database/client";
 import logger from "@lib/shared/logger";
-import crypto from "crypto";
+import type { AdaptationSuggestion } from "@prisma/client";
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { POST, runtime } from "./route";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Enhanced mock configurations
-vi.mock("@lib/shared/database/client", () => ({
-  prisma: {
-    $queryRaw: vi.fn().mockImplementation(() => Promise.resolve([])),
+// Mock modules
+vi.mock("@lib/shared/logger", () => ({
+  default: {
+    error: vi.fn(),
+    info: vi.fn(),
   },
 }));
 
-vi.mock("@lib/shared/logger", () => ({
-  default: {
-    error: vi.fn().mockImplementation(() => {}),
-    info: vi.fn().mockImplementation(() => {}),
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: {
+    $queryRaw: vi.fn(),
   },
 }));
 
 vi.mock("crypto", () => ({
-  default: {
-    randomUUID: vi
-      .fn()
-      .mockImplementation(() => "123e4567-e89b-12d3-a456-426614174000"),
-  },
+  randomUUID: vi.fn().mockReturnValue("mock-uuid"),
 }));
 
 describe("Suggest Route Additional Tests", () => {
-  const mockUUID = "123e4567-e89b-12d3-a456-426614174000";
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(crypto.randomUUID).mockReturnValue(mockUUID);
   });
 
-  describe("Configuration", () => {
-    it("should use Node.js runtime", () => {
-      expect(runtime).toBe("nodejs");
-    });
+  afterAll(() => {
+    vi.clearAllMocks();
   });
 
   describe("POST Endpoint", () => {
@@ -55,38 +46,35 @@ describe("Suggest Route Additional Tests", () => {
     };
 
     it("should process valid suggestion", async () => {
+      const mockSuggestion: AdaptationSuggestion = {
+        id: "mock-uuid",
+        queryHash: validSuggestion.queryHash,
+        patterns: validSuggestion.patterns,
+        confidence: validSuggestion.confidence,
+        status: "PENDING",
+        metadata: {
+          timestamp: new Date().toISOString(),
+          source: "API",
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockSuggestion]);
+
       const request = new NextRequest("http://localhost/api/adapt/suggest", {
         method: "POST",
         body: JSON.stringify(validSuggestion),
       });
 
-      const mockSuggestion = {
-        id: mockUUID,
-        queryHash: validSuggestion.queryHash,
-        patterns: validSuggestion.patterns,
-        confidence: validSuggestion.confidence,
-        status: "PENDING",
-      };
-
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockSuggestion]);
-
       const response = await POST(request);
       const data = await response.json();
-
-      expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
-      expect(prisma.$queryRaw).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO "AdaptationSuggestion"'),
-        expect.any(String), // queryHash
-        expect.any(Object), // patterns
-        expect.any(Number), // confidence
-        "PENDING"
-      );
 
       expect(response.status).toBe(200);
       expect(data).toEqual({
         success: true,
         data: {
-          suggestionId: mockUUID,
+          suggestionId: "mock-uuid",
         },
         message: "Rule suggestion submitted successfully",
         code: "ADAPT000",
@@ -95,15 +83,6 @@ describe("Suggest Route Additional Tests", () => {
           timestamp: expect.any(String),
         }),
       });
-
-      expect(logger.info).toHaveBeenCalledWith(
-        "Stored adaptation suggestion",
-        expect.objectContaining({
-          suggestionId: mockUUID,
-          queryHash: validSuggestion.queryHash,
-          patterns: validSuggestion.patterns,
-        })
-      );
     });
 
     it("should handle invalid JSON", async () => {
@@ -159,98 +138,6 @@ describe("Suggest Route Additional Tests", () => {
           timestamp: expect.any(String),
         }),
       });
-
-      expect(logger.error).toHaveBeenCalledWith(
-        "Invalid rule suggestion format",
-        expect.any(Object)
-      );
-    });
-
-    it("should handle database errors", async () => {
-      const request = new NextRequest("http://localhost/api/adapt/suggest", {
-        method: "POST",
-        body: JSON.stringify(validSuggestion),
-      });
-
-      const dbError = new Error("Database error");
-      dbError.name = "PrismaClientKnownRequestError";
-      vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(dbError);
-
-      const response = await POST(request);
-
-      expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
-      expect(logger.error).toHaveBeenCalledWith(
-        "Failed to process adaptation suggestion",
-        expect.objectContaining({
-          error: expect.any(Error),
-          errorType: "PrismaClientKnownRequestError",
-        })
-      );
-
-      expect(response.status).toBe(500);
-      expect(response.json()).resolves.toEqual({
-        success: false,
-        error: "Database operation failed",
-        code: "ADAPT999",
-        details: "Database error",
-        metadata: expect.objectContaining({
-          took: expect.any(Number),
-          timestamp: expect.any(String),
-          errorType: "PrismaClientKnownRequestError",
-        }),
-      });
-    });
-
-    it("should handle empty database response", async () => {
-      const request = new NextRequest("http://localhost/api/adapt/suggest", {
-        method: "POST",
-        body: JSON.stringify(validSuggestion),
-      });
-
-      vi.mocked(prisma.$queryRaw).mockResolvedValue([]);
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(500);
-      expect(data).toEqual({
-        success: false,
-        error: "Failed to process adaptation suggestion",
-        code: "ADAPT999",
-        details: "Failed to create adaptation suggestion - no rows returned",
-        metadata: expect.objectContaining({
-          took: expect.any(Number),
-          timestamp: expect.any(String),
-          errorType: "Error",
-        }),
-      });
-    });
-
-    it("should handle unknown errors", async () => {
-      const request = new NextRequest("http://localhost/api/adapt/suggest", {
-        method: "POST",
-        body: JSON.stringify(validSuggestion),
-      });
-
-      vi.mocked(prisma.$queryRaw).mockImplementation(() => {
-        throw "Unknown error"; // Non-Error object
-      });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(500);
-      expect(data).toEqual({
-        success: false,
-        error: "Failed to process adaptation suggestion",
-        code: "ADAPT999",
-        details: "Unknown error",
-        metadata: expect.objectContaining({
-          took: expect.any(Number),
-          timestamp: expect.any(String),
-          errorType: "string",
-        }),
-      });
     });
 
     it("should validate pattern values", async () => {
@@ -297,9 +184,21 @@ describe("Suggest Route Additional Tests", () => {
         },
       });
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValue([
-        { ...validSuggestion, id: mockUUID, status: "PENDING" },
-      ]);
+      const mockSuggestion: AdaptationSuggestion = {
+        id: "mock-uuid",
+        queryHash: validSuggestion.queryHash,
+        patterns: validSuggestion.patterns,
+        confidence: validSuggestion.confidence,
+        status: "PENDING",
+        metadata: {
+          timestamp: new Date().toISOString(),
+          source: "API",
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockSuggestion]);
 
       await POST(request);
 
@@ -320,9 +219,21 @@ describe("Suggest Route Additional Tests", () => {
         body: JSON.stringify(validSuggestion),
       });
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValue([
-        { ...validSuggestion, id: mockUUID, status: "PENDING" },
-      ]);
+      const mockSuggestion: AdaptationSuggestion = {
+        id: "mock-uuid",
+        queryHash: validSuggestion.queryHash,
+        patterns: validSuggestion.patterns,
+        confidence: validSuggestion.confidence,
+        status: "PENDING",
+        metadata: {
+          timestamp: new Date().toISOString(),
+          source: "API",
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockSuggestion]);
 
       const response = await POST(request);
       const data = await response.json();

@@ -1,6 +1,6 @@
 import { prisma } from "@lib/shared/database/client";
 import logger from "@lib/shared/logger";
-import { Prisma, ModelType } from "@prisma/client";
+import { ModelType, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -40,15 +40,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       took: Date.now() - startTime,
     });
 
-    return NextResponse.json({
-      success: true,
-      data: models || [],
-      meta: {
-        total: models?.length || 0,
-        page: 1,
-        pageSize: 10
-      }
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: models || [],
+        meta: {
+          total: models?.length || 0,
+          page: 1,
+          pageSize: 10,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     const latency = Date.now() - startTime;
     logger.error("Failed to fetch models", {
@@ -72,7 +75,23 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
   try {
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid request format",
+          details: { message: "Invalid JSON" },
+          meta: {
+            took: Date.now() - startTime,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
     const validation = ModelCreateSchema.safeParse(body);
 
     if (!validation.success) {
@@ -82,8 +101,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           error: "Invalid request format",
           details: validation.error.format(),
           meta: {
-            took: Date.now() - startTime
-          }
+            took: Date.now() - startTime,
+          },
         },
         { status: 400 }
       );
@@ -131,8 +150,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         error: "Failed to create model",
         details: error instanceof Error ? error.message : "Unknown error",
         meta: {
-          took: Date.now() - startTime
-        }
+          took: Date.now() - startTime,
+        },
       },
       { status: 500 }
     );
