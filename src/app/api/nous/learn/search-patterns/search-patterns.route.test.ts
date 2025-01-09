@@ -50,21 +50,25 @@ vi.mock('@prisma/client', () => ({
   }))
 }));
 
-vi.mock('@lib/shared/database/client', () => {
-  const mockPrisma = {
-    modelState: {
-      findMany: vi.fn(),
-      findFirst: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      count: vi.fn(),
-      $queryRaw: vi.fn(),
-      $executeRaw: vi.fn()
-    }
-  };
-  return { prisma: mockPrisma };
-});
+const mockPrisma = {
+  modelState: {
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockResolvedValue({}),
+    update: vi.fn().mockResolvedValue({}),
+    delete: vi.fn().mockResolvedValue({}),
+    count: vi.fn().mockResolvedValue(0),
+    $queryRaw: vi.fn().mockResolvedValue([]),
+    $executeRaw: vi.fn().mockResolvedValue(0)
+  },
+  $transaction: vi.fn().mockImplementation(async (callback) => {
+    return callback(mockPrisma);
+  })
+};
+
+vi.mock('@lib/shared/database/client', () => ({
+  prisma: mockPrisma
+}));
 
 // Import after mocks
 import { prisma } from '@lib/shared/database/client';

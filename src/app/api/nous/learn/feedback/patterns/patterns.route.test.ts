@@ -80,6 +80,8 @@ describe("Feedback Patterns Route Handler", () => {
         "http://localhost:3000/api/nous/learn/feedback/patterns"
       );
       const response = await GET(request);
+      expect(response).toBeDefined();
+      expect(response.json).toBeDefined();
       const data = await response.json();
 
       expect(response.status).toBe(200);

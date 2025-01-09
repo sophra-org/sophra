@@ -5,13 +5,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST, runtime } from "./route";
 
 // Mock dependencies withexplicit return values
-vi.mock("@lib/shared/database/client", () => ({
-  prisma: {
-    feedbackRequest: {
-      findMany: vi.fn().mockResolvedValue([]),
-      create: vi.fn().mockResolvedValue({}),
-    },
+const mockPrisma = {
+  feedbackRequest: {
+    findMany: vi.fn().mockResolvedValue([]),
+    create: vi.fn().mockResolvedValue({}),
   },
+};
+
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: mockPrisma,
 }));
 
 vi.mock("@lib/shared/logger", () => ({
