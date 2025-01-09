@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="16" failures="0" errors="0" time="4.671">
-    <testsuite name="src/app/api/nous/learn/models/models.route.additional.test.ts" timestamp="2025-01-09T11:29:34.566Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0414615">
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; GET /api/learn/models &gt; Success cases &gt; should successfully retrieve models with their latest versions" time="0.016158">
+<testsuites name="vitest tests" tests="13" failures="0" errors="0" time="4.365">
+    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" timestamp="2025-01-09T11:47:50.936Z" hostname="sophra" tests="3" failures="0" errors="0" skipped="0" time="0.0290755">
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" name="Metrics Route Additional Tests &gt; Configuration &gt; should use Node.js runtime" time="0.0019546">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; GET /api/learn/models &gt; Success cases &gt; should handle empty results" time="0.002518">
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" name="Metrics Route Additional Tests &gt; GET Endpoint &gt; should validate metric types" time="0.0242866">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; GET /api/learn/models &gt; Error cases &gt; should handle database errors" time="0.0045824">
-        </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Success cases &gt; should successfully create a model with initial version" time="0.0049573">
-        </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Validation &gt; should validate model type" time="0.0029342">
-        </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Validation &gt; should validate required fields" time="0.0020382">
-        </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Validation &gt; should handle invalid JSON" time="0.0013201">
-        </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Error handling &gt; should handle database errors" time="0.0017315">
-        </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.additional.test.ts" name="Learning Models API &gt; POST /api/learn/models &gt; Error handling &gt; should include timing information in error response" time="0.0028915">
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" name="Metrics Route Additional Tests &gt; GET Endpoint &gt; should handle multiple metrics" time="0.001663">
         </testcase>
     </testsuite>
-    <testsuite name="src/app/api/nous/learn/models/models.route.test.ts" timestamp="2025-01-09T11:29:34.574Z" hostname="sophra" tests="7" failures="0" errors="0" skipped="0" time="0.0371974">
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; GET /api/nous/learn/models &gt; successful scenarios &gt; should fetch models with proper pagination metadata" time="0.0160166">
+    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.test.ts" timestamp="2025-01-09T11:47:50.940Z" hostname="sophra" tests="2" failures="0" errors="0" skipped="0" time="0.0265151">
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; Configuration &gt; should use Node.js runtime" time="0.0019359">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; GET /api/nous/learn/models &gt; successful scenarios &gt; should handle empty results with proper metadata" time="0.002234">
+        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should fetch metrics with default parameters" time="0.0233865">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; GET /api/nous/learn/models &gt; error scenarios &gt; should handle database errors with proper error response" time="0.0044785">
+    </testsuite>
+    <testsuite name="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" timestamp="2025-01-09T11:47:50.942Z" hostname="sophra" tests="8" failures="0" errors="0" skipped="0" time="0.0381359">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should fetch patterns with default parameters" time="0.0262244">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; successful scenarios &gt; should create model with proper response structure" time="0.0060127">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle database errors gracefully" time="0.0013133">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; error scenarios &gt; should handle invalid request format with validation details" time="0.0029536">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle custom timeframe and limit" time="0.0011976">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; error scenarios &gt; should handle invalid JSON with proper error response" time="0.0015616">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle invalid timeframe parameter" time="0.0018855">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/models/models.route.test.ts" name="Models API Endpoints &gt; POST /api/nous/learn/models &gt; error scenarios &gt; should handle database errors during creation" time="0.0018396">
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle invalid limit parameter" time="0.0016793">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle limit out of range" time="0.0016001">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should calculate confidence and metrics correctly" time="0.001098">
+        </testcase>
+        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle empty results" time="0.0013508">
         </testcase>
     </testsuite>
 </testsuites>
