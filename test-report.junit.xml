@@ -1,530 +1,113 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="12" failures="8" errors="0" time="5.225">
-    <testsuite name="src/lib/cortex/utils/service-manager.additional.test.ts" timestamp="2025-01-09T15:05:31.516Z" hostname="sophra" tests="12" failures="8" errors="0" skipped="0" time="0.4041318">
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Singleton Pattern &gt; should create only one instance" time="0.3562321">
+<testsuites name="vitest tests" tests="51" failures="0" errors="0" time="4.95">
+    <testsuite name="src/lib/nous/adapt/actions/actions.additional.test.ts" timestamp="2025-01-09T16:20:39.940Z" hostname="sophra" tests="15" failures="0" errors="0" skipped="0" time="0.0315174">
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; NotifyAction &gt; should log notification with context data" time="0.009996">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Singleton Pattern &gt; should expose singleton instance through serviceManager" time="0.001972">
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; NotifyAction &gt; should handle different severity levels" time="0.0030824">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should initialize Redis with correct configuration" time="0.0075958">
-            <failure message="[Function Redis] is not a spy or a call to a spy!" type="TypeError">
-TypeError: [Function Redis] is not a spy or a call to a spy!
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:158:25
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; NotifyAction &gt; should handle missing optional channels" time="0.0011768">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should handle Redis initialization errors" time="0.0188823">
-            <failure message="promise resolved &quot;{ …(15) }&quot; instead of rejecting" type="AssertionError">
-AssertionError: promise resolved &quot;{ …(15) }&quot; instead of rejecting
-
-- Expected
-+ Received
-
-- [Error: rejected promise]
-+ Object {
-+   &quot;abTesting&quot;: SearchABTestingService {
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;metrics&quot;: Object {
-+       &quot;getEngineMetrics&quot;: [Function spy],
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function spy],
-+         &quot;error&quot;: [Function spy],
-+         &quot;info&quot;: [Function spy],
-+         &quot;warn&quot;: [Function spy],
-+       },
-+       &quot;observeMetric&quot;: [Function spy],
-+     },
-+     &quot;prisma&quot;: Object {
-+       &quot;$queryRaw&quot;: [Function spy],
-+     },
-+   },
-+   &quot;analytics&quot;: AnalyticsService {
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;metrics&quot;: Object {
-+       &quot;getEngineMetrics&quot;: [Function spy],
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function spy],
-+         &quot;error&quot;: [Function spy],
-+         &quot;info&quot;: [Function spy],
-+         &quot;warn&quot;: [Function spy],
-+       },
-+       &quot;observeMetric&quot;: [Function spy],
-+     },
-+     &quot;prisma&quot;: Object {
-+       &quot;$queryRaw&quot;: [Function spy],
-+     },
-+   },
-+   &quot;documents&quot;: null,
-+   &quot;elasticsearch&quot;: ElasticsearchService {
-+     &quot;client&quot;: Object {
-+       &quot;bulk&quot;: [Function spy],
-+       &quot;close&quot;: [Function spy],
-+       &quot;indices&quot;: Object {
-+         &quot;addBlock&quot;: [Function spy],
-+         &quot;analyze&quot;: [Function spy],
-+         &quot;clearCache&quot;: [Function spy],
-+         &quot;create&quot;: [Function spy],
-+         &quot;delete&quot;: [Function spy],
-+         &quot;exists&quot;: [Function spy],
-+         &quot;transport&quot;: [Function spy],
-+       },
-+       &quot;ping&quot;: [Function spy],
-+       &quot;search&quot;: [Function spy],
-+     },
-+     &quot;environment&quot;: &quot;test&quot;,
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;metrics&quot;: Object {
-+       &quot;getEngineMetrics&quot;: [Function spy],
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function spy],
-+         &quot;error&quot;: [Function spy],
-+         &quot;info&quot;: [Function spy],
-+         &quot;warn&quot;: [Function spy],
-+       },
-+       &quot;observeMetric&quot;: [Function spy],
-+     },
-+     &quot;requestQueue&quot;: Object {
-+       &quot;add&quot;: [Function add],
-+     },
-+   },
-+   &quot;engine&quot;: Object {
-+     &quot;instance&quot;: null,
-+     &quot;testService&quot;: [Function testService],
-+   },
-+   &quot;feedback&quot;: FeedbackService {
-+     &quot;abTesting&quot;: SearchABTestingService {
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function debug],
-+         &quot;error&quot;: [Function error],
-+         &quot;http&quot;: [Function http],
-+         &quot;info&quot;: [Function info],
-+         &quot;level&quot;: &quot;debug&quot;,
-+         &quot;service&quot;: &quot;sophra&quot;,
-+         &quot;verbose&quot;: [Function verbose],
-+         &quot;warn&quot;: [Function warn],
-+       },
-+       &quot;metrics&quot;: Object {
-+         &quot;getEngineMetrics&quot;: [Function spy],
-+         &quot;logger&quot;: Object {
-+           &quot;debug&quot;: [Function spy],
-+           &quot;error&quot;: [Function spy],
-+           &quot;info&quot;: [Function spy],
-+           &quot;warn&quot;: [Function spy],
-+         },
-+         &quot;observeMetric&quot;: [Function spy],
-+       },
-+       &quot;prisma&quot;: Object {
-+         &quot;$queryRaw&quot;: [Function spy],
-+       },
-+     },
-+     &quot;automatedProcessor&quot;: AutomatedFeedbackProcessor {
-+       &quot;elasticsearch&quot;: ElasticsearchService {
-+         &quot;client&quot;: Object {
-+           &quot;bulk&quot;: [Function spy],
-+           &quot;close&quot;: [Function spy],
-+           &quot;indices&quot;: Object {
-+             &quot;addBlock&quot;: [Function spy],
-+             &quot;analyze&quot;: [Function spy],
-+             &quot;clearCache&quot;: [Function spy],
-+             &quot;create&quot;: [Function spy],
-+             &quot;delete&quot;: [Function spy],
-+             &quot;exists&quot;: [Function spy],
-+             &quot;transport&quot;: [Function spy],
-+           },
-+           &quot;ping&quot;: [Function spy],
-+           &quot;search&quot;: [Function spy],
-+         },
-+         &quot;environment&quot;: &quot;test&quot;,
-+         &quot;logger&quot;: Object {
-+           &quot;debug&quot;: [Function debug],
-+           &quot;error&quot;: [Function error],
-+           &quot;http&quot;: [Function http],
-+           &quot;info&quot;: [Function info],
-+           &quot;level&quot;: &quot;debug&quot;,
-+           &quot;service&quot;: &quot;sophra&quot;,
-+           &quot;verbose&quot;: [Function verbose],
-+           &quot;warn&quot;: [Function warn],
-+         },
-+         &quot;metrics&quot;: Object {
-+           &quot;getEngineMetrics&quot;: [Function spy],
-+           &quot;logger&quot;: Object {
-+             &quot;debug&quot;: [Function spy],
-+             &quot;error&quot;: [Function spy],
-+             &quot;info&quot;: [Function spy],
-+             &quot;warn&quot;: [Function spy],
-+           },
-+           &quot;observeMetric&quot;: [Function spy],
-+         },
-+         &quot;requestQueue&quot;: Object {
-+           &quot;add&quot;: [Function add],
-+         },
-+       },
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function debug],
-+         &quot;error&quot;: [Function error],
-+         &quot;http&quot;: [Function http],
-+         &quot;info&quot;: [Function info],
-+         &quot;level&quot;: &quot;debug&quot;,
-+         &quot;service&quot;: &quot;sophra&quot;,
-+         &quot;verbose&quot;: [Function verbose],
-+         &quot;warn&quot;: [Function warn],
-+       },
-+       &quot;metrics&quot;: Object {
-+         &quot;getEngineMetrics&quot;: [Function spy],
-+         &quot;logger&quot;: Object {
-+           &quot;debug&quot;: [Function spy],
-+           &quot;error&quot;: [Function spy],
-+           &quot;info&quot;: [Function spy],
-+           &quot;warn&quot;: [Function spy],
-+         },
-+         &quot;observeMetric&quot;: [Function spy],
-+       },
-+       &quot;prisma&quot;: Object {
-+         &quot;$queryRaw&quot;: [Function spy],
-+       },
-+     },
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;metrics&quot;: Object {
-+       &quot;getEngineMetrics&quot;: [Function spy],
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function spy],
-+         &quot;error&quot;: [Function spy],
-+         &quot;info&quot;: [Function spy],
-+         &quot;warn&quot;: [Function spy],
-+       },
-+       &quot;observeMetric&quot;: [Function spy],
-+     },
-+     &quot;prisma&quot;: Object {
-+       &quot;$queryRaw&quot;: [Function spy],
-+     },
-+   },
-+   &quot;health&quot;: null,
-+   &quot;learning&quot;: null,
-+   &quot;metrics&quot;: Object {
-+     &quot;getEngineMetrics&quot;: [Function spy],
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function spy],
-+       &quot;error&quot;: [Function spy],
-+       &quot;info&quot;: [Function spy],
-+       &quot;warn&quot;: [Function spy],
-+     },
-+     &quot;observeMetric&quot;: [Function spy],
-+   },
-+   &quot;observe&quot;: null,
-+   &quot;postgres&quot;: PostgresDataService {
-+     &quot;isInitialized&quot;: false,
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+   },
-+   &quot;redis&quot;: RedisCacheService {
-+     &quot;client&quot;: RedisClient {
-+       &quot;client&quot;: Object {
-+         &quot;commandQueue&quot;: Array [],
-+         &quot;condition&quot;: [Function spy],
-+         &quot;connect&quot;: [Function spy],
-+         &quot;connector&quot;: [Function spy],
-+         &quot;disconnect&quot;: [Function spy],
-+         &quot;duplicate&quot;: [Function spy],
-+         &quot;isCluster&quot;: false,
-+         &quot;on&quot;: [Function spy],
-+         &quot;options&quot;: Object {},
-+         &quot;ping&quot;: [Function spy],
-+         &quot;quit&quot;: [Function spy],
-+         &quot;sendCommand&quot;: [Function spy],
-+         &quot;status&quot;: &quot;ready&quot;,
-+         &quot;stream&quot;: [Function spy],
-+       },
-+       &quot;defaultTTL&quot;: 3600,
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function debug],
-+         &quot;error&quot;: [Function error],
-+         &quot;http&quot;: [Function http],
-+         &quot;info&quot;: [Function info],
-+         &quot;level&quot;: &quot;debug&quot;,
-+         &quot;service&quot;: &quot;sophra&quot;,
-+         &quot;verbose&quot;: [Function verbose],
-+         &quot;warn&quot;: [Function warn],
-+       },
-+     },
-+     &quot;defaultTTL&quot;: 3600,
-+     &quot;environment&quot;: &quot;test&quot;,
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;maxTTL&quot;: 86400,
-+     &quot;metrics&quot;: Object {
-+       &quot;getEngineMetrics&quot;: [Function spy],
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function spy],
-+         &quot;error&quot;: [Function spy],
-+         &quot;info&quot;: [Function spy],
-+         &quot;warn&quot;: [Function spy],
-+       },
-+       &quot;observeMetric&quot;: [Function spy],
-+     },
-+     &quot;minTTL&quot;: 300,
-+     &quot;queryPatternKey&quot;: &quot;query:patterns&quot;,
-+     &quot;retryAttempts&quot;: 3,
-+     &quot;retryDelay&quot;: 100,
-+     &quot;searchService&quot;: undefined,
-+   },
-+   &quot;sessions&quot;: SessionService {
-+     &quot;defaultTTL&quot;: 3600,
-+     &quot;environment&quot;: &quot;test&quot;,
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;redis&quot;: RedisClient {
-+       &quot;client&quot;: Object {
-+         &quot;commandQueue&quot;: Array [],
-+         &quot;condition&quot;: [Function spy],
-+         &quot;connect&quot;: [Function spy],
-+         &quot;connector&quot;: [Function spy],
-+         &quot;disconnect&quot;: [Function spy],
-+         &quot;duplicate&quot;: [Function spy],
-+         &quot;isCluster&quot;: false,
-+         &quot;on&quot;: [Function spy],
-+         &quot;options&quot;: Object {},
-+         &quot;ping&quot;: [Function spy],
-+         &quot;quit&quot;: [Function spy],
-+         &quot;sendCommand&quot;: [Function spy],
-+         &quot;status&quot;: &quot;ready&quot;,
-+         &quot;stream&quot;: [Function spy],
-+       },
-+       &quot;defaultTTL&quot;: 3600,
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function debug],
-+         &quot;error&quot;: [Function error],
-+         &quot;http&quot;: [Function http],
-+         &quot;info&quot;: [Function info],
-+         &quot;level&quot;: &quot;debug&quot;,
-+         &quot;service&quot;: &quot;sophra&quot;,
-+         &quot;verbose&quot;: [Function verbose],
-+         &quot;warn&quot;: [Function warn],
-+       },
-+     },
-+   },
-+   &quot;sync&quot;: DataSyncService {
-+     &quot;embeddingService&quot;: VectorizationService {
-+       &quot;openaiApiKey&quot;: &quot;test-openai-key&quot;,
-+       &quot;serviceName&quot;: &quot;VectorizationService&quot;,
-+     },
-+     &quot;es&quot;: ElasticsearchService {
-+       &quot;client&quot;: Object {
-+         &quot;bulk&quot;: [Function spy],
-+         &quot;close&quot;: [Function spy],
-+         &quot;indices&quot;: Object {
-+           &quot;addBlock&quot;: [Function spy],
-+           &quot;analyze&quot;: [Function spy],
-+           &quot;clearCache&quot;: [Function spy],
-+           &quot;create&quot;: [Function spy],
-+           &quot;delete&quot;: [Function spy],
-+           &quot;exists&quot;: [Function spy],
-+           &quot;transport&quot;: [Function spy],
-+         },
-+         &quot;ping&quot;: [Function spy],
-+         &quot;search&quot;: [Function spy],
-+       },
-+       &quot;environment&quot;: &quot;test&quot;,
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function debug],
-+         &quot;error&quot;: [Function error],
-+         &quot;http&quot;: [Function http],
-+         &quot;info&quot;: [Function info],
-+         &quot;level&quot;: &quot;debug&quot;,
-+         &quot;service&quot;: &quot;sophra&quot;,
-+         &quot;verbose&quot;: [Function verbose],
-+         &quot;warn&quot;: [Function warn],
-+       },
-+       &quot;metrics&quot;: Object {
-+         &quot;getEngineMetrics&quot;: [Function spy],
-+         &quot;logger&quot;: Object {
-+           &quot;debug&quot;: [Function spy],
-+           &quot;error&quot;: [Function spy],
-+           &quot;info&quot;: [Function spy],
-+           &quot;warn&quot;: [Function spy],
-+         },
-+         &quot;observeMetric&quot;: [Function spy],
-+       },
-+       &quot;requestQueue&quot;: Object {
-+         &quot;add&quot;: [Function add],
-+       },
-+     },
-+     &quot;logger&quot;: Object {
-+       &quot;debug&quot;: [Function debug],
-+       &quot;error&quot;: [Function error],
-+       &quot;http&quot;: [Function http],
-+       &quot;info&quot;: [Function info],
-+       &quot;level&quot;: &quot;debug&quot;,
-+       &quot;service&quot;: &quot;sophra&quot;,
-+       &quot;verbose&quot;: [Function verbose],
-+       &quot;warn&quot;: [Function warn],
-+     },
-+     &quot;redis&quot;: RedisCacheService {
-+       &quot;client&quot;: RedisClient {
-+         &quot;client&quot;: Object {
-+           &quot;commandQueue&quot;: Array [],
-+           &quot;condition&quot;: [Function spy],
-+           &quot;connect&quot;: [Function spy],
-+           &quot;connector&quot;: [Function spy],
-+           &quot;disconnect&quot;: [Function spy],
-+           &quot;duplicate&quot;: [Function spy],
-+           &quot;isCluster&quot;: false,
-+           &quot;on&quot;: [Function spy],
-+           &quot;options&quot;: Object {},
-+           &quot;ping&quot;: [Function spy],
-+           &quot;quit&quot;: [Function spy],
-+           &quot;sendCommand&quot;: [Function spy],
-+           &quot;status&quot;: &quot;ready&quot;,
-+           &quot;stream&quot;: [Function spy],
-+         },
-+         &quot;defaultTTL&quot;: 3600,
-+         &quot;logger&quot;: Object {
-+           &quot;debug&quot;: [Function debug],
-+           &quot;error&quot;: [Function error],
-+           &quot;http&quot;: [Function http],
-+           &quot;info&quot;: [Function info],
-+           &quot;level&quot;: &quot;debug&quot;,
-+           &quot;service&quot;: &quot;sophra&quot;,
-+           &quot;verbose&quot;: [Function verbose],
-+           &quot;warn&quot;: [Function warn],
-+         },
-+       },
-+       &quot;defaultTTL&quot;: 3600,
-+       &quot;environment&quot;: &quot;test&quot;,
-+       &quot;logger&quot;: Object {
-+         &quot;debug&quot;: [Function debug],
-+         &quot;error&quot;: [Function error],
-+         &quot;http&quot;: [Function http],
-+         &quot;info&quot;: [Function info],
-+         &quot;level&quot;: &quot;debug&quot;,
-+         &quot;service&quot;: &quot;sophra&quot;,
-+         &quot;verbose&quot;: [Function verbose],
-+         &quot;warn&quot;: [Function warn],
-+       },
-+       &quot;maxTTL&quot;: 86400,
-+       &quot;metrics&quot;: Object {
-+         &quot;getEngineMetrics&quot;: [Function spy],
-+         &quot;logger&quot;: Object {
-+           &quot;debug&quot;: [Function spy],
-+           &quot;error&quot;: [Function spy],
-+           &quot;info&quot;: [Function spy],
-+           &quot;warn&quot;: [Function spy],
-+         },
-+         &quot;observeMetric&quot;: [Function spy],
-+       },
-+       &quot;minTTL&quot;: 300,
-+       &quot;queryPatternKey&quot;: &quot;query:patterns&quot;,
-+       &quot;retryAttempts&quot;: 3,
-+       &quot;retryDelay&quot;: 100,
-+       &quot;searchService&quot;: undefined,
-+     },
-+     &quot;searchCacheTTL&quot;: 300,
-+   },
-+   &quot;vectorization&quot;: VectorizationService {
-+     &quot;openaiApiKey&quot;: &quot;test-openai-key&quot;,
-+     &quot;serviceName&quot;: &quot;VectorizationService&quot;,
-+   },
-+ }
-
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:180:54
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; UpdateStateAction &gt; should update system state with provided updates" time="0.0009119">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should cache initialized services" time="0.0023618">
-            <failure message="[Function Redis] is not a spy or a call to a spy!" type="TypeError">
-TypeError: [Function Redis] is not a spy or a call to a spy!
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:190:25
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; UpdateStateAction &gt; should handle empty updates" time="0.0014207">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should handle concurrent initialization requests" time="0.0018155">
-            <failure message="[Function Redis] is not a spy or a call to a spy!" type="TypeError">
-TypeError: [Function Redis] is not a spy or a call to a spy!
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:200:25
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; UpdateStateAction &gt; should handle nested state updates" time="0.000682">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Connection Checks &gt; should check all connections successfully" time="0.00196">
-            <failure message="Cannot read properties of undefined (reading &apos;ping&apos;)" type="TypeError">
-TypeError: Cannot read properties of undefined (reading &apos;ping&apos;)
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:211:23
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; CompositeAction &gt; should execute all actions in sequence" time="0.0017536">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Connection Checks &gt; should handle Redis connection failure" time="0.0018593">
-            <failure message="Cannot read properties of undefined (reading &apos;ping&apos;)" type="TypeError">
-TypeError: Cannot read properties of undefined (reading &apos;ping&apos;)
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:225:23
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; CompositeAction &gt; should continue execution after action failure" time="0.0020863">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Connection Checks &gt; should handle Elasticsearch connection failure" time="0.0023312">
-            <failure message="Cannot read properties of undefined (reading &apos;ping&apos;)" type="TypeError">
-TypeError: Cannot read properties of undefined (reading &apos;ping&apos;)
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:241:23
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; CompositeAction &gt; should handle empty action list" time="0.0017139">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Connection Checks &gt; should handle Postgres connection failure" time="0.002466">
-            <failure message="Cannot read properties of undefined (reading &apos;ping&apos;)" type="TypeError">
-TypeError: Cannot read properties of undefined (reading &apos;ping&apos;)
- ❯ src/lib/cortex/utils/service-manager.additional.test.ts:257:23
-            </failure>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; ThresholdAdjustmentAction &gt; should adjust metric value within bounds" time="0.0022605">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Management &gt; should create all required services" time="0.0020667">
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; ThresholdAdjustmentAction &gt; should respect minimum value" time="0.0006185">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Management &gt; should handle engine test service" time="0.0025675">
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; ThresholdAdjustmentAction &gt; should respect maximum value" time="0.0006954">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; ThresholdAdjustmentAction &gt; should handle non-existent metrics" time="0.0008716">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; ThresholdAdjustmentAction &gt; should handle negative adjustments" time="0.0004947">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/actions.additional.test.ts" name="Actions Additional Tests &gt; ThresholdAdjustmentAction &gt; should handle zero adjustments" time="0.0010246">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/adapt/actions/index.test.ts" timestamp="2025-01-09T16:20:39.948Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0194577">
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="NotifyAction &gt; should log notification with context data" time="0.0089763">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="UpdateStateAction &gt; should update system state with new values" time="0.0013486">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="UpdateStateAction &gt; should override existing values" time="0.0005476">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="CompositeAction &gt; should execute all actions in sequence" time="0.0008151">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="CompositeAction &gt; should continue execution if one action fails" time="0.0016433">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="ThresholdAdjustmentAction &gt; should adjust metric value within bounds" time="0.0022149">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="ThresholdAdjustmentAction &gt; should respect minimum value" time="0.0003465">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="ThresholdAdjustmentAction &gt; should respect maximum value" time="0.0002659">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/actions/index.test.ts" name="ThresholdAdjustmentAction &gt; should initialize metric if not present" time="0.0007013">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/adapt/rules/index.test.ts" timestamp="2025-01-09T16:20:39.951Z" hostname="sophra" tests="20" failures="0" errors="0" skipped="0" time="0.0299008">
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="RuleRegistry &gt; should register and retrieve rules" time="0.0036348">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="RuleRegistry &gt; should unregister rules" time="0.0012623">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="RuleRegistry &gt; should execute triggered rules in priority order" time="0.0017923">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="RuleRegistry &gt; should handle rule execution errors" time="0.0048915">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="RuleRegistry &gt; should only execute enabled rules" time="0.0007776">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate gt operator correctly" time="0.0007177">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate gt operator correctly" time="0.0003176">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate lt operator correctly" time="0.0002785">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate lt operator correctly" time="0.0006495">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate gte operator correctly" time="0.0007879">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate gte operator correctly" time="0.0010954">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate lte operator correctly" time="0.0005522">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate lte operator correctly" time="0.0018921">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate eq operator correctly" time="0.0008924">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should evaluate eq operator correctly" time="0.0013273">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="ThresholdCondition &gt; should return false for undefined metrics" time="0.0008249">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="EventCondition &gt; should match event type and properties" time="0.0013212">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="EventCondition &gt; should not match different event type" time="0.0005519">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="EventCondition &gt; should not match when properties differ" time="0.0008038">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/rules/index.test.ts" name="EventCondition &gt; should match when no properties specified" time="0.0025118">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/nous/adapt/types/index.test.ts" timestamp="2025-01-09T16:20:39.956Z" hostname="sophra" tests="7" failures="0" errors="0" skipped="0" time="0.0157402">
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RuleContextSchema &gt; should validate valid rule context" time="0.0052583">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RuleContextSchema &gt; should validate context without optional metadata" time="0.0015475">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RuleContextSchema &gt; should reject invalid timestamp" time="0.00141">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RuleContextSchema &gt; should reject non-numeric metrics" time="0.0010028">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RuleContextSchema &gt; should reject missing required fields" time="0.0009253">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RulePriority &gt; should have correct priority values" time="0.0023721">
+        </testcase>
+        <testcase classname="src/lib/nous/adapt/types/index.test.ts" name="RulePriority &gt; should maintain priority order" time="0.0007026">
         </testcase>
     </testsuite>
 </testsuites>
