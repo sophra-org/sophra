@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/codebase-sync-client"
+}
+
+generator migrate {
+  provider = "prisma-migrate"
+  output   = "./migrations-codebase"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PROVIDER_DATABASE_URL")
+}
+
+
+model CodebaseFile {
+  id            String   @id @default(uuid())
+  path          String   @unique
+  content       String   @db.Text
+  isBinary      Boolean  @default(false)
+  hash          String
+  size          Int
+  lastModified  DateTime
+  version       CodebaseVersion @relation(fields: [versionId], references: [id])
+  versionId     String
+  directory     CodebaseDirectory? @relation(fields: [directoryId], references: [id])
+  directoryId   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([path])
+  @@index([hash])
+}
+
+model CodebaseDirectory {
+  id        String   @id @default(uuid())
+  path      String   @unique
+  files     CodebaseFile[]
+  parent    CodebaseDirectory?  @relation("DirectoryHierarchy", fields: [parentId], references: [id])
+  parentId  String?
+  children  CodebaseDirectory[] @relation("DirectoryHierarchy")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([path])
+}
+
+model CodebaseVersion {
+  id          String   @id @default(uuid())
+  version     Int      @default(1)
+  files       CodebaseFile[]
+  syncedAt    DateTime @default(now())
+  description String?
+
+  @@index([version])
+}
