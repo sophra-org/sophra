@@ -1,184 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="16" failures="0" errors="0" time="5.024">
-    <testsuite name="src/lib/cortex/utils/service-manager.additional.test.ts" timestamp="2025-01-09T17:53:16.028Z" hostname="sophra" tests="16" failures="0" errors="0" skipped="0" time="0.3877812">
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Redis Connection Management &gt; should handle Redis connection timeouts" time="0.1217019">
-            <system-err>
-[default] Redis ping failed: {
-  error: Error: Connection timeout
-      at Timeout._onTimeout [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:58:39[90m)[39m
-  [90m    at listOnTimeout (node:internal/timers:614:17)[39m
-  [90m    at processTimers (node:internal/timers:549:7)[39m
-}
-[default] Redis initialization failed {
-  error: Error: Connection timeout
-      at Timeout._onTimeout [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:58:39[90m)[39m
-  [90m    at listOnTimeout (node:internal/timers:614:17)[39m
-  [90m    at processTimers (node:internal/timers:549:7)[39m
-}
-
-            </system-err>
+<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="5.849">
+    <testsuite name="src/lib/nous/learn/models.test.ts" timestamp="2025-01-09T18:04:12.848Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0194397">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; train &gt; should train the model successfully" time="0.0057758">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Redis Connection Management &gt; should handle Redis reconnection attempts" time="0.0043721">
-            <system-err>
-[default] Redis ping failed: {
-  error: Error: Connection failed
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:75:34
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
-}
-[default] Redis initialization failed {
-  error: Error: Connection failed
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:75:34
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
-}
-
-            </system-err>
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; train &gt; should throw error when no features provided" time="0.0017894">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Redis Connection Management &gt; should cleanup Redis connection on initialization failure" time="0.003344">
-            <system-err>
-[default] Redis ping failed: {
-  error: Error: Initialization failed
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:93:41
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
-}
-[default] Redis initialization failed {
-  error: Error: Initialization failed
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:93:41
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
-}
-[default] Error initializing services {
-  error: Error: Initialization failed
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:93:41
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
-}
-
-            </system-err>
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; predict &gt; should throw error when model is not trained" time="0.0006295">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Elasticsearch Connection Management &gt; should handle Elasticsearch connection timeouts" time="0.1123686">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; predict &gt; should make predictions after training" time="0.0013865">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Elasticsearch Connection Management &gt; should handle Elasticsearch authentication errors" time="0.0013606">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; evaluate &gt; should throw error when model is not trained" time="0.0007677">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Postgres Connection Management &gt; should handle Postgres connection timeouts" time="0.0009835">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; evaluate &gt; should calculate metrics after training" time="0.0015529">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Postgres Connection Management &gt; should handle Postgres authentication errors" time="0.0008712">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; saveState &gt; should save model state successfully" time="0.0017913">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should initialize all required services" time="0.0080534">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; loadState &gt; should load model state successfully" time="0.0024742">
         </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should handle missing optional services gracefully" time="0.0036874">
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Service Initialization &gt; should initialize engine service with test functionality" time="0.0037635">
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Environment Configuration &gt; should throw error when Redis URL is missing" time="0.0053012">
-            <system-err>
-[default] Redis initialization failed {
-  error: Error: Missing SOPHRA_REDIS_URL environment variable
-      at ServiceManager.initializeRedis [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:185:7[90m)[39m
-      at ServiceManager.getServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:66:13[90m)[39m
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:236:35
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-}
-[default] Error initializing services {
-  error: Error: Missing SOPHRA_REDIS_URL environment variable
-      at ServiceManager.initializeRedis [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:185:7[90m)[39m
-      at ServiceManager.getServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:66:13[90m)[39m
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:236:35
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
-      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-}
-
-            </system-err>
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Environment Configuration &gt; should handle missing Elasticsearch configuration" time="0.0039965">
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Environment Configuration &gt; should handle missing OpenAI API key" time="0.0019999">
-            <system-err>
-[default] Error initializing services {
-  error: Error: OpenAI API key is required for vectorization service
-      at new VectorizationService [90m(D:\sophra\[39msrc\lib\cortex\services\vectorization.ts:59:13[90m)[39m
-      at ServiceManager.createBaseServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:271:8[90m)[39m
-      at ServiceManager.getServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:80:24[90m)[39m
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:262:7
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:5
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:11[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-}
-
-            </system-err>
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Environment Configuration &gt; should handle empty string environment variables" time="0.001948">
-            <system-err>
-[default] Error initializing services {
-  error: Error: OpenAI API key is required for vectorization service
-      at new VectorizationService [90m(D:\sophra\[39msrc\lib\cortex\services\vectorization.ts:59:13[90m)[39m
-      at ServiceManager.createBaseServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:271:8[90m)[39m
-      at ServiceManager.getServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:80:24[90m)[39m
-      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.additional.test.ts:272:7
-      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:5
-      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:11[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
-      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
-}
-
-            </system-err>
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Concurrent Access &gt; should handle multiple simultaneous initialization requests" time="0.1096951">
-        </testcase>
-        <testcase classname="src/lib/cortex/utils/service-manager.additional.test.ts" name="ServiceManager Additional Tests &gt; Concurrent Access &gt; should handle concurrent connection checks" time="0.0016849">
+        <testcase classname="src/lib/nous/learn/models.test.ts" name="SearchOptimizationModel &gt; loadState &gt; should throw error when version not found" time="0.0008788">
         </testcase>
     </testsuite>
 </testsuites>
