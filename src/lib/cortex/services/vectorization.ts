@@ -54,6 +54,11 @@ export class VectorizationService {
    * @returns {Promise<number[]>} The magical number pattern
    */
   async generateEmbeddings(text: string, apiKey: string): Promise<number[]> {
+    if (!apiKey) {
+      this.log("error", "Missing API key for embedding generation");
+      throw new Error("OpenAI API key is required for vectorization");
+    }
+
     try {
       const response = await fetch("https://api.openai.com/v1/embeddings", {
         method: "POST",
@@ -120,6 +125,9 @@ export class VectorizationService {
       const apiKey = config?.apiKey || this.openaiApiKey;
 
       if (!apiKey) {
+        this.log("error", "Missing API key for vectorization", {
+          docId: doc.id,
+        });
         throw new Error("OpenAI API key is required for vectorization");
       }
 
@@ -168,9 +176,16 @@ export class VectorizationService {
 
   async checkHealth(): Promise<boolean> {
     try {
-      // Basic check - if service is instantiated
+      // Test the connection to OpenAI API
+      await fetch("https://api.openai.com/v1/models", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${this.openaiApiKey}`,
+        },
+      });
       return true;
     } catch (error) {
+      this.log("error", "Health check failed", { error });
       return false;
     }
   }

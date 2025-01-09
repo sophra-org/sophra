@@ -136,7 +136,7 @@ describe("AutomatedFeedbackProcessor Additional Tests", () => {
       const metrics = (processor as any).calculateFeedbackMetrics(feedback);
 
       expect(metrics.clickThroughRate).toBe(1 / 3);
-      expect(metrics.averageRelevance).toBe(0.7);
+      expect(metrics.averageRelevance).toBeCloseTo(0.7, 5);
       expect(metrics.conversionRate).toBe(1 / 3);
       expect(metrics.requiresAdjustment).toBe(false);
     });
