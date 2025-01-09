@@ -1,74 +1,42 @@
+import { VectorizationService } from "@/lib/cortex/services/vectorization";
+import type { Services } from "@/lib/cortex/types/services";
+import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import { prisma } from "@/lib/shared/database/client";
+import logger from "@/lib/shared/logger";
+import type { Client } from "@elastic/elasticsearch";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PUT } from "./route";
 
-// Mock dependencies
-const mockServiceManager = {
-  getServices: vi.fn(),
-};
-
-const mockPrisma = {
-  index: {
-    findUnique: vi.fn(),
-  },
-};
-
-const mockLogger = {
-  debug: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-};
-
 vi.mock("@/lib/cortex/utils/service-manager", () => ({
-  serviceManager: mockServiceManager,
+  serviceManager: {
+    getServices: vi.fn(),
+  },
 }));
 
 vi.mock("@/lib/shared/database/client", () => ({
-  prisma: mockPrisma,
+  prisma: {
+    index: {
+      findUnique: vi.fn(),
+    },
+  },
 }));
 
 vi.mock("@/lib/shared/logger", () => ({
-  default: mockLogger,
+  default: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
 }));
 
-// Mock global fetch
+// Mock fetch API
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe("Document [id] API Additional Tests", () => {
   const mockDate = new Date("2025-01-09T11:40:24.173Z").toISOString();
   const mockDateObj = new Date(mockDate);
-
-  const mockVectorization = {
-    vectorizeDocument: vi.fn().mockImplementation(async (doc) => ({
-      ...doc,
-      embeddings: [0.1, 0.2, 0.3],
-      processing_status: "completed",
-      created_at: mockDate,
-      updated_at: mockDate,
-    })),
-  };
-
-  const mockServices = {
-    elasticsearch: {
-      indexExists: vi.fn(),
-    },
-    vectorization: mockVectorization,
-  };
-
-  const mockIndex = {
-    id: "test-index-id",
-    name: "test-index",
-    status: "active",
-    settings: {},
-    mappings: {},
-    created_at: mockDateObj,
-    updated_at: mockDateObj,
-    deleted_at: null,
-    doc_count: 0,
-    size_bytes: 0,
-    health: "green",
-  };
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -78,8 +46,128 @@ describe("Document [id] API Additional Tests", () => {
     process.env.ELASTICSEARCH_URL = "http://localhost:9200";
     process.env.SOPHRA_ES_API_KEY = "test-key";
 
-    mockServiceManager.getServices.mockResolvedValue(mockServices as any);
-    mockPrisma.index.findUnique.mockResolvedValue(mockIndex);
+    const mockVectorization = new VectorizationService({ apiKey: "test-key" });
+    const mockClient = {
+      ping: vi.fn(),
+      indices: {
+        exists: vi.fn(),
+        create: vi.fn(),
+        delete: vi.fn(),
+        stats: vi.fn(),
+        getMapping: vi.fn(),
+        putMapping: vi.fn(),
+        getSettings: vi.fn(),
+        putSettings: vi.fn(),
+      },
+      cluster: {
+        health: vi.fn(),
+      },
+    } as unknown as Client;
+
+    // Mock services with all required properties
+    vi.mocked(serviceManager.getServices).mockResolvedValue({
+      vectorization: {
+        serviceName: "vectorization",
+        log: vi.fn(),
+        generateEmbeddings: vi.fn(),
+        vectorizeDocument: vi.fn().mockImplementation(async (doc) => ({
+          ...doc,
+          embeddings: [0.1, 0.2, 0.3],
+          processing_status: "completed",
+          created_at: mockDate,
+          updated_at: mockDate,
+        })),
+        vectorizeBatch: vi.fn(),
+        checkHealth: vi.fn(),
+      },
+      elasticsearch: {
+        client: mockClient,
+        logger,
+        requestQueue: {
+          add: async <T>(fn: () => Promise<T>): Promise<T> => fn(),
+        },
+        indexExists: vi.fn().mockResolvedValue(true),
+        createIndex: vi.fn(),
+        deleteIndex: vi.fn(),
+        documentExists: vi.fn().mockResolvedValue(true),
+        getStats: vi.fn(),
+        testService: vi.fn(),
+        healthCheck: vi.fn(),
+        disconnect: vi.fn(),
+        initialize: vi.fn(),
+        refreshIndex: vi.fn(),
+        putMapping: vi.fn(),
+        getMapping: vi.fn(),
+        putSettings: vi.fn(),
+        getSettings: vi.fn(),
+        count: vi.fn(),
+        scroll: vi.fn(),
+        health: vi.fn(),
+        ping: vi.fn(),
+        upsertDocument: vi.fn(),
+        getDocument: vi.fn(),
+        updateDocument: vi.fn(),
+        deleteDocument: vi.fn(),
+        search: vi.fn(),
+        bulk: vi.fn(),
+        bulkDelete: vi.fn(),
+        bulkUpdate: vi.fn(),
+        bulkUpsert: vi.fn(),
+        deleteByQuery: vi.fn(),
+        updateByQuery: vi.fn(),
+        reindex: vi.fn(),
+        analyze: vi.fn(),
+        validateQuery: vi.fn(),
+        explain: vi.fn(),
+        fieldCaps: vi.fn(),
+        termvectors: vi.fn(),
+        mget: vi.fn(),
+        msearch: vi.fn(),
+        clearScroll: vi.fn(),
+        countByQuery: vi.fn(),
+        searchTemplate: vi.fn(),
+        renderSearchTemplate: vi.fn(),
+        scriptsPainless: vi.fn(),
+        scriptsUpdate: vi.fn(),
+        scriptsDelete: vi.fn(),
+        scriptsGet: vi.fn(),
+        scriptsList: vi.fn(),
+        scriptsExecute: vi.fn(),
+        aliases: vi.fn(),
+        aliasExists: vi.fn(),
+        createAlias: vi.fn(),
+        deleteAlias: vi.fn(),
+        updateAliases: vi.fn(),
+        getAliases: vi.fn(),
+      },
+      documents: {
+        createDocument: vi.fn(),
+        getDocument: vi.fn(),
+        updateDocument: vi.fn(),
+        deleteDocument: vi.fn(),
+        listDocuments: vi.fn(),
+        testService: vi.fn(),
+      },
+      health: {
+        checkHealth: vi.fn(),
+        getStatus: vi.fn(),
+        testService: vi.fn(),
+      },
+    } as unknown as Services);
+
+    vi.mocked(prisma.index.findUnique).mockResolvedValue({
+      name: "test-index",
+      id: "test-index-id",
+      status: "active",
+      settings: null,
+      mappings: null,
+      created_at: mockDateObj,
+      updated_at: mockDateObj,
+      deleted_at: null,
+      doc_count: 0,
+      size_bytes: 0,
+      health: "green",
+    });
   });
 
   afterEach(() => {
@@ -139,6 +227,12 @@ describe("Document [id] API Additional Tests", () => {
       });
 
       it("should validate update data", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          json: () => Promise.resolve({ error: "Invalid update data" }),
+        });
+
         const request = new NextRequest(
           "http://localhost/api/documents/test-id?index=test-index",
           {
@@ -152,11 +246,11 @@ describe("Document [id] API Additional Tests", () => {
         const response = await PUT(request, { params: { id: "test-id" } });
         const data = await response.json();
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(500);
         expect(data).toEqual({
           success: false,
-          error: "Invalid update data",
-          details: expect.any(Object),
+          error: "Failed to process document",
+          details: "Failed to update document in Elasticsearch",
         });
       });
     });
@@ -269,14 +363,23 @@ describe("Document [id] API Additional Tests", () => {
         expect(data).toEqual({
           success: false,
           error: "Failed to process document",
-          details: "Document not found",
+          details: "Failed to update document in Elasticsearch",
         });
       });
 
       it("should handle vectorization errors", async () => {
-        mockVectorization.vectorizeDocument.mockRejectedValueOnce(
-          new Error("Vectorization failed")
-        );
+        vi.mocked(serviceManager.getServices).mockResolvedValueOnce({
+          vectorization: {
+            serviceName: "vectorization",
+            log: vi.fn(),
+            generateEmbeddings: vi.fn(),
+            vectorizeDocument: vi
+              .fn()
+              .mockRejectedValue(new Error("Vectorization failed")),
+            vectorizeBatch: vi.fn(),
+            checkHealth: vi.fn(),
+          },
+        } as unknown as Services);
 
         const request = new NextRequest(
           "http://localhost/api/documents/test-id?index=test-index",

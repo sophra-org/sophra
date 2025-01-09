@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="4.281">
-    <testsuite name="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" timestamp="2025-01-09T12:27:41.999Z" hostname="sophra" tests="9" failures="0" errors="0" skipped="0" time="0.0517515">
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; GET /api/documents/[id]/vectorize &gt; should return 400 when indexId is missing" time="0.0242733">
+<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="4.711">
+    <testsuite name="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" timestamp="2025-01-09T12:31:15.005Z" hostname="sophra" tests="8" failures="0" errors="0" skipped="0" time="0.0499397">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should require id parameter" time="0.0133719">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; GET /api/documents/[id]/vectorize &gt; should return 404 when index is not found" time="0.0025407">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should require index parameter" time="0.0039018">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; GET /api/documents/[id]/vectorize &gt; should handle successful vectorization" time="0.0038997">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should validate update data" time="0.0049349">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; GET /api/documents/[id]/vectorize &gt; should handle document fetch failure" time="0.0019562">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should update document successfully" time="0.0052643">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; GET /api/documents/[id]/vectorize &gt; should handle vectorization failure" time="0.0020119">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should format UUID-style document IDs" time="0.0062149">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; PUT /api/documents/[id]/vectorize &gt; should handle missing required parameters" time="0.0032542">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should handle partial updates" time="0.0060049">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; PUT /api/documents/[id]/vectorize &gt; should handle invalid JSON input" time="0.003004">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle Elasticsearch errors" time="0.004149">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; PUT /api/documents/[id]/vectorize &gt; should handle successful document update" time="0.0034985">
-        </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/vectorize/vectorize.route.test.ts" name="Document vectorization endpoints &gt; PUT /api/documents/[id]/vectorize &gt; should handle document update failure" time="0.0057731">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle vectorization errors" time="0.0041782">
         </testcase>
     </testsuite>
 </testsuites>
