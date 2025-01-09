@@ -1,0 +1,65 @@
+version: 2
+updates:
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    versioning-strategy: "auto"
+    package-manager: "pnpm"
+    labels:
+      - "dependencies"
+      - "security"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier"
+          - "typescript"
+          - "ts-*"  # Covers ts-node, ts-jest, ts-morph
+      testing:
+        patterns:
+          - "vitest*"
+          - "@testing-library/*"
+          - "@vitest/*"
+      core-dependencies:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "@prisma/*"
+          - "zod*"
+          - "tailwindcss"
+      security-critical:
+        patterns:
+          - "bcryptjs"
+          - "jsonwebtoken"
+          - "next-auth"
+          - "@auth/*"  # Covers @auth/prisma-adapter
+      api-dependencies:
+        patterns:
+          - "@anthropic-ai/*"
+          - "openai"
+          - "@elastic/*"
+      monitoring:
+        patterns:
+          - "newrelic"
+          - "@newrelic/*"
+          - "@logtail/*"
+          - "winston"
+          - "prom-client"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "ci-cd"
+      - "dependencies"
