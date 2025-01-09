@@ -85,13 +85,30 @@ describe("Feedback Patterns Route Handler", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.patterns).toBeDefined();
-      expect(data.patterns.length).toBe(1);
-      expect(data.meta.timeframe).toBe("24h");
-      expect(data.meta.total).toBe(1);
-      expect(data.meta.took).toBeGreaterThanOrEqual(0);
-      expect(data.meta.generated_at).toBeDefined();
+      expect(data).toMatchObject({
+        success: true,
+        patterns: expect.arrayContaining([
+          expect.objectContaining({
+            id: expect.any(String),
+            query_id: expect.any(String),
+            pattern_type: expect.any(String),
+            confidence: expect.any(Number),
+            metadata: expect.objectContaining({
+              averageRating: expect.any(Number),
+              uniqueQueries: expect.any(Number),
+              actions: expect.any(Array),
+              engagementTypes: expect.any(Array)
+            }),
+            timestamp: expect.any(String)
+          })
+        ]),
+        meta: {
+          timeframe: "24h",
+          total: 1,
+          took: expect.any(Number),
+          generated_at: expect.any(String)
+        }
+      });
     });
 
     it("should handle database errors gracefully", async () => {

@@ -9,7 +9,9 @@ vi.mock("@lib/shared/database/client", () => ({
     feedbackRequest: {
       findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn().mockResolvedValue({}),
+      $queryRaw: vi.fn(),
     },
+    $transaction: vi.fn(),
   },
 }));
 

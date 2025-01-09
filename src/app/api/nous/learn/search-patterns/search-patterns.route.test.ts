@@ -63,18 +63,22 @@ vi.mock('@lib/shared/database/client', () => ({
       $executeRaw: vi.fn().mockResolvedValue(0)
     },
     $transaction: vi.fn().mockImplementation(async (callback) => {
-      return callback({
-        modelState: {
-          findMany: vi.fn().mockResolvedValue([]),
-          findFirst: vi.fn().mockResolvedValue(null),
-          create: vi.fn().mockResolvedValue({}),
-          update: vi.fn().mockResolvedValue({}),
-          delete: vi.fn().mockResolvedValue({}),
-          count: vi.fn().mockResolvedValue(0),
-          $queryRaw: vi.fn().mockResolvedValue([]),
-          $executeRaw: vi.fn().mockResolvedValue(0)
-        }
-      });
+      try {
+        return await callback({
+          modelState: {
+            findMany: vi.fn().mockResolvedValue([]),
+            findFirst: vi.fn().mockResolvedValue(null),
+            create: vi.fn().mockResolvedValue({}),
+            update: vi.fn().mockResolvedValue({}),
+            delete: vi.fn().mockResolvedValue({}),
+            count: vi.fn().mockResolvedValue(0),
+            $queryRaw: vi.fn().mockResolvedValue([]),
+            $executeRaw: vi.fn().mockResolvedValue(0)
+          }
+        });
+      } catch (error) {
+        throw error;
+      }
     })
   }
 }));

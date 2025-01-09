@@ -9,8 +9,11 @@ import { GET, runtime } from "./route";
 vi.mock("@lib/shared/database/client", () => ({
   prisma: {
     learningMetric: {
-      findMany: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
+      $queryRaw: vi.fn(),
     },
+    $transaction: vi.fn(),
   },
 }));
 
