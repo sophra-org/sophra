@@ -50,24 +50,33 @@ vi.mock('@prisma/client', () => ({
   }))
 }));
 
-const mockPrisma = {
-  modelState: {
-    findMany: vi.fn().mockResolvedValue([]),
-    findFirst: vi.fn().mockResolvedValue(null),
-    create: vi.fn().mockResolvedValue({}),
-    update: vi.fn().mockResolvedValue({}),
-    delete: vi.fn().mockResolvedValue({}),
-    count: vi.fn().mockResolvedValue(0),
-    $queryRaw: vi.fn().mockResolvedValue([]),
-    $executeRaw: vi.fn().mockResolvedValue(0)
-  },
-  $transaction: vi.fn().mockImplementation(async (callback) => {
-    return callback(mockPrisma);
-  })
-};
-
 vi.mock('@lib/shared/database/client', () => ({
-  prisma: mockPrisma
+  prisma: {
+    modelState: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({}),
+      update: vi.fn().mockResolvedValue({}),
+      delete: vi.fn().mockResolvedValue({}),
+      count: vi.fn().mockResolvedValue(0),
+      $queryRaw: vi.fn().mockResolvedValue([]),
+      $executeRaw: vi.fn().mockResolvedValue(0)
+    },
+    $transaction: vi.fn().mockImplementation(async (callback) => {
+      return callback({
+        modelState: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
+          create: vi.fn().mockResolvedValue({}),
+          update: vi.fn().mockResolvedValue({}),
+          delete: vi.fn().mockResolvedValue({}),
+          count: vi.fn().mockResolvedValue(0),
+          $queryRaw: vi.fn().mockResolvedValue([]),
+          $executeRaw: vi.fn().mockResolvedValue(0)
+        }
+      });
+    })
+  }
 }));
 
 // Import after mocks

@@ -4,16 +4,13 @@ import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST, runtime } from "./route";
 
-// Mock dependencies withexplicit return values
-const mockPrisma = {
-  feedbackRequest: {
-    findMany: vi.fn().mockResolvedValue([]),
-    create: vi.fn().mockResolvedValue({}),
-  },
-};
-
 vi.mock("@lib/shared/database/client", () => ({
-  prisma: mockPrisma,
+  prisma: {
+    feedbackRequest: {
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({}),
+    },
+  },
 }));
 
 vi.mock("@lib/shared/logger", () => ({
