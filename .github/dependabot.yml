@@ -6,7 +6,6 @@ updates:
     schedule:
       interval: "weekly"
     versioning-strategy: "auto"
-    package-manager: "pnpm"
     labels:
       - "dependencies"
       - "security"
@@ -22,11 +21,12 @@ updates:
           - "eslint*"
           - "prettier"
           - "typescript"
-          - "ts-*"  # Covers ts-node, ts-jest, ts-morph
+          - "ts-*"
       testing:
         patterns:
           - "vitest*"
           - "@testing-library/*"
+          - "jest*"
           - "@vitest/*"
       core-dependencies:
         patterns:
@@ -41,7 +41,7 @@ updates:
           - "bcryptjs"
           - "jsonwebtoken"
           - "next-auth"
-          - "@auth/*"  # Covers @auth/prisma-adapter
+          - "@auth/*"
       api-dependencies:
         patterns:
           - "@anthropic-ai/*"
