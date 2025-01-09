@@ -1,55 +1,156 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="25" failures="0" errors="0" time="4.579">
-    <testsuite name="src/lib/test/next-server.mock.additional.test.ts" timestamp="2025-01-09T17:27:39.756Z" hostname="sophra" tests="25" failures="0" errors="0" skipped="0" time="0.0465258">
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Static Methods &gt; should create JSON response" time="0.0204894">
+<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="4.862">
+    <testsuite name="src/lib/cortex/utils/service-manager.test.ts" timestamp="2025-01-09T17:41:35.608Z" hostname="sophra" tests="11" failures="0" errors="0" skipped="0" time="0.1347351">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; getInstance &gt; should return the same instance when called multiple times" time="0.0023246">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Static Methods &gt; should create JSON response with custom status" time="0.0007987">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; getServices &gt; should initialize services successfully" time="0.0069964">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Static Methods &gt; should create redirect response" time="0.0004468">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; getServices &gt; should reuse existing services on subsequent calls" time="0.0029036">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Static Methods &gt; should create next response" time="0.000434">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; getServices &gt; should handle initialization errors gracefully" time="0.0068182">
+            <system-err>
+[default] Redis ping failed: {
+  error: Error: Redis connection failed
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:97:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+}
+[default] Redis initialization failed {
+  error: Error: Redis connection failed
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:97:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+}
+[default] Error initializing services {
+  error: Error: Redis connection failed
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:97:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+  [90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+}
+
+            </system-err>
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Static Methods &gt; should create rewrite response" time="0.0003565">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; getServices &gt; should wait for initialization if already in progress" time="0.1042671">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Instance Methods &gt; should handle json method" time="0.000483">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; checkConnections &gt; should return true for all connections when healthy" time="0.0019326">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Instance Methods &gt; should handle text method" time="0.000401">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; checkConnections &gt; should handle Redis connection failure" time="0.0019414">
+            <system-err>
+[default] Redis ping failed: {
+  error: Error: Redis error
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:149:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
+}
+[default] Redis initialization failed {
+  error: Error: Redis error
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:149:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
+}
+
+            </system-err>
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Instance Methods &gt; should clone response" time="0.0010545">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; checkConnections &gt; should handle Elasticsearch connection failure" time="0.0006392">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockResponse Additional Tests &gt; Instance Methods &gt; should handle custom headers" time="0.0012011">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; checkConnections &gt; should handle Postgres connection failure" time="0.0007516">
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; URL Handling &gt; should parse URL correctly" time="0.0017971">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; error handling &gt; should throw error when Redis URL is missing" time="0.0017297">
+            <system-err>
+[default] Redis initialization failed {
+  error: Error: Missing SOPHRA_REDIS_URL environment variable
+      at ServiceManager.initializeRedis [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:185:7[90m)[39m
+      at ServiceManager.getServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:66:13[90m)[39m
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:213:35
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+}
+[default] Error initializing services {
+  error: Error: Missing SOPHRA_REDIS_URL environment variable
+      at ServiceManager.initializeRedis [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:185:7[90m)[39m
+      at ServiceManager.getServices [90m(D:\sophra\[39msrc\lib\cortex\utils\service-manager.ts:66:13[90m)[39m
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:213:35
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+}
+
+            </system-err>
         </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; URL Handling &gt; should handle search parameters" time="0.0005684">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Headers and Cookies &gt; should handle custom headers" time="0.0003018">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Headers and Cookies &gt; should initialize cookies from headers" time="0.0004997">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Body Handling &gt; should handle JSON body" time="0.0015887">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Body Handling &gt; should handle text body" time="0.0010132">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Body Handling &gt; should handle empty body" time="0.0005425">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Body Handling &gt; should handle streaming body" time="0.0006326">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Optional Properties &gt; should initialize with undefined geo" time="0.0008983">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Optional Properties &gt; should initialize with undefined ip" time="0.0004444">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Edge Cases &gt; should handle malformed URLs gracefully" time="0.0010514">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Edge Cases &gt; should handle invalid JSON body" time="0.0009733">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Edge Cases &gt; should handle multiple reads from body stream" time="0.0006056">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Edge Cases &gt; should handle large bodies" time="0.0015142">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Integration Tests &gt; should handle complete request scenario" time="0.0013506">
-        </testcase>
-        <testcase classname="src/lib/test/next-server.mock.additional.test.ts" name="MockRequest Additional Tests &gt; Integration Tests &gt; should handle request-response cycle" time="0.0029486">
+        <testcase classname="src/lib/cortex/utils/service-manager.test.ts" name="ServiceManager &gt; error handling &gt; should handle Redis connection errors" time="0.0019694">
+            <system-err>
+[default] Redis ping failed: {
+  error: Error: Connection failed
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:220:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
+}
+[default] Redis initialization failed {
+  error: Error: Connection failed
+      at [90mD:\sophra\[39msrc\lib\cortex\utils\service-manager.test.ts:220:41
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+      at [90mfile:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+      at runWithTimeout [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:39:7[90m)[39m
+      at runTest [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:17[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runSuite [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+      at runFiles [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+      at startTests [90m(file:///D:/sophra/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
+}
+
+            </system-err>
         </testcase>
     </testsuite>
 </testsuites>

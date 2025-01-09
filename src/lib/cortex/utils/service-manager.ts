@@ -48,7 +48,12 @@ export class ServiceManager {
 
       // Only initialize Redis if not already initialized
       if (!this.redis) {
-        this.redis = await this.initializeRedis();
+        try {
+          this.redis = await this.initializeRedis();
+        } catch (error) {
+          logger.error("Redis initialization failed", { error });
+          throw error;
+        }
       }
 
       // Create base services
@@ -73,7 +78,16 @@ export class ServiceManager {
     try {
       // Initialize Redis if needed
       if (!this.redis) {
-        this.redis = await this.initializeRedis();
+        try {
+          this.redis = await this.initializeRedis();
+        } catch (error) {
+          logger.error("Redis initialization failed", { error });
+          return {
+            redis: false,
+            elasticsearch: await this.checkElasticsearchConnection(),
+            postgres: await this.checkPostgresConnection(),
+          };
+        }
       }
 
       // Perform basic connection checks without full service initialization
@@ -81,7 +95,10 @@ export class ServiceManager {
         this.redis
           .ping()
           .then(() => true)
-          .catch(() => false),
+          .catch((error) => {
+            logger.error("Redis ping failed", { error });
+            return false;
+          }),
         this.checkElasticsearchConnection(),
         this.checkPostgresConnection(),
       ]);
@@ -141,6 +158,7 @@ export class ServiceManager {
       commandTimeout: 5000,
     });
 
+    // Attach event handlers before any operations
     redis.on("error", (error) => {
       logger.error("Redis error:", { error });
     });
@@ -148,6 +166,16 @@ export class ServiceManager {
     redis.on("connect", () => {
       logger.info("Redis connected");
     });
+
+    // Try to ping Redis to ensure connection is working
+    try {
+      await redis.ping();
+    } catch (error) {
+      logger.error("Redis ping failed:", { error });
+      // Clean up the Redis instance
+      redis.disconnect();
+      throw error;
+    }
 
     return redis;
   }
