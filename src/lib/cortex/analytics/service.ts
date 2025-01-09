@@ -1,7 +1,7 @@
 import { MetricsService } from "@/lib/cortex/monitoring/metrics";
 import { prisma } from "@/lib/shared/database/client";
-import { SearchAnalyticsWhereInputSchema } from "@/lib/shared/database/validation/generated";
 import { Logger } from "@/lib/shared/types";
+import type { Prisma } from "@prisma/client";
 import { InputJsonValue, JsonValue } from "@prisma/client/runtime/library";
 import { z } from "zod";
 import type {
@@ -17,12 +17,18 @@ export class AnalyticsService {
   private readonly metrics: MetricsService;
   private readonly prisma: typeof prisma;
 
-  constructor(config: { logger: Logger; metrics?: MetricsService; environment?: string }) {
+  constructor(config: {
+    logger: Logger;
+    metrics?: MetricsService;
+    environment?: string;
+  }) {
     this.logger = config.logger;
-    this.metrics = config.metrics ?? new MetricsService({
-      logger: this.logger,
-      environment: config.environment ?? 'development'
-    });
+    this.metrics =
+      config.metrics ??
+      new MetricsService({
+        logger: this.logger,
+        environment: config.environment ?? "development",
+      });
     this.prisma = prisma;
   }
 
@@ -66,9 +72,9 @@ export class AnalyticsService {
           pageSize: 10,
         },
       });
-      this.logger.debug('Search event created successfully', { data });
+      this.logger.debug("Search event created successfully", { data });
     } catch (error) {
-      this.logger.error('Failed to create search event', { error, data });
+      this.logger.error("Failed to create search event", { error, data });
       throw error;
     }
   }
@@ -93,14 +99,14 @@ export class AnalyticsService {
       pageSize?: number;
     }>
   > {
-    const where = SearchAnalyticsWhereInputSchema.parse({
+    const where: Prisma.SearchAnalyticsWhereInput = {
       sessionId: params.sessionId,
       ...(params.timeframe && {
         timestamp: {
           gte: this.getTimeWindowStart(params.timeframe),
         },
       }),
-    });
+    };
 
     return this.prisma.searchAnalytics.findMany({
       where,
@@ -161,7 +167,9 @@ export class AnalyticsService {
       const popularQueries = this.calculatePopularQueries(metrics);
 
       // Calculate trends
-      const previousPeriodStart = new Date(startTime.getTime() - (startTime.getTime() - new Date().getTime()));
+      const previousPeriodStart = new Date(
+        startTime.getTime() - (startTime.getTime() - new Date().getTime())
+      );
       const previousMetrics = await this.prisma.searchAnalytics.findMany({
         where: {
           timestamp: {
@@ -173,44 +181,92 @@ export class AnalyticsService {
 
       const trends: AnalyticsTrend[] = [
         {
-          metric: 'totalSearches',
+          metric: "totalSearches",
           current: totalSearches,
-          trend: totalSearches > previousMetrics.length ? 'increasing' : totalSearches < previousMetrics.length ? 'decreasing' : 'stable',
-          change: ((totalSearches - previousMetrics.length) / previousMetrics.length) * 100,
+          trend:
+            totalSearches > previousMetrics.length
+              ? "increasing"
+              : totalSearches < previousMetrics.length
+                ? "decreasing"
+                : "stable",
+          change:
+            ((totalSearches - previousMetrics.length) /
+              previousMetrics.length) *
+            100,
         },
         {
-          metric: 'averageLatency',
+          metric: "averageLatency",
           current: averageLatency,
-          trend: averageLatency > (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) / previousMetrics.length || 0) ? 'increasing' : averageLatency < (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) / previousMetrics.length || 0) ? 'decreasing' : 'stable',
-          change: ((averageLatency - (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) / previousMetrics.length || 0)) / (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) / previousMetrics.length || 1)) * 100,
+          trend:
+            averageLatency >
+            (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) /
+              previousMetrics.length || 0)
+              ? "increasing"
+              : averageLatency <
+                  (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) /
+                    previousMetrics.length || 0)
+                ? "decreasing"
+                : "stable",
+          change:
+            ((averageLatency -
+              (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) /
+                previousMetrics.length || 0)) /
+              (previousMetrics.reduce((acc, curr) => acc + curr.took, 0) /
+                previousMetrics.length || 1)) *
+            100,
         },
         {
-          metric: 'errorRate',
+          metric: "errorRate",
           current: errorRate,
-          trend: errorRate > (previousMetrics.filter(m => m.totalHits === 0).length / previousMetrics.length * 100 || 0) ? 'increasing' : errorRate < (previousMetrics.filter(m => m.totalHits === 0).length / previousMetrics.length * 100 || 0) ? 'decreasing' : 'stable',
-          change: ((errorRate - (previousMetrics.filter(m => m.totalHits === 0).length / previousMetrics.length * 100 || 0)) / (previousMetrics.filter(m => m.totalHits === 0).length / previousMetrics.length * 100 || 1)) * 100,
+          trend:
+            errorRate >
+            ((previousMetrics.filter((m) => m.totalHits === 0).length /
+              previousMetrics.length) *
+              100 || 0)
+              ? "increasing"
+              : errorRate <
+                  ((previousMetrics.filter((m) => m.totalHits === 0).length /
+                    previousMetrics.length) *
+                    100 || 0)
+                ? "decreasing"
+                : "stable",
+          change:
+            ((errorRate -
+              ((previousMetrics.filter((m) => m.totalHits === 0).length /
+                previousMetrics.length) *
+                100 || 0)) /
+              ((previousMetrics.filter((m) => m.totalHits === 0).length /
+                previousMetrics.length) *
+                100 || 1)) *
+            100,
         },
       ];
 
       // Generate insights
       const insights: PerformanceInsight[] = [
         {
-          type: 'search',
+          type: "search",
           message: `Average latency is ${averageLatency.toFixed(2)}ms`,
-          severity: averageLatency > 1000 ? 'high' : averageLatency > 500 ? 'medium' : 'low',
-          metric: 'latency',
+          severity:
+            averageLatency > 1000
+              ? "high"
+              : averageLatency > 500
+                ? "medium"
+                : "low",
+          metric: "latency",
           currentValue: averageLatency,
           recommendedValue: 500,
-          action: 'Optimize search performance if latency continues to increase'
+          action:
+            "Optimize search performance if latency continues to increase",
         },
         {
-          type: 'error',
+          type: "error",
           message: `Error rate is ${errorRate.toFixed(2)}%`,
-          severity: errorRate > 5 ? 'high' : errorRate > 1 ? 'medium' : 'low',
-          metric: 'error_rate',
+          severity: errorRate > 5 ? "high" : errorRate > 1 ? "medium" : "low",
+          metric: "error_rate",
           currentValue: errorRate,
           recommendedValue: 1,
-          action: 'Investigate and fix search errors if rate exceeds threshold'
+          action: "Investigate and fix search errors if rate exceeds threshold",
         },
       ];
 

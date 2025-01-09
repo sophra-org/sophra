@@ -1,39 +1,48 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ServiceManager } from './service-manager';
-import { mockPrisma } from '../../../../vitest.setup';
-import Redis from 'ioredis';
-import { Client } from '@elastic/elasticsearch';
+import { mockPrisma } from "../../../../vitest.setup";
 
-// Mock all imported services
-vi.mock('@elastic/elasticsearch', () => ({
-  Client: vi.fn().mockImplementation(() => ({
-    ping: vi.fn().mockResolvedValue(true)
-  }))
+vi.mock("@/lib/shared/database/client", () => ({
+  prisma: mockPrisma,
 }));
 
-vi.mock('ioredis', () => {
+vi.mock("@elastic/elasticsearch", () => ({
+  Client: vi.fn().mockImplementation(() => ({
+    ping: vi.fn().mockResolvedValue(true),
+  })),
+}));
+
+vi.mock("ioredis", () => {
   const RedisMock = vi.fn().mockImplementation(() => ({
-    ping: vi.fn().mockResolvedValue('PONG'),
+    ping: vi.fn().mockResolvedValue("PONG"),
     on: vi.fn(),
-    disconnect: vi.fn()
+    disconnect: vi.fn(),
   }));
-  return RedisMock;
+  return { default: RedisMock };
 });
 
-// Mock environment variables
-const mockEnv = {
-  NODE_ENV: 'test',
-  SOPHRA_REDIS_URL: 'redis://localhost:6379',
-  ELASTICSEARCH_URL: 'http://localhost:9200',
-  SOPHRA_ES_API_KEY: 'test-key',
-  OPENAI_API_KEY: 'test-openai-key'
-};
+import Redis from "ioredis";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ServiceManager } from "./service-manager";
 
-describe('ServiceManager', () => {
+describe("ServiceManager Additional Tests", () => {
+  let serviceManager: ServiceManager;
+
   beforeEach(() => {
+    // Reset singleton instance
+    (ServiceManager as any)._instance = null;
+    serviceManager = ServiceManager.getInstance();
+    (serviceManager as any).redis = null;
+    (serviceManager as any).services = null;
+
     // Setup environment variables
-    process.env = { ...mockEnv };
-    
+    process.env = {
+      ...process.env,
+      NODE_ENV: "test",
+      SOPHRA_REDIS_URL: "redis://localhost:6379",
+      ELASTICSEARCH_URL: "http://localhost:9200",
+      SOPHRA_ES_API_KEY: "test-key",
+      OPENAI_API_KEY: "test-openai-key",
+    };
+
     // Clear all mocks
     vi.clearAllMocks();
     mockPrisma.$queryRaw.mockResolvedValue([{ count: 1 }]);
@@ -43,20 +52,10 @@ describe('ServiceManager', () => {
     vi.clearAllMocks();
   });
 
-  describe('getInstance', () => {
-    it('should return the same instance when called multiple times', () => {
-      const instance1 = ServiceManager.getInstance();
-      const instance2 = ServiceManager.getInstance();
-      expect(instance1).toBe(instance2);
-    });
-  });
-
-  describe('getServices', () => {
-    it('should initialize services successfully', async () => {
-      const serviceManager = ServiceManager.getInstance();
+  describe("Service Initialization", () => {
+    it("should initialize all required services", async () => {
       const services = await serviceManager.getServices();
 
-      expect(services).toBeDefined();
       expect(services.elasticsearch).toBeDefined();
       expect(services.redis).toBeDefined();
       expect(services.postgres).toBeDefined();
@@ -69,103 +68,96 @@ describe('ServiceManager', () => {
       expect(services.sessions).toBeDefined();
     });
 
-    it('should reuse existing services on subsequent calls', async () => {
-      const serviceManager = ServiceManager.getInstance();
-      const services1 = await serviceManager.getServices();
-      const services2 = await serviceManager.getServices();
-      expect(services1).toBe(services2);
+    it("should handle missing optional services gracefully", async () => {
+      const services = await serviceManager.getServices();
+
+      expect(services.observe).toBeNull();
+      expect(services.learning).toBeNull();
+      expect(services.documents).toBeNull();
+      expect(services.health).toBeNull();
     });
 
-    it('should handle initialization errors gracefully', async () => {
-      // Mock Redis to throw an error
-      (Redis as unknown as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('Redis connection failed');
+    it("should initialize engine service with test functionality", async () => {
+      const services = await serviceManager.getServices();
+
+      expect(services.engine).toBeDefined();
+      expect(services.engine.instance).toBeNull();
+
+      const testResult = await services.engine.testService();
+      expect(testResult).toEqual({
+        operational: true,
+        latency: expect.any(Number),
+        errors: [],
+        metrics: {
+          operations: {
+            total: 100,
+            successful: 95,
+            failed: 5,
+            pending: 0,
+          },
+          performance: {
+            latency: 50,
+            throughput: 10,
+            errorRate: 0.05,
+            cpuUsage: 0.6,
+            memoryUsage: 0.4,
+          },
+          status: "active",
+          uptime: expect.any(Number),
+        },
       });
-
-      const serviceManager = ServiceManager.getInstance();
-      await expect(serviceManager.getServices()).rejects.toThrow('Redis connection failed');
-    });
-
-    it('should wait for initialization if already in progress', async () => {
-      const serviceManager = ServiceManager.getInstance();
-      
-      // Start two initialization processes
-      const promise1 = serviceManager.getServices();
-      const promise2 = serviceManager.getServices();
-
-      const [services1, services2] = await Promise.all([promise1, promise2]);
-      expect(services1).toBe(services2);
     });
   });
 
-  describe('checkConnections', () => {
-    it('should return true for all connections when healthy', async () => {
-      const serviceManager = ServiceManager.getInstance();
-      const status = await serviceManager.checkConnections();
-
-      expect(status).toEqual({
-        redis: true,
-        elasticsearch: true,
-        postgres: true
-      });
-    });
-
-    it('should handle Redis connection failure', async () => {
-      // Mock Redis ping to fail
-      (Redis as unknown as jest.Mock).mockImplementationOnce(() => ({
-        ping: vi.fn().mockRejectedValue(new Error('Redis error')),
-        on: vi.fn()
-      }));
-
-      const serviceManager = ServiceManager.getInstance();
-      const status = await serviceManager.checkConnections();
-
-      expect(status.redis).toBe(false);
-    });
-
-    it('should handle Elasticsearch connection failure', async () => {
-      // Mock Elasticsearch ping to fail
-      (Client as unknown as jest.Mock).mockImplementationOnce(() => ({
-        ping: vi.fn().mockRejectedValue(new Error('Elasticsearch error'))
-      }));
-
-      const serviceManager = ServiceManager.getInstance();
-      const status = await serviceManager.checkConnections();
-
-      expect(status.elasticsearch).toBe(false);
-    });
-
-    it('should handle Postgres connection failure', async () => {
-      // Mock Prisma query to fail
-      mockPrisma.$queryRaw.mockRejectedValueOnce(new Error('Postgres error'));
-
-      const serviceManager = ServiceManager.getInstance();
-      const status = await serviceManager.checkConnections();
-
-      expect(status.postgres).toBe(false);
-    });
-  });
-
-  describe('error handling', () => {
-    it('should throw error when Redis URL is missing', async () => {
-      process.env.SOPHRA_REDIS_URL = '';
-      
-      const serviceManager = ServiceManager.getInstance();
-      await expect(serviceManager.getServices()).rejects.toThrow('Missing SOPHRA_REDIS_URL environment variable');
-    });
-
-    it('should handle Redis connection errors', async () => {
+  describe("Connection Management", () => {
+    it("should handle Redis connection timeouts", async () => {
       const mockRedis = {
-        ping: vi.fn().mockRejectedValue(new Error('Connection failed')),
+        ping: vi.fn().mockImplementation(
+          () =>
+            new Promise((_, reject) => {
+              setTimeout(() => reject(new Error("Connection timeout")), 100);
+            })
+        ),
         on: vi.fn(),
-        disconnect: vi.fn()
+        disconnect: vi.fn(),
       };
       (Redis as unknown as jest.Mock).mockImplementationOnce(() => mockRedis);
 
-      const serviceManager = ServiceManager.getInstance();
-      const status = await serviceManager.checkConnections();
-      
-      expect(status.redis).toBe(false);
-      expect(mockRedis.on).toHaveBeenCalledWith('error', expect.any(Function));
+      await expect(serviceManager.getServices()).rejects.toThrow();
+      expect(mockRedis.disconnect).toHaveBeenCalled();
+    });
+
+    it("should handle Redis reconnection attempts", async () => {
+      const mockRedis = {
+        ping: vi
+          .fn()
+          .mockRejectedValueOnce(new Error("Connection failed"))
+          .mockResolvedValueOnce("PONG"),
+        on: vi.fn(),
+        disconnect: vi.fn(),
+      };
+      (Redis as unknown as jest.Mock).mockImplementationOnce(() => mockRedis);
+
+      await expect(serviceManager.getServices()).rejects.toThrow();
+      expect(mockRedis.on).toHaveBeenCalledWith("error", expect.any(Function));
+      expect(mockRedis.on).toHaveBeenCalledWith(
+        "connect",
+        expect.any(Function)
+      );
+    });
+
+    it("should cleanup Redis connection on initialization failure", async () => {
+      const mockRedis = {
+        ping: vi.fn().mockRejectedValue(new Error("Initialization failed")),
+        on: vi.fn(),
+        disconnect: vi.fn(),
+      };
+      (Redis as unknown as jest.Mock).mockImplementationOnce(() => mockRedis);
+
+      await expect(serviceManager.getServices()).rejects.toThrow(
+        "Initialization failed"
+      );
+      expect(mockRedis.disconnect).toHaveBeenCalled();
     });
   });
+});

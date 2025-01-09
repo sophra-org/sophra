@@ -1,107 +1,110 @@
 import { MetricType } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mockPrisma } from "~/vitest.setup";
-import { GET } from "./route";
+import { GET, runtime } from "./route";
 
-vi.mock("next/server", () => {
-  return {
-    NextResponse: {
-      json: (data: any, init?: { status?: number }) => ({
-        status: init?.status || 200,
-        ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-        headers: new Headers({ "content-type": "application/json" }),
-        json: () => Promise.resolve(data),
-      }),
-    },
-    NextRequest: class {
-      url: string;
-      nextUrl: URL;
-      searchParams: URLSearchParams;
-
-      constructor(url: string) {
-        this.url = url;
-        this.nextUrl = new URL(url);
-        this.searchParams = new URL(url).searchParams;
-      }
-    },
-  };
-});
-
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    $queryRaw: vi.fn(),
-  },
-}));
-
-vi.mock("@/lib/shared/logger", () => ({
+// Mock modules
+vi.mock("@lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
-    debug: vi.fn(),
   },
 }));
 
+vi.mock("next/server", () => {
+  const NextResponse = {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data,
+    })),
+  };
+  return {
+    NextRequest: vi.fn().mockImplementation((url) => ({
+      url,
+      nextUrl: new URL(url),
+      headers: new Headers(),
+      searchParams: new URL(url).searchParams,
+    })),
+    NextResponse,
+  };
+});
+
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: {
+    learningMetric: {
+      findMany: vi.fn(),
+      count: vi.fn(),
+      $queryRaw: vi.fn(),
+    },
+  },
+}));
+
+// Import after mocks
+import { prisma } from "@lib/shared/database/client";
+
 describe("Learning Metrics Route Handler", () => {
   const mockMetric = {
-    id: "test-1",
+    id: "metric-1",
     type: MetricType.FEEDBACK_SCORE,
-    value: 100,
-    count: 1,
-    timestamp: new Date(),
-    sessionId: "sess-1",
-    totalSearches: 100,
-    averageLatency: 150,
-    successRate: 0.95,
-    errorRate: 0.05,
-    cacheHitRate: 0.8,
-    queryCount: 1000,
-    uniqueQueries: 800,
-    topQueries: ["query1", "query2"],
-    queryPatterns: ["pattern1", "pattern2"],
-    feedbackScore: 4.5,
-    userSatisfaction: 0.9,
-    timeWindow: "1h",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    metadata: {},
+    value: 0.85,
+    count: 100,
+    timestamp: new Date("2025-01-09T11:40:24.173Z"),
+    sessionId: "session-1",
+    modelId: "model-1",
+    interval: "1h",
+    timeframe: "24h",
+    aggregated: true,
+    metadata: {
+      averageLatency: 150,
+      cacheHitRate: 0.8,
+      errorRate: 0.05,
+      feedbackScore: 4.5,
+      queryCount: 500,
+      queryPatterns: ["pattern1", "pattern2"],
+      successRate: 0.95,
+      topQueries: ["query1", "query2"],
+      totalSearches: 1000,
+      uniqueQueries: 300,
+      userSatisfaction: 0.9,
+    },
+    createdAt: new Date("2025-01-09T11:40:24.173Z"),
+    updatedAt: new Date("2025-01-09T11:40:24.173Z"),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  describe("Configuration", () => {
+    it("should use Node.js runtime", () => {
+      expect(runtime).toBe("nodejs");
+    });
+  });
+
   describe("GET /api/nous/learn/metrics", () => {
     it("should fetch metrics with default parameters", async () => {
-      const mockMetricWithRequired = {
-        ...mockMetric,
-        interval: "1h",
-        modelId: null,
-        timeframe: "1h",
-        aggregated: false,
-      };
-
-      vi.mocked(mockPrisma.learningMetric.findMany).mockResolvedValue([
-        mockMetricWithRequired,
-      ]);
-      vi.mocked(mockPrisma.learningMetric.count).mockResolvedValue(1);
-
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics"
       );
+
+      vi.mocked(prisma.learningMetric.findMany).mockResolvedValue([mockMetric]);
+      vi.mocked(prisma.learningMetric.count).mockResolvedValue(1);
+
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data).toEqual([mockMetric]);
-      expect(data.meta).toEqual({
-        total: 1,
-        page: 1,
-        pageSize: 10,
+      expect(data).toEqual({
+        metrics: [mockMetric],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          total: 1,
+          totalPages: 1,
+        },
       });
     });
-
-    // ... rest of the tests using mockMetric ...
   });
 });

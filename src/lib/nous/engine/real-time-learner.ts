@@ -1,3 +1,14 @@
+import {
+  EngineOptimizationStrategy,
+  EngineOptimizationType,
+  EngineRiskLevel,
+  LearningEvent,
+  LearningEventPriority,
+  LearningEventStatus,
+  LearningEventType,
+  LearningPattern,
+} from "@prisma/client";
+import { Redis } from "ioredis";
 import { ElasticsearchService } from "../../../lib/cortex/elasticsearch/services";
 import { MetricsService } from "../../../lib/cortex/monitoring/metrics";
 import { prisma } from "../../../lib/shared/database/client";
@@ -11,17 +22,6 @@ import {
 } from "../../../lib/shared/engine/processors";
 import { ITimeBasedProcessor } from "../../../lib/shared/engine/processors/time-based-processor";
 import { Logger } from "../../../lib/shared/types";
-import {
-  EngineOptimizationStrategy,
-  EngineOptimizationType,
-  EngineRiskLevel,
-  LearningEvent,
-  LearningEventPriority,
-  LearningEventStatus,
-  LearningEventType,
-  LearningPattern,
-} from "@prisma/client";
-import { Redis } from "ioredis";
 
 interface PerformanceMetrics {
   latency: number;
@@ -94,24 +94,21 @@ export class RealTimeLearner {
     this.prisma = prisma;
 
     const metricsAdapter = new MetricsAdapter(config.metrics, config.logger);
-    
+
     // Initialize processors with their required dependencies
-    const timeBasedProcessor = Object.assign(
-      new TimeBasedProcessor(),
-      {
-        findRecurringPatterns: async (params: any) => ({
-          daily: [],
-          weekly: [],
-          confidence: 0
-        })
-      }
-    ) as unknown as ITimeBasedProcessor;
+    const timeBasedProcessor = Object.assign(new TimeBasedProcessor(), {
+      findRecurringPatterns: async (params: any) => ({
+        daily: [],
+        weekly: [],
+        confidence: 0,
+      }),
+    }) as unknown as ITimeBasedProcessor;
 
     const processors: ProcessorMap = {
       feedback: new FeedbackProcessor(),
       performance: new PerformanceProcessor(),
       timeBased: timeBasedProcessor,
-      strategy: new StrategyProcessor()
+      strategy: new StrategyProcessor(),
     };
 
     this.engine = new LearningEngine(config.logger, processors, this.prisma);
@@ -126,7 +123,7 @@ export class RealTimeLearner {
       this.config.logger.warn("RealTimeLearner is already running");
       return;
     }
-    
+
     this.isRunning = true;
     this.config.logger.info("Starting RealTimeLearner");
     await this.initializeStreamConsumer();
@@ -141,7 +138,7 @@ export class RealTimeLearner {
       this.config.logger.warn("RealTimeLearner is not running");
       return;
     }
-    
+
     this.isRunning = false;
     this.config.logger.info("RealTimeLearner stopping gracefully");
   }
@@ -261,27 +258,141 @@ export class RealTimeLearner {
     return typeSuccessRates[patternType] || defaultRate;
   }
 
+  private async validateStrategyImpact(
+    strategy: ExtendedLearningPattern
+  ): Promise<boolean> {
+    const baselineMetrics = await this.collectBaselineMetrics();
+    const projectedImpact = this.calculateProjectedImpact(
+      strategy,
+      baselineMetrics
+    );
+
+    // Add to validation queue
+    const validationContext: ValidationContext = {
+      strategyId: strategy.id,
+      baselineMetrics,
+      projectedImpact,
+      validationStartTime: Date.now(),
+      sampledQueries: new Set(),
+    };
+
+    this.validationQueue.set(strategy.id, validationContext);
+
+    // Wait for validation window
+    await new Promise((resolve) =>
+      setTimeout(resolve, this.config.validationWindow)
+    );
+
+    // Compute validation result
+    const result = await this.computeValidationResult(validationContext);
+
+    // Cleanup
+    this.validationQueue.delete(strategy.id);
+
+    return result.isValid;
+  }
+
   private async computeValidationResult(
     context: ValidationContext
   ): Promise<{ isValid: boolean }> {
     const currentMetrics = await this.collectCurrentMetrics();
-    const threshold = this.config.minConfidenceThreshold;
+
+    // Compare with baseline and projected impact
+    const latencyDiff =
+      (context.baselineMetrics.latency - currentMetrics.latency) /
+      context.baselineMetrics.latency;
+    const throughputDiff =
+      (currentMetrics.throughput - context.baselineMetrics.throughput) /
+      context.baselineMetrics.throughput;
+    const errorRateDiff =
+      (context.baselineMetrics.errorRate - currentMetrics.errorRate) /
+      context.baselineMetrics.errorRate;
+    const resourceDiff =
+      (context.baselineMetrics.resourceUtilization -
+        currentMetrics.resourceUtilization) /
+      context.baselineMetrics.resourceUtilization;
+
+    // Check if actual improvements are close to projected ones
+    const isLatencyValid =
+      latencyDiff >= context.projectedImpact.latencyImprovement * 0.7;
+    const isThroughputValid =
+      throughputDiff >= context.projectedImpact.throughputGain * 0.7;
+    const isErrorRateValid =
+      errorRateDiff >= context.projectedImpact.errorRateReduction * 0.7;
+    const isResourceValid =
+      resourceDiff >= context.projectedImpact.resourceOptimization * 0.7;
 
     return {
       isValid:
-        currentMetrics.latency <=
-        context.baselineMetrics.latency * (1 + threshold),
+        isLatencyValid &&
+        isThroughputValid &&
+        isErrorRateValid &&
+        isResourceValid,
     };
+  }
+
+  private async monitorStrategyPerformance(
+    strategy: ExtendedLearningPattern
+  ): Promise<boolean> {
+    const samples: MetricSample[] = [];
+    const startTime = Date.now();
+    const monitoringDuration = this.config.validationWindow;
+
+    while (Date.now() - startTime < monitoringDuration) {
+      const currentMetrics = await this.collectCurrentMetrics();
+      samples.push({
+        timestamp: Date.now(),
+        metrics: currentMetrics,
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Sample every second
+    }
+
+    return this.analyzePerformanceSamples(samples, strategy);
   }
 
   private async analyzePerformanceSamples(
     samples: MetricSample[],
     strategy: ExtendedLearningPattern
   ): Promise<boolean> {
-    const avgLatency =
-      samples.reduce((sum, sample) => sum + sample.metrics.latency, 0) /
-      samples.length;
-    return avgLatency <= (strategy.metrics.latency || 0) * 1.1; // 10% threshold
+    if (samples.length === 0) return false;
+
+    // Calculate average metrics
+    const avgMetrics = samples.reduce(
+      (acc, sample) => ({
+        latency: acc.latency + sample.metrics.latency / samples.length,
+        throughput: acc.throughput + sample.metrics.throughput / samples.length,
+        errorRate: acc.errorRate + sample.metrics.errorRate / samples.length,
+        resourceUtilization:
+          acc.resourceUtilization +
+          sample.metrics.resourceUtilization / samples.length,
+      }),
+      {
+        latency: 0,
+        throughput: 0,
+        errorRate: 0,
+        resourceUtilization: 0,
+      }
+    );
+
+    // Compare with strategy metrics
+    const isLatencyValid =
+      !strategy.metrics.latency ||
+      avgMetrics.latency <= strategy.metrics.latency * 1.1;
+    const isThroughputValid =
+      !strategy.metrics.throughput ||
+      avgMetrics.throughput >= strategy.metrics.throughput * 0.9;
+    const isErrorRateValid =
+      !strategy.metrics.errorRate ||
+      avgMetrics.errorRate <= strategy.metrics.errorRate * 1.1;
+    const isResourceValid =
+      !strategy.metrics.resourceUtilization ||
+      avgMetrics.resourceUtilization <=
+        strategy.metrics.resourceUtilization * 1.1;
+
+    return (
+      isLatencyValid && isThroughputValid && isErrorRateValid && isResourceValid
+    );
   }
 
   private convertToOptimizationStrategy(
@@ -334,25 +445,6 @@ export class RealTimeLearner {
         );
       }
     }
-  }
-
-  private async monitorStrategyPerformance(strategy: ExtendedLearningPattern) {
-    const monitoringWindow = 5 * 60 * 1000; // 5 minutes
-    const samplingInterval = 30 * 1000; // 30 seconds
-    const samples: MetricSample[] = [];
-
-    const startTime = Date.now();
-    while (Date.now() - startTime < monitoringWindow) {
-      const metrics = await this.collectCurrentMetrics();
-      samples.push({
-        timestamp: Date.now(),
-        metrics,
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, samplingInterval));
-    }
-
-    return this.analyzePerformanceSamples(samples, strategy);
   }
 
   private async initializeStreamConsumer() {
@@ -446,37 +538,5 @@ export class RealTimeLearner {
         strategy.confidence >= this.config.minConfidenceThreshold &&
         this.validateStrategyImpact(strategy)
     );
-  }
-
-  private async validateStrategyImpact(
-    strategy: ExtendedLearningPattern
-  ): Promise<boolean> {
-    const baselineMetrics = await this.collectBaselineMetrics();
-    const projectedImpact = this.calculateProjectedImpact(
-      strategy,
-      baselineMetrics
-    );
-
-    // Create validation context
-    const validationContext = {
-      strategyId: strategy.id,
-      baselineMetrics,
-      projectedImpact,
-      validationStartTime: Date.now(),
-      sampledQueries: new Set<string>(),
-    };
-
-    this.validationQueue.set(strategy.id, validationContext);
-
-    // Wait for validation window
-    await new Promise((resolve) =>
-      setTimeout(resolve, this.config.validationWindow)
-    );
-
-    const validationResult =
-      await this.computeValidationResult(validationContext);
-    this.validationQueue.delete(strategy.id);
-
-    return validationResult.isValid;
   }
 }

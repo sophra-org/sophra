@@ -648,7 +648,11 @@ declare function defineExtension(ext: ExtensionArgs | ((client: Client) => Clien
 
 declare const denylist: readonly ["$connect", "$disconnect", "$on", "$transaction", "$use", "$extends"];
 
+declare type DeserializedResponse = Array<Record<string, unknown>>;
+
 export declare function deserializeJsonResponse(result: unknown): unknown;
+
+export declare function deserializeRawResult(response: RawResponse): DeserializedResponse;
 
 export declare type DevTypeMapDef = {
     meta: {
@@ -875,6 +879,7 @@ export declare namespace DMMF {
         createManyAndReturn?: string | null;
         update?: string | null;
         updateMany?: string | null;
+        updateManyAndReturn?: string | null;
         upsert?: string | null;
         delete?: string | null;
         deleteMany?: string | null;
@@ -895,6 +900,7 @@ export declare namespace DMMF {
         createManyAndReturn = "createManyAndReturn",
         update = "update",
         updateMany = "updateMany",
+        updateManyAndReturn = "updateManyAndReturn",
         upsert = "upsert",
         delete = "delete",
         deleteMany = "deleteMany",
@@ -1446,7 +1452,9 @@ export declare type GetFindResult<P extends OperationPayload, A, ClientOptions> 
     } ? O : K extends '_count' ? Count<P['objects']> : never;
 } & (A extends {
     include: any;
-} & Record<string, unknown> ? DefaultSelection<P, A, ClientOptions> : unknown) : DefaultSelection<P, A, ClientOptions>;
+} & Record<string, unknown> ? DefaultSelection<P, A & {
+    omit: A['omit'];
+}, ClientOptions> : unknown) : DefaultSelection<P, A, ClientOptions>;
 
 export declare type GetGroupByResult<P extends OperationPayload, A> = A extends {
     by: string[];
@@ -1700,6 +1708,7 @@ export declare type GetResult<Payload extends OperationPayload, Args, OperationN
     createManyAndReturn: GetFindResult<Payload, Args, ClientOptions>[];
     update: GetFindResult<Payload, Args, ClientOptions>;
     updateMany: GetBatchResult;
+    updateManyAndReturn: GetFindResult<Payload, Args, ClientOptions>[];
     upsert: GetFindResult<Payload, Args, ClientOptions>;
     delete: GetFindResult<Payload, Args, ClientOptions>;
     deleteMany: GetBatchResult;
@@ -1950,7 +1959,7 @@ export declare type JsonQuery = {
     query: JsonFieldSelection;
 };
 
-declare type JsonQueryAction = 'findUnique' | 'findUniqueOrThrow' | 'findFirst' | 'findFirstOrThrow' | 'findMany' | 'createOne' | 'createMany' | 'createManyAndReturn' | 'updateOne' | 'updateMany' | 'deleteOne' | 'deleteMany' | 'upsertOne' | 'aggregate' | 'groupBy' | 'executeRaw' | 'queryRaw' | 'runCommandRaw' | 'findRaw' | 'aggregateRaw';
+declare type JsonQueryAction = 'findUnique' | 'findUniqueOrThrow' | 'findFirst' | 'findFirstOrThrow' | 'findMany' | 'createOne' | 'createMany' | 'createManyAndReturn' | 'updateOne' | 'updateMany' | 'updateManyAndReturn' | 'deleteOne' | 'deleteMany' | 'upsertOne' | 'aggregate' | 'groupBy' | 'executeRaw' | 'queryRaw' | 'runCommandRaw' | 'findRaw' | 'aggregateRaw';
 
 declare type JsonSelectionSet = {
     $scalars?: boolean;
@@ -2237,7 +2246,7 @@ export { Omit_2 as Omit }
 
 export declare type OmitValue<Omit, Key> = Key extends keyof Omit ? Omit[Key] : false;
 
-export declare type Operation = 'findFirst' | 'findFirstOrThrow' | 'findUnique' | 'findUniqueOrThrow' | 'findMany' | 'create' | 'createMany' | 'createManyAndReturn' | 'update' | 'updateMany' | 'upsert' | 'delete' | 'deleteMany' | 'aggregate' | 'count' | 'groupBy' | '$queryRaw' | '$executeRaw' | '$queryRawUnsafe' | '$executeRawUnsafe' | 'findRaw' | 'aggregateRaw' | '$runCommandRaw';
+export declare type Operation = 'findFirst' | 'findFirstOrThrow' | 'findUnique' | 'findUniqueOrThrow' | 'findMany' | 'create' | 'createMany' | 'createManyAndReturn' | 'update' | 'updateMany' | 'updateManyAndReturn' | 'upsert' | 'delete' | 'deleteMany' | 'aggregate' | 'count' | 'groupBy' | '$queryRaw' | '$executeRaw' | '$queryRawUnsafe' | '$executeRawUnsafe' | 'findRaw' | 'aggregateRaw' | '$runCommandRaw';
 
 export declare type OperationPayload = {
     name: string;
@@ -2577,6 +2586,8 @@ declare type QueryEvent = {
 
 declare type QueryEventType = 'query';
 
+declare type QueryIntrospectionBuiltinType = 'int' | 'bigint' | 'float' | 'double' | 'string' | 'enum' | 'bytes' | 'bool' | 'char' | 'decimal' | 'json' | 'xml' | 'uuid' | 'datetime' | 'date' | 'time' | 'int-array' | 'bigint-array' | 'float-array' | 'double-array' | 'string-array' | 'char-array' | 'bytes-array' | 'bool-array' | 'decimal-array' | 'json-array' | 'xml-array' | 'uuid-array' | 'datetime-array' | 'date-array' | 'time-array' | 'null' | 'unknown';
+
 declare type QueryMiddleware = (params: QueryMiddlewareParams, next: (params: QueryMiddlewareParams) => Promise<unknown>) => Promise<unknown>;
 
 declare type QueryMiddlewareParams = {
@@ -2619,6 +2630,12 @@ export declare type RawParameters = {
 };
 
 export declare type RawQueryArgs = Sql | UnknownTypedSql | [query: string, ...values: RawValue[]];
+
+declare type RawResponse = {
+    columns: string[];
+    types: QueryIntrospectionBuiltinType[];
+    rows: unknown[][];
+};
 
 declare type RawTaggedValue = {
     $type: 'Raw';

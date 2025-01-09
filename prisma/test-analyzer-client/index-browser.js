@@ -17,11 +17,11 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.1.0
+ * Prisma Client JS version: 6.2.1
  * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
  */
 Prisma.prismaVersion = {
-  client: "6.1.0",
+  client: "6.2.1",
   engine: "605197351a3c8bdd595af2d2a9bc3025bca48ea2"
 }
 

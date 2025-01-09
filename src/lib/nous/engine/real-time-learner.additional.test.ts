@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { RealTimeLearner } from './real-time-learner';
-import type { Logger } from '@/lib/shared/types';
-import type { ElasticsearchService } from '@/lib/cortex/elasticsearch/services';
-import type { MetricsService } from '@/lib/cortex/monitoring/metrics';
-import { Redis } from 'ioredis';
-import { LearningEventType, LearningEventStatus, LearningEventPriority, EngineRiskLevel } from '@prisma/client';
+import type { ElasticsearchService } from "@/lib/cortex/elasticsearch/services";
+import type { MetricsService } from "@/lib/cortex/monitoring/metrics";
+import type { Logger } from "@/lib/shared/types";
+import { EngineRiskLevel, LearningEventType } from "@prisma/client";
+import { Redis } from "ioredis";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { RealTimeLearner } from "./real-time-learner";
 
-describe('RealTimeLearner Additional Tests', () => {
+describe("RealTimeLearner Additional Tests", () => {
   let learner: RealTimeLearner;
   let mockRedis: Redis;
   let mockElasticsearch: ElasticsearchService;
@@ -53,11 +53,11 @@ describe('RealTimeLearner Additional Tests', () => {
     });
   });
 
-  describe('Impact Analysis', () => {
-    it('should calculate projected impact accurately', async () => {
+  describe("Impact Analysis", () => {
+    it("should calculate projected impact accurately", async () => {
       const mockPattern = {
-        id: 'pattern1',
-        type: 'high_relevance_search',
+        id: "pattern1",
+        type: "high_relevance_search",
         confidence: 0.9,
         metrics: {
           latency: 80,
@@ -92,10 +92,10 @@ describe('RealTimeLearner Additional Tests', () => {
       expect(impact.resourceOptimization).toBeGreaterThan(0);
     });
 
-    it('should handle missing metrics gracefully', async () => {
+    it("should handle missing metrics gracefully", async () => {
       const mockPattern = {
-        id: 'pattern1',
-        type: 'high_relevance_search',
+        id: "pattern1",
+        type: "high_relevance_search",
         confidence: 0.9,
         metrics: {},
         features: {},
@@ -122,8 +122,8 @@ describe('RealTimeLearner Additional Tests', () => {
     });
   });
 
-  describe('Performance Monitoring', () => {
-    it('should analyze performance samples correctly', async () => {
+  describe("Performance Monitoring", () => {
+    it("should analyze performance samples correctly", async () => {
       const samples = [
         {
           timestamp: Date.now(),
@@ -146,7 +146,7 @@ describe('RealTimeLearner Additional Tests', () => {
       ];
 
       const strategy = {
-        id: 'strategy1',
+        id: "strategy1",
         metrics: {
           latency: 100,
         },
@@ -159,7 +159,7 @@ describe('RealTimeLearner Additional Tests', () => {
       expect(result).toBe(true);
     });
 
-    it('should detect performance degradation', async () => {
+    it("should detect performance degradation", async () => {
       const samples = [
         {
           timestamp: Date.now(),
@@ -173,7 +173,7 @@ describe('RealTimeLearner Additional Tests', () => {
       ];
 
       const strategy = {
-        id: 'strategy1',
+        id: "strategy1",
         metrics: {
           latency: 100,
         },
@@ -187,11 +187,11 @@ describe('RealTimeLearner Additional Tests', () => {
     });
   });
 
-  describe('Strategy Validation', () => {
-    it('should validate and apply strategies successfully', async () => {
+  describe("Strategy Validation", () => {
+    it("should validate and apply strategies successfully", async () => {
       const mockStrategy = {
-        id: 'strategy1',
-        type: 'high_relevance_search',
+        id: "strategy1",
+        type: "high_relevance_search",
         confidence: 0.95,
         metrics: {
           latency: 80,
@@ -209,18 +209,22 @@ describe('RealTimeLearner Additional Tests', () => {
       };
 
       // Mock successful validation
-      vi.spyOn(learner as any, 'validateStrategyImpact').mockResolvedValue(true);
-      vi.spyOn(learner as any, 'monitorStrategyPerformance').mockResolvedValue(true);
+      vi.spyOn(learner as any, "validateStrategyImpact").mockResolvedValue(
+        true
+      );
+      vi.spyOn(learner as any, "monitorStrategyPerformance").mockResolvedValue(
+        true
+      );
 
       await (learner as any).applyStrategiesWithValidation([mockStrategy]);
 
       expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
-    it('should handle validation failures and rollback', async () => {
+    it("should handle validation failures and rollback", async () => {
       const mockStrategy = {
-        id: 'strategy1',
-        type: 'high_relevance_search',
+        id: "strategy1",
+        type: "high_relevance_search",
         confidence: 0.95,
         metrics: {
           latency: 80,
@@ -232,33 +236,62 @@ describe('RealTimeLearner Additional Tests', () => {
       };
 
       // Mock failed monitoring
-      vi.spyOn(learner as any, 'monitorStrategyPerformance').mockResolvedValue(false);
+      vi.spyOn(learner as any, "monitorStrategyPerformance").mockResolvedValue(
+        false
+      );
 
       await (learner as any).applyStrategiesWithValidation([mockStrategy]);
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        'Strategy rolled back due to performance',
+        "Strategy rolled back due to performance",
         expect.any(Object)
       );
     });
   });
 
-  describe('Validation Queue Management', () => {
-    it('should manage validation queue lifecycle', async () => {
+  describe("Validation Queue Management", () => {
+    it("should manage validation queue lifecycle", async () => {
       const mockStrategy = {
-        id: 'strategy1',
-        type: 'high_relevance_search',
+        id: "strategy1",
+        type: LearningEventType.SEARCH_PATTERN,
         confidence: 0.9,
         metrics: {
           latency: 80,
+          throughput: 1200,
+          errorRate: 0.005,
+          resourceUtilization: 0.4,
         },
-        features: {},
+        features: {
+          relevantHits: 100,
+          totalHits: 120,
+          took: 50,
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
+      // Mock validation methods
+      vi.spyOn(learner as any, "collectBaselineMetrics").mockResolvedValue({
+        latency: 100,
+        throughput: 1000,
+        errorRate: 0.01,
+        resourceUtilization: 0.5,
+      });
+
+      vi.spyOn(learner as any, "collectCurrentMetrics").mockResolvedValue({
+        latency: 80,
+        throughput: 1200,
+        errorRate: 0.005,
+        resourceUtilization: 0.4,
+      });
+
       // Start validation
-      const validationPromise = (learner as any).validateStrategyImpact(mockStrategy);
+      const validationPromise = (learner as any).validateStrategyImpact(
+        mockStrategy
+      );
+
+      // Give time for the validation to be added to the queue
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Check queue state
       expect((learner as any).validationQueue.has(mockStrategy.id)).toBe(true);
@@ -270,28 +303,67 @@ describe('RealTimeLearner Additional Tests', () => {
       expect((learner as any).validationQueue.has(mockStrategy.id)).toBe(false);
     });
 
-    it('should handle concurrent validations', async () => {
+    it("should handle concurrent validations", async () => {
       const strategies = [
         {
-          id: 'strategy1',
-          type: 'high_relevance_search',
+          id: "strategy1",
+          type: LearningEventType.SEARCH_PATTERN,
           confidence: 0.9,
-          metrics: { latency: 80 },
-          features: {},
+          metrics: {
+            latency: 80,
+            throughput: 1200,
+            errorRate: 0.005,
+            resourceUtilization: 0.4,
+          },
+          features: {
+            relevantHits: 100,
+            totalHits: 120,
+            took: 50,
+          },
         },
         {
-          id: 'strategy2',
-          type: 'high_relevance_search',
+          id: "strategy2",
+          type: LearningEventType.SEARCH_PATTERN,
           confidence: 0.9,
-          metrics: { latency: 85 },
-          features: {},
+          metrics: {
+            latency: 85,
+            throughput: 1150,
+            errorRate: 0.006,
+            resourceUtilization: 0.45,
+          },
+          features: {
+            relevantHits: 95,
+            totalHits: 115,
+            took: 55,
+          },
         },
       ];
 
+      // Mock validation methods
+      vi.spyOn(learner as any, "collectBaselineMetrics").mockResolvedValue({
+        latency: 100,
+        throughput: 1000,
+        errorRate: 0.01,
+        resourceUtilization: 0.5,
+      });
+
+      vi.spyOn(learner as any, "collectCurrentMetrics").mockResolvedValue({
+        latency: 80,
+        throughput: 1200,
+        errorRate: 0.005,
+        resourceUtilization: 0.4,
+      });
+
+      // Reduce validation window for testing
+      (learner as any).config.validationWindow = 10;
+
       // Start concurrent validations
-      const validationPromises = strategies.map(strategy => 
+      const validationPromises = strategies.map((strategy) =>
         (learner as any).validateStrategyImpact(strategy)
       );
+
+      // Give time for validations to be added to the queue
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Check queue state
       expect((learner as any).validationQueue.size).toBe(2);

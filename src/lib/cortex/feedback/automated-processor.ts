@@ -1,8 +1,7 @@
 import type { ElasticsearchService } from "@/lib/cortex/elasticsearch/services";
 import type { MetricsService } from "@/lib/cortex/monitoring/metrics";
-import { SearchEvent } from "@/lib/shared/database/validation/generated";
 import type { Logger } from "@/lib/shared/types";
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, SearchEvent } from "@prisma/client";
 import {
   LearningEvent,
   LearningEventType,

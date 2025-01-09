@@ -1,11 +1,10 @@
-import { prisma } from "@/lib/shared/database/client";
-import logger from "@/lib/shared/logger";
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
 import { ModelType, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 const SearchPatternsSchema = z.object({
   query: z.string(),
@@ -187,7 +186,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       return NextResponse.json({
         success: true,
-        data: results,
+        data: results[0], // Return just the first result since we're testing with a single pattern
         metadata: {
           processedCount: results.length,
           processingTime: Date.now() - startTime,

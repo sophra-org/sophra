@@ -1,39 +1,39 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from "vitest";
+import { LearningEventType } from "../types/learning";
+import { ModelType } from "../types/models";
 import {
-  EngineStateSchema,
-  EngineOperationSchema,
-  EngineMetricsSchema,
-  PatternAnalysisResultSchema,
-  EngineLearningResultSchema,
-  EngineOptimizationStrategySchema,
   EngineConfidenceScoreSchema,
-  EngineStatus,
-  EngineOperationType,
+  EngineLearningResultSchema,
+  EngineMetricsSchema,
+  EngineOperationSchema,
   EngineOperationStatus,
+  EngineOperationType,
+  EngineOptimizationStrategySchema,
   EngineOptimizationType,
   EngineRiskLevel,
-} from './types';
-import { ModelType } from '../types/models';
-import { LearningEventType } from '../types/learning';
+  EngineStateSchema,
+  EngineStatus,
+  PatternAnalysisResultSchema,
+} from "./types";
 
-describe('Engine Types Schema Validation', () => {
-  describe('EngineStateSchema', () => {
-    it('should validate valid engine state', () => {
+describe("Engine Types Schema Validation", () => {
+  describe("EngineStateSchema", () => {
+    it("should validate valid engine state", () => {
       const validState = {
-        id: 'state-1',
+        id: "state-1",
         status: EngineStatus.READY,
         confidence: 0.9,
         lastActive: new Date(),
-        metadata: { version: '1.0' },
+        metadata: { version: "1.0" },
       };
 
       const result = EngineStateSchema.safeParse(validState);
       expect(result.success).toBe(true);
     });
 
-    it('should reject invalid confidence values', () => {
+    it("should reject invalid confidence values", () => {
       const invalidState = {
-        id: 'state-1',
+        id: "state-1",
         status: EngineStatus.READY,
         confidence: 1.5, // Invalid: > 1
         lastActive: new Date(),
@@ -43,9 +43,9 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should handle optional fields', () => {
+    it("should handle optional fields", () => {
       const minimalState = {
-        id: 'state-1',
+        id: "state-1",
         status: EngineStatus.READY,
         confidence: 0.8,
         lastActive: new Date(),
@@ -56,25 +56,25 @@ describe('Engine Types Schema Validation', () => {
     });
   });
 
-  describe('EngineOperationSchema', () => {
-    it('should validate valid operation', () => {
+  describe("EngineOperationSchema", () => {
+    it("should validate valid operation", () => {
       const validOperation = {
-        id: 'op-1',
+        id: "op-1",
         type: EngineOperationType.LEARNING,
         status: EngineOperationStatus.COMPLETED,
         startTime: new Date(),
         endTime: new Date(),
         metrics: { duration: 1000 },
-        metadata: { source: 'test' },
+        metadata: { source: "test" },
       };
 
       const result = EngineOperationSchema.safeParse(validOperation);
       expect(result.success).toBe(true);
     });
 
-    it('should handle operation without end time', () => {
+    it("should handle operation without end time", () => {
       const ongoingOperation = {
-        id: 'op-1',
+        id: "op-1",
         type: EngineOperationType.LEARNING,
         status: EngineOperationStatus.IN_PROGRESS,
         startTime: new Date(),
@@ -84,13 +84,13 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate error field', () => {
+    it("should validate error field", () => {
       const failedOperation = {
-        id: 'op-1',
+        id: "op-1",
         type: EngineOperationType.LEARNING,
         status: EngineOperationStatus.FAILED,
         startTime: new Date(),
-        error: 'Operation timeout',
+        error: "Operation timeout",
       };
 
       const result = EngineOperationSchema.safeParse(failedOperation);
@@ -98,8 +98,8 @@ describe('Engine Types Schema Validation', () => {
     });
   });
 
-  describe('EngineMetricsSchema', () => {
-    it('should validate valid metrics', () => {
+  describe("EngineMetricsSchema", () => {
+    it("should validate valid metrics", () => {
       const validMetrics = {
         eventType: LearningEventType.SEARCH_PATTERN,
         patternCount: 5,
@@ -111,7 +111,7 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject negative values', () => {
+    it("should reject negative values", () => {
       const invalidMetrics = {
         eventType: LearningEventType.SEARCH_PATTERN,
         patternCount: -1,
@@ -124,38 +124,68 @@ describe('Engine Types Schema Validation', () => {
     });
   });
 
-  describe('PatternAnalysisResultSchema', () => {
-    it('should validate valid analysis result', () => {
+  describe("PatternAnalysisResultSchema", () => {
+    it("should validate valid analysis result", () => {
       const validResult = {
         pattern: {
-          id: 'pattern-1',
-          type: 'high_relevance',
+          id: "pattern-1",
+          type: LearningEventType.SEARCH_PATTERN,
           confidence: 0.9,
-          metadata: {},
+          metadata: {
+            source: "test",
+            timestamp: new Date().toISOString(),
+            relevantHits: 80,
+            totalHits: 100,
+            searchType: "keyword",
+            took: 50,
+          },
+          features: {
+            queryLength: 10,
+            hasFilters: true,
+            filterCount: 2,
+            sortField: "relevance",
+            sortOrder: "desc",
+          },
           createdAt: new Date(),
           updatedAt: new Date(),
+          status: "COMPLETED",
+          priority: "HIGH",
+          tags: ["search", "relevance"],
+          correlationId: "corr-1",
+          sessionId: "session-1",
+          userId: "user-1",
+          clientId: "client-1",
+          environment: "production",
+          version: "1.0",
         },
         confidence: 0.95,
         modelType: ModelType.SEARCH_RANKER,
         metadata: {
-          source: 'test',
+          source: "test",
           timestamp: new Date().toISOString(),
+          relevantHits: 80,
+          totalHits: 100,
+          searchType: "keyword",
+          took: 50,
         },
       };
 
       const result = PatternAnalysisResultSchema.safeParse(validResult);
+      if (!result.success) {
+        console.error("Validation errors:", result.error);
+      }
       expect(result.success).toBe(true);
     });
   });
 
-  describe('EngineLearningResultSchema', () => {
-    it('should validate valid learning result', () => {
+  describe("EngineLearningResultSchema", () => {
+    it("should validate valid learning result", () => {
       const validResult = {
-        id: 'result-1',
+        id: "result-1",
         patterns: [],
         confidence: 0.9,
         metadata: {
-          source: 'test',
+          source: "test",
           timestamp: new Date().toISOString(),
         },
         recommendations: [],
@@ -165,13 +195,13 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate performance data', () => {
+    it("should validate performance data", () => {
       const resultWithPerformance = {
-        id: 'result-1',
+        id: "result-1",
         patterns: [],
         confidence: 0.9,
         metadata: {
-          source: 'test',
+          source: "test",
           timestamp: new Date().toISOString(),
         },
         recommendations: [],
@@ -182,21 +212,23 @@ describe('Engine Types Schema Validation', () => {
         },
       };
 
-      const result = EngineLearningResultSchema.safeParse(resultWithPerformance);
+      const result = EngineLearningResultSchema.safeParse(
+        resultWithPerformance
+      );
       expect(result.success).toBe(true);
     });
   });
 
-  describe('EngineOptimizationStrategySchema', () => {
-    it('should validate valid strategy', () => {
+  describe("EngineOptimizationStrategySchema", () => {
+    it("should validate valid strategy", () => {
       const validStrategy = {
-        id: 'strategy-1',
+        id: "strategy-1",
         type: EngineOptimizationType.WEIGHT_ADJUSTMENT,
         priority: 0.8,
         confidence: 0.9,
         impact: 0.7,
         metadata: {
-          targetMetrics: ['latency', 'throughput'],
+          targetMetrics: ["latency", "throughput"],
           expectedImprovement: 0.2,
           riskLevel: EngineRiskLevel.LOW,
           dependencies: [],
@@ -207,28 +239,29 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate priority and confidence ranges', () => {
+    it("should validate priority and confidence ranges", () => {
       const invalidStrategy = {
-        id: 'strategy-1',
+        id: "strategy-1",
         type: EngineOptimizationType.WEIGHT_ADJUSTMENT,
         priority: 1.5, // Invalid: > 1
         confidence: 0.9,
         impact: 0.7,
         metadata: {
-          targetMetrics: ['latency'],
+          targetMetrics: ["latency"],
           expectedImprovement: 0.2,
           riskLevel: EngineRiskLevel.LOW,
           dependencies: [],
         },
       };
 
-      const result = EngineOptimizationStrategySchema.safeParse(invalidStrategy);
+      const result =
+        EngineOptimizationStrategySchema.safeParse(invalidStrategy);
       expect(result.success).toBe(false);
     });
   });
 
-  describe('EngineConfidenceScoreSchema', () => {
-    it('should validate valid confidence score', () => {
+  describe("EngineConfidenceScoreSchema", () => {
+    it("should validate valid confidence score", () => {
       const validScore = {
         value: 0.9,
         factors: {
@@ -239,7 +272,7 @@ describe('Engine Types Schema Validation', () => {
         },
         metadata: {
           sampleSize: 1000,
-          timeWindow: '24h',
+          timeWindow: "24h",
           lastUpdated: new Date(),
         },
       };
@@ -248,7 +281,7 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate factor ranges', () => {
+    it("should validate factor ranges", () => {
       const invalidScore = {
         value: 0.9,
         factors: {
@@ -259,7 +292,7 @@ describe('Engine Types Schema Validation', () => {
         },
         metadata: {
           sampleSize: 1000,
-          timeWindow: '24h',
+          timeWindow: "24h",
           lastUpdated: new Date(),
         },
       };
@@ -268,7 +301,7 @@ describe('Engine Types Schema Validation', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should validate sample size', () => {
+    it("should validate sample size", () => {
       const invalidScore = {
         value: 0.9,
         factors: {
@@ -279,7 +312,7 @@ describe('Engine Types Schema Validation', () => {
         },
         metadata: {
           sampleSize: -1, // Invalid: < 0
-          timeWindow: '24h',
+          timeWindow: "24h",
           lastUpdated: new Date(),
         },
       };

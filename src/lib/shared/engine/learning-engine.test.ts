@@ -1,41 +1,43 @@
-import { mockPrisma } from '~/vitest.setup';
+import { mockPrisma } from "~/vitest.setup";
 
 // Mock Prisma before other imports
-vi.mock('@prisma/client', () => ({
+vi.mock("@prisma/client", () => ({
   PrismaClient: vi.fn(() => mockPrisma),
   Prisma: {
     JsonValue: undefined,
     JsonObject: undefined,
-  }
+  },
+  EngineOperationStatus: {
+    COMPLETED: "COMPLETED",
+    RUNNING: "RUNNING",
+    FAILED: "FAILED",
+  },
+  EngineOperationType: {
+    PATTERN_DETECTION: "PATTERN_DETECTION",
+    STRATEGY_EXECUTION: "STRATEGY_EXECUTION",
+    STRATEGY_ROLLBACK: "STRATEGY_ROLLBACK",
+  },
 }));
 
-vi.mock('../database/client', () => ({
+vi.mock("../database/client", () => ({
   default: mockPrisma,
-  prisma: mockPrisma
+  prisma: mockPrisma,
 }));
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { Mocked } from 'vitest';
-import { 
-  PrismaClient, 
-  LearningEvent, 
-  EngineOperationType, 
-  EngineOperationStatus,
-  Prisma 
-} from '@prisma/client';
+import { EngineOperationStatus, LearningEvent, Prisma } from "@prisma/client";
+import type { Mocked } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MetricsService } from "../../cortex/monitoring/metrics";
+import { EnhancedPrismaClient } from "../database/client";
+import type { Logger } from "../types";
+import { MetricsAdapter } from "./adapters/metrics-adapter";
+import { LearningEngine } from "./learning-engine";
 import {
   FeedbackProcessor,
   PerformanceProcessor,
   StrategyProcessor,
-  TimeBasedProcessor
 } from "./processors";
 import type { ITimeBasedProcessor } from "./processors/time-based-processor";
-import type { Logger } from '../types';
-import { LearningEngine } from "./learning-engine";
-import { MetricsAdapter } from "./adapters/metrics-adapter";
-import { MetricsService } from "../../cortex/monitoring/metrics";
-import { EnhancedPrismaClient } from '../database/client';
-import { EngineOperation } from '@/lib/nous/engine/types';
 
 type JsonValue = Prisma.JsonValue;
 
@@ -54,7 +56,7 @@ describe("LearningEngine", () => {
       debug: vi.fn(),
       info: vi.fn(),
       warn: vi.fn(),
-      error: vi.fn()
+      error: vi.fn(),
     } as unknown as Logger;
 
     mockMetrics = {
@@ -64,19 +66,19 @@ describe("LearningEngine", () => {
       getCPUUsage: vi.fn(),
       getMemoryUsage: vi.fn(),
       recordEngineMetric: vi.fn(),
-      recordLearningMetrics: vi.fn()
+      recordLearningMetrics: vi.fn(),
     } as unknown as Mocked<MetricsService>;
 
     metricsAdapter = new MetricsAdapter(mockMetrics, logger);
 
     mockFeedbackProcessor = {
       analyze: vi.fn(),
-      process: vi.fn()
+      process: vi.fn(),
     } as unknown as FeedbackProcessor;
 
     mockPerformanceProcessor = {
       analyze: vi.fn(),
-      process: vi.fn()
+      process: vi.fn(),
     } as unknown as PerformanceProcessor;
 
     mockTimeBasedProcessor = {
@@ -87,12 +89,12 @@ describe("LearningEngine", () => {
       findRecurringPatterns: vi.fn(),
       logger,
       metrics: metricsAdapter,
-      calculateConfidence: () => 0.8
+      calculateConfidence: () => 0.8,
     } as unknown as ITimeBasedProcessor;
 
     mockStrategyProcessor = {
       executeStrategy: vi.fn(),
-      process: vi.fn()
+      process: vi.fn(),
     } as unknown as StrategyProcessor;
 
     engine = new LearningEngine(
@@ -123,13 +125,15 @@ describe("LearningEngine", () => {
         metrics: {},
         metadata: {},
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
       const mockOperationWithEndTime = {
         ...mockOperation,
-        endTime: null
+        endTime: null,
       };
-      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(mockOperationWithEndTime);
+      vi.mocked(mockPrisma.engineOperation.create).mockResolvedValue(
+        mockOperationWithEndTime
+      );
       vi.mocked(mockPrisma.engineOperation.update).mockResolvedValue({
         id: mockOperation.id,
         type: mockOperation.type,
@@ -140,33 +144,40 @@ describe("LearningEngine", () => {
         metrics: {} as JsonValue,
         metadata: {} as JsonValue,
         createdAt: mockOperation.createdAt,
-        updatedAt: mockOperation.updatedAt
+        updatedAt: mockOperation.updatedAt,
       });
 
       const events: LearningEvent[] = [];
-      const mockPatterns = [{
-        id: "pattern-1",
-        type: "TEST_PATTERN",
-        metadata: {} as JsonValue,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        confidence: 0.9,
-        features: {} as JsonValue,
-        eventId: "event-1"
-      }, {
-        id: "pattern-2",
-        type: "TEST_PATTERN",
-        metadata: {} as JsonValue,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        confidence: 0.9,
-        features: {} as JsonValue,
-        eventId: "event-2"
-      }];
+      const mockPatterns = [
+        {
+          id: "pattern-1",
+          type: "TEST_PATTERN",
+          metadata: {} as JsonValue,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          confidence: 0.9,
+          features: {} as JsonValue,
+          eventId: "event-1",
+        },
+        {
+          id: "pattern-2",
+          type: "TEST_PATTERN",
+          metadata: {} as JsonValue,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          confidence: 0.9,
+          features: {} as JsonValue,
+          eventId: "event-2",
+        },
+      ];
 
-      vi.mocked(mockFeedbackProcessor.analyze).mockResolvedValue([mockPatterns[0]]);
+      vi.mocked(mockFeedbackProcessor.analyze).mockResolvedValue([
+        mockPatterns[0],
+      ]);
       vi.mocked(mockPerformanceProcessor.analyze).mockResolvedValue([]);
-      vi.mocked(mockTimeBasedProcessor.analyze).mockResolvedValue([mockPatterns[1]]);
+      vi.mocked(mockTimeBasedProcessor.analyze).mockResolvedValue([
+        mockPatterns[1],
+      ]);
 
       const result = await engine.detectPatterns(events);
 
@@ -184,16 +195,22 @@ describe("LearningEngine", () => {
         granularity: "daily",
       };
       const expectedData = {
-        data: [{
-          x: new Date(),
-          y: 0
-        }]
+        data: [
+          {
+            x: new Date(),
+            y: 0,
+          },
+        ],
       };
-      vi.mocked(mockTimeBasedProcessor.getTimeSeriesData).mockResolvedValue(expectedData);
+      vi.mocked(mockTimeBasedProcessor.getTimeSeriesData).mockResolvedValue(
+        expectedData
+      );
 
       const result = await engine.getTimeSeriesData(params);
 
-      expect(mockTimeBasedProcessor.getTimeSeriesData).toHaveBeenCalledWith(params);
+      expect(mockTimeBasedProcessor.getTimeSeriesData).toHaveBeenCalledWith(
+        params
+      );
       expect(result).toEqual(expectedData);
     });
   });
@@ -202,24 +219,32 @@ describe("LearningEngine", () => {
     it("should delegate to timeBased processor", async () => {
       const timeSeriesData = { data: [{ x: new Date(), y: 0 }] };
       const expectedCorrelations = {
-        correlations: [{
-          variable1: "var1",
-          variable2: "var2",
-          coefficient: 0.8
-        }]
+        correlations: [
+          {
+            variable1: "var1",
+            variable2: "var2",
+            coefficient: 0.8,
+          },
+        ],
       };
       const expectedPatterns = {
         daily: [{ time: "09:00", confidence: 0.85 }],
         weekly: [{ day: "Monday", confidence: 0.85 }],
-        confidence: 0.85
+        confidence: 0.85,
       };
 
-      vi.mocked(mockTimeBasedProcessor.analyzeCorrelations).mockResolvedValue(expectedCorrelations);
-      vi.mocked(mockTimeBasedProcessor.findRecurringPatterns).mockResolvedValue(expectedPatterns);
+      vi.mocked(mockTimeBasedProcessor.analyzeCorrelations).mockResolvedValue(
+        expectedCorrelations
+      );
+      vi.mocked(mockTimeBasedProcessor.findRecurringPatterns).mockResolvedValue(
+        expectedPatterns
+      );
 
       const result = await engine.analyzeTemporalCorrelations(timeSeriesData);
 
-      expect(mockTimeBasedProcessor.analyzeCorrelations).toHaveBeenCalledWith(timeSeriesData);
+      expect(mockTimeBasedProcessor.analyzeCorrelations).toHaveBeenCalledWith(
+        timeSeriesData
+      );
       expect(result).toEqual(expectedCorrelations);
     });
   });
@@ -235,11 +260,15 @@ describe("LearningEngine", () => {
         weekly: [],
         confidence: 0.8,
       };
-      vi.mocked(mockTimeBasedProcessor.findRecurringPatterns).mockResolvedValue(expectedPatterns);
+      vi.mocked(mockTimeBasedProcessor.findRecurringPatterns).mockResolvedValue(
+        expectedPatterns
+      );
 
       const result = await engine.findRecurringPatterns(params);
 
-      expect(mockTimeBasedProcessor.findRecurringPatterns).toHaveBeenCalledWith(params);
+      expect(mockTimeBasedProcessor.findRecurringPatterns).toHaveBeenCalledWith(
+        params
+      );
     });
   });
 });

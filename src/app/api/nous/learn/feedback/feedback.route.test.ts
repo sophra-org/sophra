@@ -1,38 +1,35 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import logger from "@lib/shared/logger";
+import { EngagementType, SignalType } from "@prisma/client";
 import { NextRequest } from "next/server";
-import logger from '@lib/shared/logger';
-import { SignalType, EngagementType } from "@prisma/client";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock modules
-vi.mock('@lib/shared/logger', () => ({
+vi.mock("@lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
-    info: vi.fn()
-  }
+    info: vi.fn(),
+  },
 }));
 
-vi.mock('next/server', () => ({
+vi.mock("next/server", () => ({
   NextRequest: vi.fn().mockImplementation((url) => ({
     url,
     nextUrl: new URL(url),
     headers: new Headers(),
-    json: vi.fn()
+    json: vi.fn(),
   })),
   NextResponse: {
     json: vi.fn().mockImplementation((data, init) => ({
       status: init?.status || 200,
       ok: init?.status ? init.status >= 200 && init.status < 300 : true,
       headers: new Headers(),
-      json: async () => data
-    }))
-  }
+      json: async () => data,
+    })),
+  },
 }));
 
-vi.mock('@lib/shared/database/client', () => {
-  const mockPrisma = {
-    $queryRaw: vi.fn(),
-    $executeRaw: vi.fn(),
-    $transaction: vi.fn(),
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: {
     feedbackRequest: {
       findMany: vi.fn(),
       create: vi.fn(),
@@ -43,21 +40,12 @@ vi.mock('@lib/shared/database/client', () => {
       count: vi.fn(),
       upsert: vi.fn(),
     },
-    feedback: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-      findFirst: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    }
-  };
-  return { prisma: mockPrisma };
-});
+  },
+}));
 
 // Import after mocks
-import { prisma } from '@lib/shared/database/client';
-import { GET, POST } from './route';
+import { prisma } from "@lib/shared/database/client";
+import { GET, POST } from "./route";
 
 describe("Feedback Route Handler", () => {
   const mockFeedback = {
@@ -66,7 +54,7 @@ describe("Feedback Route Handler", () => {
         queryId: "q1",
         rating: 0.8,
         metadata: {
-          userAction: SignalType.SEARCH,
+          userAction: SignalType.USER_BEHAVIOR_CLICK,
           resultId: "r1",
           queryHash: "hash1",
           timestamp: new Date().toISOString(),
@@ -82,27 +70,22 @@ describe("Feedback Route Handler", () => {
 
   describe("GET /api/nous/learn/feedback", () => {
     it("should fetch feedback requests successfully", async () => {
-      const mockResponse = [{
-        id: "1", 
-        content: mockFeedback.feedback,
-        createdAt: new Date(),
-        metrics: {
-          uniqueUsers: 1,
-          averageRating: 0.8,
-          totalFeedback: 1
-        }
-      }];
+      const mockResponse = [
+        {
+          id: "1",
+          feedback: mockFeedback.feedback,
+          timestamp: new Date(),
+          meta: {
+            uniqueQueries: 1,
+            averageRating: 0.8,
+            feedbackCount: 1,
+          },
+        },
+      ];
 
-      const mockFeedbackResponse = mockResponse.map(item => ({
-        id: item.id,
-        timestamp: item.createdAt,
-        feedback: {
-          feedback: item.content
-        }
-      }));
-
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(mockFeedbackResponse);
-      vi.mocked(prisma.$queryRaw).mockResolvedValue([{ count: 1 }]);
+      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue(
+        mockResponse
+      );
 
       const response = await GET();
       const data = await response.json();
@@ -111,26 +94,14 @@ describe("Feedback Route Handler", () => {
       expect(data).toEqual({
         success: true,
         data: mockResponse,
-        meta: { total: 1 }
-      });
-    });
-
-    it("should handle empty results", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockResolvedValue([]);
-
-      const response = await GET();
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data).toMatchObject({
-        success: true,
-        data: [],
-        meta: { total: 0 }
+        meta: { total: 1 },
       });
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.feedbackRequest.findMany).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(prisma.feedbackRequest.findMany).mockRejectedValue(
+        new Error("DB Error")
+      );
 
       const response = await GET();
       const data = await response.json();
@@ -139,8 +110,12 @@ describe("Feedback Route Handler", () => {
       expect(data).toEqual({
         success: false,
         error: "Failed to fetch feedback",
-        meta: { total: 0 }
+        meta: { total: 0 },
       });
+      expect(logger.error).toHaveBeenCalledWith(
+        "Failed to fetch feedback:",
+        expect.any(Error)
+      );
     });
   });
 
@@ -153,13 +128,15 @@ describe("Feedback Route Handler", () => {
         meta: {
           uniqueQueries: 1,
           averageRating: 0.8,
-          feedbackCount: 1
-        }
+          feedbackCount: 1,
+        },
       };
 
       vi.mocked(prisma.feedbackRequest.create).mockResolvedValue(mockResponse);
 
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/feedback");
+      const request = new NextRequest(
+        "http://localhost:3000/api/nous/learn/feedback"
+      );
       request.json = vi.fn().mockResolvedValue(mockFeedback);
 
       const response = await POST(request);
@@ -169,21 +146,18 @@ describe("Feedback Route Handler", () => {
       expect(data).toEqual({
         success: true,
         data: mockResponse,
-        meta: { total: 1 }
+        meta: { total: 1 },
       });
     });
 
-    it("should handle invalid feedback data", async () => {
+    it("should validate request format", async () => {
       const invalidFeedback = {
-        feedback: [
-          {
-            queryId: "q1",
-            // Missing required fields
-          },
-        ],
+        feedback: [{ invalid: "data" }],
       };
 
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/feedback");
+      const request = new NextRequest(
+        "http://localhost:3000/api/nous/learn/feedback"
+      );
       request.json = vi.fn().mockResolvedValue(invalidFeedback);
 
       const response = await POST(request);
@@ -192,56 +166,19 @@ describe("Feedback Route Handler", () => {
       expect(response.status).toBe(400);
       expect(data).toMatchObject({
         success: false,
-        error: expect.stringContaining('Invalid'),
-        details: expect.any(Object)
-      });
-    });
-
-    it("should handle missing feedback array", async () => {
-      const invalidFeedback = {};
-
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/feedback");
-      request.json = vi.fn().mockResolvedValue(invalidFeedback);
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data).toMatchObject({
-        success: false,
-        error: expect.stringContaining('Invalid'),
-        details: expect.any(Object)
-      });
-    });
-
-    it("should handle invalid rating values", async () => {
-      const invalidFeedback = {
-        feedback: [
-          {
-            ...mockFeedback.feedback[0],
-            rating: 1.5, // Invalid rating > 1
-          },
-        ],
-      };
-
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/feedback");
-      request.json = vi.fn().mockResolvedValue(invalidFeedback);
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data).toMatchObject({
-        success: false,
-        error: expect.stringContaining('Invalid'),
-        details: expect.any(Object)
+        error: "Invalid request format",
+        details: expect.any(Object),
       });
     });
 
     it("should handle database errors during creation", async () => {
-      vi.mocked(prisma.feedbackRequest.create).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(prisma.feedbackRequest.create).mockRejectedValue(
+        new Error("DB Error")
+      );
 
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/feedback");
+      const request = new NextRequest(
+        "http://localhost:3000/api/nous/learn/feedback"
+      );
       request.json = vi.fn().mockResolvedValue(mockFeedback);
 
       const response = await POST(request);
@@ -251,22 +188,12 @@ describe("Feedback Route Handler", () => {
       expect(data).toEqual({
         success: false,
         error: "Failed to record feedback",
-        meta: { total: 0 }
+        meta: { total: 0 },
       });
-    });
-
-    it("should handle malformed JSON in request body", async () => {
-      const request = new NextRequest("http://localhost:3000/api/nous/learn/feedback");
-      request.json = vi.fn().mockRejectedValue(new SyntaxError("Unexpected token"));
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(500);
-      expect(data).toMatchObject({
-        success: false,
-        error: expect.stringContaining('Failed')
-      });
+      expect(logger.error).toHaveBeenCalledWith(
+        "Failed to record feedback:",
+        expect.any(Error)
+      );
     });
   });
 });

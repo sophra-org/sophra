@@ -1,220 +1,283 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PUT, GET, DELETE } from './route';
-import { mockPrisma } from '~/vitest.setup';
-import { NextRequest, NextResponse } from 'next/server';
+import { VectorizationService } from "@/lib/cortex/services/vectorization";
+import type { Services } from "@/lib/cortex/types/services";
+import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import { prisma } from "@/lib/shared/database/client";
+import logger from "@/lib/shared/logger";
+import type { Client } from "@elastic/elasticsearch";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DELETE } from "./route";
 
-// Note: No changes needed as code already matches edit plan requirements
-
-// Setup mocks
-vi.mock('@/lib/cortex/utils/service-manager', () => ({
-    serviceManager: {
-        getServices: vi.fn()
-    }
+vi.mock("@/lib/cortex/utils/service-manager", () => ({
+  serviceManager: {
+    getServices: vi.fn(),
+  },
 }));
 
-vi.mock('@/lib/shared/logger', () => ({
-    default: {
-        debug: vi.fn(),
-        error: vi.fn()
-    }
+vi.mock("@/lib/shared/database/client", () => ({
+  prisma: {
+    index: {
+      findUnique: vi.fn(),
+    },
+  },
+}));
+
+vi.mock("@/lib/shared/logger", () => ({
+  default: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
 }));
 
 // Mock fetch API
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-vi.mock('next/server', () => ({
-    NextRequest: class MockNextRequest {
-        private body: string;
-        url: string;
-        nextUrl: URL;
-        constructor(url: string, init?: { method: string; body?: string }) {
-            this.url = url;
-            this.nextUrl = new URL(url);
-            this.body = init?.body || '';
-        }
-        async text() {
-            return this.body;
-        }
-        async json() {
-            return JSON.parse(this.body);
-        }
-    },
-    NextResponse: {
-        json: vi.fn().mockImplementation((data, init) => ({
-            status: init?.status || 200,
-            ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-            headers: new Headers(),
-            json: async () => data
-        }))
+vi.mock("next/server", () => ({
+  NextRequest: class MockNextRequest {
+    private body: string;
+    url: string;
+    nextUrl: URL;
+    constructor(url: string, init?: { method: string; body?: string }) {
+      this.url = url;
+      this.nextUrl = new URL(url);
+      this.body = init?.body || "";
     }
+    async text() {
+      return this.body;
+    }
+    async json() {
+      return JSON.parse(this.body);
+    }
+  },
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data,
+    })),
+  },
 }));
 
-beforeEach(() => {
+vi.mock("@/lib/cortex/services/vectorization", () => ({
+  VectorizationService: vi.fn().mockImplementation((config) => ({
+    serviceName: "vectorization",
+    log: vi.fn(),
+    generateEmbeddings: vi.fn(),
+    vectorizeDocument: vi.fn().mockImplementation(async (doc) => ({
+      ...doc,
+      embeddings: [0.1, 0.2, 0.3],
+      processing_status: "completed",
+    })),
+    vectorizeBatch: vi.fn(),
+    checkHealth: vi.fn(),
+  })),
+}));
+
+describe("Document API Routes", () => {
+  const mockDate = new Date("2025-01-09T11:40:24.173Z").toISOString();
+  const mockDateObj = new Date(mockDate);
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(mockDateObj);
     vi.clearAllMocks();
-});
 
-describe('Document API Routes', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        vi.mocked(mockPrisma.index.findUnique).mockResolvedValue({
-            name: 'test-index',
-            id: '',
-            status: '',
-            settings: null,
-            mappings: null,
-            created_at: new Date(),
-            updated_at: new Date(),
-            deleted_at: null,
-            doc_count: 0,
-            size_bytes: 0,
-            health: ''
-        });
+    process.env.ELASTICSEARCH_URL = "http://localhost:9200";
+    process.env.SOPHRA_ES_API_KEY = "test-key";
+
+    const mockVectorization = new VectorizationService({ apiKey: "test-key" });
+    const mockClient = {
+      ping: vi.fn(),
+      indices: {
+        exists: vi.fn(),
+        create: vi.fn(),
+        delete: vi.fn(),
+        stats: vi.fn(),
+        getMapping: vi.fn(),
+        putMapping: vi.fn(),
+        getSettings: vi.fn(),
+        putSettings: vi.fn(),
+      },
+      cluster: {
+        health: vi.fn(),
+      },
+    } as unknown as Client;
+
+    // Mock services with all required properties
+    vi.mocked(serviceManager.getServices).mockResolvedValue({
+      vectorization: mockVectorization,
+      elasticsearch: {
+        client: mockClient,
+        logger,
+        requestQueue: {
+          add: async <T>(fn: () => Promise<T>): Promise<T> => fn(),
+        },
+        indexExists: vi.fn().mockResolvedValue(true),
+        createIndex: vi.fn(),
+        deleteIndex: vi.fn(),
+        documentExists: vi.fn().mockResolvedValue(true),
+        getStats: vi.fn(),
+        testService: vi.fn(),
+        healthCheck: vi.fn(),
+        disconnect: vi.fn(),
+        initialize: vi.fn(),
+        refreshIndex: vi.fn(),
+        putMapping: vi.fn(),
+        getMapping: vi.fn(),
+        putSettings: vi.fn(),
+        getSettings: vi.fn(),
+        count: vi.fn(),
+        scroll: vi.fn(),
+        health: vi.fn(),
+        ping: vi.fn(),
+        upsertDocument: vi.fn(),
+        getDocument: vi.fn(),
+        updateDocument: vi.fn(),
+        deleteDocument: vi.fn().mockResolvedValue({
+          success: true,
+          meta: {
+            took: 0,
+          },
+        }),
+        search: vi.fn(),
+        bulk: vi.fn(),
+        bulkDelete: vi.fn(),
+        bulkUpdate: vi.fn(),
+        bulkUpsert: vi.fn(),
+        deleteByQuery: vi.fn(),
+        updateByQuery: vi.fn(),
+        reindex: vi.fn(),
+        analyze: vi.fn(),
+        validateQuery: vi.fn(),
+        explain: vi.fn(),
+        fieldCaps: vi.fn(),
+        termvectors: vi.fn(),
+        mget: vi.fn(),
+        msearch: vi.fn(),
+        clearScroll: vi.fn(),
+        countByQuery: vi.fn(),
+        searchTemplate: vi.fn(),
+        renderSearchTemplate: vi.fn(),
+        scriptsPainless: vi.fn(),
+        scriptsUpdate: vi.fn(),
+        scriptsDelete: vi.fn(),
+        scriptsGet: vi.fn(),
+        scriptsList: vi.fn(),
+        scriptsExecute: vi.fn(),
+        aliases: vi.fn(),
+        aliasExists: vi.fn(),
+        createAlias: vi.fn(),
+        deleteAlias: vi.fn(),
+        updateAliases: vi.fn(),
+        getAliases: vi.fn(),
+      },
+      documents: {
+        createDocument: vi.fn(),
+        getDocument: vi.fn(),
+        updateDocument: vi.fn(),
+        deleteDocument: vi.fn(),
+        listDocuments: vi.fn(),
+        testService: vi.fn(),
+      },
+      health: {
+        checkHealth: vi.fn(),
+        getStatus: vi.fn(),
+        testService: vi.fn(),
+      },
+    } as unknown as Services);
+
+    vi.mocked(prisma.index.findUnique).mockResolvedValue({
+      name: "test-index",
+      id: "test-index-id",
+      status: "active",
+      settings: null,
+      mappings: null,
+      created_at: mockDateObj,
+      updated_at: mockDateObj,
+      deleted_at: null,
+      doc_count: 0,
+      size_bytes: 0,
+      health: "green",
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  describe("DELETE /api/cortex/documents/[id]", () => {
+    it("should delete a document successfully", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ result: "deleted" }),
+      });
+
+      const request = new NextRequest(
+        "http://localhost:3000/api/cortex/documents/123?index=test-index-id",
+        {
+          method: "DELETE",
+        }
+      );
+
+      const response = await DELETE(request, { params: { id: "123" } });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toEqual({
+        success: true,
+        meta: {
+          took: expect.any(Number),
+        },
+      });
     });
 
-    describe('PUT /api/cortex/documents/[id]', () => {
-        it('should successfully update a document', async () => {
-            const documentId = '123';
-            const updateData = {
-                title: 'Updated Title',
-                content: 'Updated Content'
-            };
+    it("should handle already deleted document gracefully", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        json: async () => ({ result: "not_found" }),
+      });
 
-            mockFetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ result: 'updated' })
-            });
+      const request = new NextRequest(
+        "http://localhost:3000/api/cortex/documents/123?index=test-index-id",
+        {
+          method: "DELETE",
+        }
+      );
 
-            const request = new NextRequest('http://localhost/api/cortex/documents/123?index=test-index', {
-                method: 'PUT',
-                body: JSON.stringify(updateData)
-            });
+      const response = await DELETE(request, { params: { id: "123" } });
+      const data = await response.json();
 
-            const response = await PUT(request, { params: { id: documentId } });
-            const data = await response.json();
-
-            expect(response.status).toBe(200);
-            expect(data.success).toBe(true);
-            expect(data.data.updated).toBe(true);
-            expect(mockFetch).toHaveBeenCalledWith(
-                expect.stringContaining('/test-index/_update/'),
-                expect.objectContaining({
-                    method: 'POST',
-                    body: expect.stringContaining('"doc":{"title":"Updated Title","content":"Updated Content"}')
-                })
-            );
-        });
-
-        it('should handle invalid update fields', async () => {
-            const documentId = '123';
-            const invalidData = {
-                title: 123,
-                content: true,
-                tags: 'not-an-array'
-            };
-
-            const request = new NextRequest('http://localhost/api/cortex/documents/123?index=test-index', {
-                method: 'PUT',
-                body: JSON.stringify(invalidData)
-            });
-
-            const response = await PUT(request, { params: { id: documentId } });
-            const data = await response.json();
-
-            expect(response.status).toBe(400);
-            expect(data.success).toBe(false);
-            expect(data.error).toBe('Invalid update data');
-            expect(data.details).toBeDefined();
-        });
+      expect(response.status).toBe(200);
+      expect(data).toEqual({
+        success: true,
+        meta: {
+          took: expect.any(Number),
+        },
+      });
     });
 
-    describe('GET /api/cortex/documents/[id]', () => {
-        it('should retrieve a document successfully', async () => {
-            const documentId = '123';
-            mockFetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({
-                    _source: {
-                        title: 'Test Document',
-                        content: 'Test Content'
-                    }
-                })
-            });
+    it("should handle missing parameters", async () => {
+      const request = new NextRequest(
+        "http://localhost:3000/api/cortex/documents/",
+        {
+          method: "DELETE",
+        }
+      );
 
-            const request = new NextRequest(`http://localhost/api/cortex/documents/${documentId}?index=test-index`);
-            const response = await GET(request, { params: { id: documentId } });
-            const data = await response.json();
+      // @ts-expect-error - Testing missing id parameter
+      const response = await DELETE(request, { params: {} });
+      const data = await response.json();
 
-            expect(response.status).toBe(200);
-            expect(data.success).toBe(true);
-            expect(data.data.title).toBe('Test Document');
-            expect(mockFetch).toHaveBeenCalledWith(
-                expect.stringContaining('/test-index/_doc/'),
-                expect.any(Object)
-            );
-        });
-
-        it('should handle non-existent index', async () => {
-            const documentId = '123';
-            vi.mocked(mockPrisma.index.findUnique).mockResolvedValue(null);
-
-            const request = new NextRequest(`http://localhost/api/cortex/documents/${documentId}?index=test-index`);
-            const response = await GET(request, { params: { id: documentId } });
-            const data = await response.json();
-
-            expect(response.status).toBe(404);
-            expect(data.success).toBe(false);
-            expect(data.error).toBe('Index not found');
-        });
+      expect(response.status).toBe(400);
+      expect(data).toEqual({
+        success: false,
+        error: "Missing required parameters",
+      });
     });
-
-    describe('DELETE /api/cortex/documents/[id]', () => {
-        it('should delete a document successfully', async () => {
-            const documentId = '123';
-            mockFetch.mockResolvedValueOnce({
-                ok: true,
-                status: 200,
-                json: async () => ({ result: 'deleted' })
-            });
-
-            const request = new NextRequest(`http://localhost/api/cortex/documents/${documentId}?index=test-index`, {
-                method: 'DELETE'
-            });
-            const response = await DELETE(request, { params: { id: documentId } });
-            const data = await response.json();
-
-            expect(response.status).toBe(200);
-            expect(data.success).toBe(true);
-            expect(mockFetch).toHaveBeenCalledWith(
-                expect.stringContaining('/test-index/_doc/'),
-                expect.objectContaining({
-                    method: 'DELETE'
-                })
-            );
-        });
-
-        it('should handle already deleted document gracefully', async () => {
-            const documentId = '123';
-            mockFetch.mockResolvedValueOnce({
-                ok: false,
-                status: 404,
-                json: async () => ({ result: 'not_found' })
-            });
-
-            const request = new NextRequest(`http://localhost/api/cortex/documents/${documentId}?index=test-index`, {
-                method: 'DELETE'
-            });
-            const response = await DELETE(request, { params: { id: documentId } });
-            const data = await response.json();
-
-            expect(response.status).toBe(200);
-            expect(data.success).toBe(true);
-            expect(mockFetch).toHaveBeenCalledWith(
-                expect.stringContaining('/test-index/_doc/'),
-                expect.objectContaining({
-                    method: 'DELETE'
-                })
-            );
-        });
-    });
+  });
 });

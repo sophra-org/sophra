@@ -1,38 +1,38 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Logger } from "@lib/shared/types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { RuleContext } from "../types";
 import {
-  NotifyAction,
-  UpdateStateAction,
   CompositeAction,
+  NotifyAction,
   ThresholdAdjustmentAction,
+  UpdateStateAction,
   type NotifyActionConfig,
-} from './index';
-import type { RuleContext } from '../types';
-import type { Logger } from '@lib/shared/types';
+} from "./index";
 
-describe('Actions Additional Tests', () => {
-  describe('NotifyAction', () => {
+describe("Actions Additional Tests", () => {
+  describe("NotifyAction", () => {
     const mockLogger = {
       info: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
       warn: vi.fn(),
       child: vi.fn(),
-      service: 'test',
+      service: "test",
       silent: false,
       format: {},
       levels: {},
     } as unknown as Logger;
 
     const defaultConfig: NotifyActionConfig = {
-      title: 'Test Notification',
-      message: 'Test Message',
-      severity: 'info',
-      channels: ['email', 'slack'],
+      title: "Test Notification",
+      message: "Test Message",
+      severity: "info",
+      channels: ["email", "slack"],
     };
 
     const mockContext: RuleContext = {
       timestamp: new Date(),
-      eventData: { type: 'test' },
+      eventData: { type: "test" },
       metrics: { value: 100 },
       systemState: {},
     };
@@ -41,12 +41,12 @@ describe('Actions Additional Tests', () => {
       vi.clearAllMocks();
     });
 
-    it('should log notification with context data', () => {
+    it("should log notification with context data", () => {
       const action = new NotifyAction(defaultConfig, mockLogger);
       action.execute(mockContext);
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Would send notification:',
+        "Would send notification:",
         expect.objectContaining({
           ...defaultConfig,
           timestamp: mockContext.timestamp,
@@ -56,11 +56,11 @@ describe('Actions Additional Tests', () => {
       );
     });
 
-    it('should handle different severity levels', () => {
+    it("should handle different severity levels", () => {
       const configs: NotifyActionConfig[] = [
-        { ...defaultConfig, severity: 'info' },
-        { ...defaultConfig, severity: 'warning' },
-        { ...defaultConfig, severity: 'error' },
+        { ...defaultConfig, severity: "info" },
+        { ...defaultConfig, severity: "warning" },
+        { ...defaultConfig, severity: "error" },
       ];
 
       configs.forEach((config) => {
@@ -68,7 +68,7 @@ describe('Actions Additional Tests', () => {
         action.execute(mockContext);
 
         expect(mockLogger.info).toHaveBeenCalledWith(
-          'Would send notification:',
+          "Would send notification:",
           expect.objectContaining({
             severity: config.severity,
           })
@@ -76,29 +76,34 @@ describe('Actions Additional Tests', () => {
       });
     });
 
-    it('should handle missing optional channels', () => {
+    it("should handle missing optional channels", () => {
       const configWithoutChannels: NotifyActionConfig = {
-        title: 'Test',
-        message: 'Test',
-        severity: 'info',
+        title: "Test",
+        message: "Test",
+        severity: "info",
       };
 
       const action = new NotifyAction(configWithoutChannels, mockLogger);
       action.execute(mockContext);
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Would send notification:',
+        "Would send notification:",
         expect.objectContaining({
-          channels: undefined,
+          title: "Test",
+          message: "Test",
+          severity: "info",
+          timestamp: mockContext.timestamp,
+          eventData: mockContext.eventData,
+          metrics: mockContext.metrics,
         })
       );
     });
   });
 
-  describe('UpdateStateAction', () => {
-    it('should update system state with provided updates', () => {
+  describe("UpdateStateAction", () => {
+    it("should update system state with provided updates", () => {
       const updates = {
-        status: 'active',
+        status: "active",
         count: 5,
         nested: { value: true },
       };
@@ -108,7 +113,7 @@ describe('Actions Additional Tests', () => {
         eventData: {},
         metrics: {},
         systemState: {
-          existing: 'value',
+          existing: "value",
           count: 0,
         },
       };
@@ -117,20 +122,20 @@ describe('Actions Additional Tests', () => {
       action.execute(context);
 
       expect(context.systemState).toEqual({
-        existing: 'value',
-        status: 'active',
+        existing: "value",
+        status: "active",
         count: 5,
         nested: { value: true },
       });
     });
 
-    it('should handle empty updates', () => {
+    it("should handle empty updates", () => {
       const context: RuleContext = {
         timestamp: new Date(),
         eventData: {},
         metrics: {},
         systemState: {
-          existing: 'value',
+          existing: "value",
         },
       };
 
@@ -138,11 +143,11 @@ describe('Actions Additional Tests', () => {
       action.execute(context);
 
       expect(context.systemState).toEqual({
-        existing: 'value',
+        existing: "value",
       });
     });
 
-    it('should handle nested state updates', () => {
+    it("should handle nested state updates", () => {
       const updates = {
         nested: {
           deep: {
@@ -174,14 +179,14 @@ describe('Actions Additional Tests', () => {
     });
   });
 
-  describe('CompositeAction', () => {
+  describe("CompositeAction", () => {
     const mockLogger = {
       info: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
       warn: vi.fn(),
       child: vi.fn(),
-      service: 'test',
+      service: "test",
       silent: false,
       format: {},
       levels: {},
@@ -198,12 +203,15 @@ describe('Actions Additional Tests', () => {
       vi.clearAllMocks();
     });
 
-    it('should execute all actions in sequence', () => {
+    it("should execute all actions in sequence", () => {
       const action1 = { execute: vi.fn() };
       const action2 = { execute: vi.fn() };
       const action3 = { execute: vi.fn() };
 
-      const composite = new CompositeAction([action1, action2, action3], mockLogger);
+      const composite = new CompositeAction(
+        [action1, action2, action3],
+        mockLogger
+      );
       composite.execute(mockContext);
 
       expect(action1.execute).toHaveBeenCalledWith(mockContext);
@@ -218,63 +226,67 @@ describe('Actions Additional Tests', () => {
       expect(action2Calls[0]).toBeLessThan(action3Calls[0]);
     });
 
-    it('should continue execution after action failure', () => {
+    it("should continue execution after action failure", () => {
       const action1 = { execute: vi.fn() };
       const failingAction = {
         execute: vi.fn().mockImplementation(() => {
-          throw new Error('Action failed');
+          throw new Error("Action failed");
         }),
       };
       const action3 = { execute: vi.fn() };
 
-      const composite = new CompositeAction([action1, failingAction, action3], mockLogger);
+      const composite = new CompositeAction(
+        [action1, failingAction, action3],
+        mockLogger
+      );
       composite.execute(mockContext);
 
       expect(action1.execute).toHaveBeenCalled();
       expect(failingAction.execute).toHaveBeenCalled();
       expect(action3.execute).toHaveBeenCalled();
       expect(mockLogger.error).toHaveBeenCalledWith(
-        'Action failed:',
+        "Action failed:",
         expect.objectContaining({
           error: expect.any(Error),
         })
       );
     });
 
-    it('should handle empty action list', () => {
+    it("should handle empty action list", () => {
       const composite = new CompositeAction([], mockLogger);
       expect(() => composite.execute(mockContext)).not.toThrow();
     });
   });
 
-  describe('ThresholdAdjustmentAction', () => {
+  describe("ThresholdAdjustmentAction", () => {
     const mockLogger = {
       info: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
       warn: vi.fn(),
       child: vi.fn(),
-      service: 'test',
+      service: "test",
       silent: false,
       format: {},
       levels: {},
     } as unknown as Logger;
 
-    const mockContext: RuleContext = {
-      timestamp: new Date(),
-      eventData: {},
-      metrics: { testMetric: 100 },
-      systemState: {},
-    };
+    let mockContext: RuleContext;
 
     beforeEach(() => {
       vi.clearAllMocks();
+      mockContext = {
+        timestamp: new Date(),
+        eventData: {},
+        metrics: { testMetric: 100 },
+        systemState: {},
+      };
     });
 
-    it('should adjust metric value within bounds', () => {
+    it("should adjust metric value within bounds", () => {
       const action = new ThresholdAdjustmentAction(
         {
-          metricName: 'testMetric',
+          metricName: "testMetric",
           adjustment: 50,
           minValue: 0,
           maxValue: 200,
@@ -286,7 +298,7 @@ describe('Actions Additional Tests', () => {
 
       expect(mockContext.metrics.testMetric).toBe(150);
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Adjusted testMetric',
+        "Adjusted testMetric",
         expect.objectContaining({
           from: 100,
           to: 150,
@@ -294,10 +306,10 @@ describe('Actions Additional Tests', () => {
       );
     });
 
-    it('should respect minimum value', () => {
+    it("should respect minimum value", () => {
       const action = new ThresholdAdjustmentAction(
         {
-          metricName: 'testMetric',
+          metricName: "testMetric",
           adjustment: -150,
           minValue: 0,
         },
@@ -309,10 +321,10 @@ describe('Actions Additional Tests', () => {
       expect(mockContext.metrics.testMetric).toBe(0);
     });
 
-    it('should respect maximum value', () => {
+    it("should respect maximum value", () => {
       const action = new ThresholdAdjustmentAction(
         {
-          metricName: 'testMetric',
+          metricName: "testMetric",
           adjustment: 150,
           maxValue: 200,
         },
@@ -324,10 +336,10 @@ describe('Actions Additional Tests', () => {
       expect(mockContext.metrics.testMetric).toBe(200);
     });
 
-    it('should handle non-existent metrics', () => {
+    it("should handle non-existent metrics", () => {
       const action = new ThresholdAdjustmentAction(
         {
-          metricName: 'nonExistentMetric',
+          metricName: "nonExistentMetric",
           adjustment: 50,
         },
         mockLogger
@@ -338,10 +350,10 @@ describe('Actions Additional Tests', () => {
       expect(mockContext.metrics.nonExistentMetric).toBe(50);
     });
 
-    it('should handle negative adjustments', () => {
+    it("should handle negative adjustments", () => {
       const action = new ThresholdAdjustmentAction(
         {
-          metricName: 'testMetric',
+          metricName: "testMetric",
           adjustment: -25,
         },
         mockLogger
@@ -352,10 +364,10 @@ describe('Actions Additional Tests', () => {
       expect(mockContext.metrics.testMetric).toBe(75);
     });
 
-    it('should handle zero adjustments', () => {
+    it("should handle zero adjustments", () => {
       const action = new ThresholdAdjustmentAction(
         {
-          metricName: 'testMetric',
+          metricName: "testMetric",
           adjustment: 0,
         },
         mockLogger
@@ -365,7 +377,7 @@ describe('Actions Additional Tests', () => {
 
       expect(mockContext.metrics.testMetric).toBe(100);
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Adjusted testMetric',
+        "Adjusted testMetric",
         expect.objectContaining({
           from: 100,
           to: 100,

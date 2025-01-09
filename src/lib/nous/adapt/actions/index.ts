@@ -1,4 +1,3 @@
-import logger from "@/lib/shared/logger";
 import type { Logger } from "@/lib/shared/types";
 import { Action, RuleContext } from "../types";
 
@@ -38,8 +37,31 @@ export class UpdateStateAction implements Action {
     this.updates = updates;
   }
 
+  private deepMerge(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>
+  ): void {
+    for (const key in source) {
+      if (
+        typeof source[key] === "object" &&
+        source[key] !== null &&
+        !Array.isArray(source[key])
+      ) {
+        if (!(key in target)) {
+          target[key] = {};
+        }
+        this.deepMerge(
+          target[key] as Record<string, unknown>,
+          source[key] as Record<string, unknown>
+        );
+      } else {
+        target[key] = source[key];
+      }
+    }
+  }
+
   execute(context: RuleContext): void {
-    Object.assign(context.systemState, this.updates);
+    this.deepMerge(context.systemState, this.updates);
   }
 }
 
@@ -70,12 +92,15 @@ export class ThresholdAdjustmentAction implements Action {
   private maxValue?: number;
   private logger: Logger;
 
-  constructor(config: {
-    metricName: string;
-    adjustment: number;
-    minValue?: number;
-    maxValue?: number;
-  }, logger: Logger) {
+  constructor(
+    config: {
+      metricName: string;
+      adjustment: number;
+      minValue?: number;
+      maxValue?: number;
+    },
+    logger: Logger
+  ) {
     this.metricName = config.metricName;
     this.adjustment = config.adjustment;
     this.minValue = config.minValue;
@@ -84,20 +109,21 @@ export class ThresholdAdjustmentAction implements Action {
   }
 
   execute(context: RuleContext): void {
-    const current = context.metrics[this.metricName] || 0;
-    let newValue = current + this.adjustment;
+    const current = context.metrics[this.metricName] ?? 0;
+    const newValue = current + this.adjustment;
 
+    let finalValue = newValue;
     if (this.minValue !== undefined) {
-      newValue = Math.max(newValue, this.minValue);
+      finalValue = Math.max(finalValue, this.minValue);
     }
     if (this.maxValue !== undefined) {
-      newValue = Math.min(newValue, this.maxValue);
+      finalValue = Math.min(finalValue, this.maxValue);
     }
 
-    context.metrics[this.metricName] = newValue;
+    context.metrics[this.metricName] = finalValue;
     this.logger.info(`Adjusted ${this.metricName}`, {
       from: current,
-      to: newValue,
+      to: finalValue,
     });
   }
 }

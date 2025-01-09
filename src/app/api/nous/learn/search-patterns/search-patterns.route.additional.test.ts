@@ -1,83 +1,96 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, POST } from './route';
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/shared/database/client';
-import logger from '@/lib/shared/logger';
-import { ModelType, Prisma } from '@prisma/client';
+import { ModelType } from '@prisma/client';
+import type { PrismaClient, Prisma } from '@prisma/client';
 
-type MockCreateCall = {
-  data: {
-    metrics: {
-      create: {
-        accuracy: number;
-        validationMetrics: {
-          pattern_confidence: number;
-          [key: string]: any;
-        };
-        [key: string]: any;
-      };
-    };
-    [key: string]: any;
-  };
-};
-
-// Mock dependencies
-vi.mock('@/lib/shared/database/client', () => ({
-  prisma: {
+// Mock modules must be defined before any imports that use them
+vi.mock('@lib/shared/database/client', () => {
+  const mockPrisma = {
     modelState: {
-      findMany: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn(),
     },
-    $transaction: vi.fn(),
-  },
-}));
+    $transaction: vi.fn().mockImplementation((arg: unknown) => {
+      if (Array.isArray(arg)) {
+        return Promise.resolve(arg.map(() => ({} as Prisma.ModelStateCreateArgs)));
+      }
+      return Promise.resolve([]);
+    }),
+  };
+  return { prisma: mockPrisma };
+});
 
-vi.mock('@/lib/shared/logger', () => ({
+vi.mock('@lib/shared/logger', () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
   },
 }));
 
+// Import after mocks
+import { GET, POST } from './route';
+import { NextRequest } from 'next/server';
+import { prisma } from '@lib/shared/database/client';
+import logger from '@lib/shared/logger';
+
+interface MockMetricsCreate {
+  accuracy: number;
+  validationMetrics: {
+    pattern_confidence: number;
+    searchType: string;
+    adaptationRulesApplied: number;
+  };
+}
+
+interface MockCreateCall {
+  data: {
+    metrics: {
+      create: MockMetricsCreate;
+    };
+  };
+}
+
 describe('Search Patterns API Additional Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  const createMockPattern = (id: string) => ({
-    id,
-    modelType: ModelType.PATTERN_DETECTOR,
-    featureNames: ['test-query'],
-    versionId: `pattern_${id}`,
-    weights: [0],
-    bias: 0,
-    scaler: {},
-    isTrained: true,
-    hyperparameters: {},
-    currentEpoch: 0,
-    trainingProgress: 1,
-    lastTrainingError: null,
-    metrics: [
-      {
-        id: `metrics_${id}`,
-        modelVersionId: `metrics_${id}`,
-        accuracy: 0.85,
-        precision: 0,
-        recall: 0,
-        f1Score: 0,
-        latencyMs: 100,
-        loss: 0,
-        validationMetrics: {
-          pattern_confidence: 0.8,
-          searchType: 'semantic',
-          adaptationRulesApplied: 2,
+  const createMockPattern = (id: string) => {
+    const now = new Date();
+    return {
+      id,
+      modelType: ModelType.PATTERN_DETECTOR,
+      featureNames: ['test-query'],
+      versionId: `pattern_${id}`,
+      weights: [0],
+      bias: 0,
+      scaler: {},
+      isTrained: true,
+      hyperparameters: {},
+      currentEpoch: 0,
+      trainingProgress: 1,
+      lastTrainingError: null,
+      metrics: [
+        {
+          id: `metrics_${id}`,
+          modelVersionId: `metrics_${id}`,
+          accuracy: 0.85,
+          precision: 0,
+          recall: 0,
+          f1Score: 0,
+          latencyMs: 100,
+          loss: 0,
+          validationMetrics: {
+            pattern_confidence: 0.8,
+            searchType: 'semantic',
+            adaptationRulesApplied: 2,
+          },
+          timestamp: now,
         },
-        timestamp: new Date(),
-      },
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+      ],
+      createdAt: now,
+      updatedAt: now,
+    };
+  };
 
   describe('GET Endpoint', () => {
     it('should handle query parameter', async () => {
@@ -207,7 +220,15 @@ describe('Search Patterns API Additional Tests', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toHaveLength(1);
+      expect(data.data).toEqual({
+        ...mockPattern,
+        createdAt: mockPattern.createdAt.toISOString(),
+        updatedAt: mockPattern.updatedAt.toISOString(),
+        metrics: [{
+          ...mockPattern.metrics[0],
+          timestamp: mockPattern.metrics[0].timestamp.toISOString()
+        }]
+      });
       expect(data.metadata).toEqual(
         expect.objectContaining({
           processedCount: 1,
@@ -278,10 +299,22 @@ describe('Search Patterns API Additional Tests', () => {
     describe('Pattern Processing', () => {
       it('should calculate metrics correctly', async () => {
         const mockPattern = createMockPattern('pattern-1');
-        const mockTransaction = vi.fn().mockImplementation((calls: MockCreateCall[]) => {
-          return Promise.resolve([mockPattern]);
-        });
-        vi.mocked(prisma.$transaction).mockImplementation(mockTransaction);
+        const mockCreateOperation: MockCreateCall = {
+          data: {
+            metrics: {
+              create: {
+                accuracy: 0.8,
+                validationMetrics: {
+                  pattern_confidence: 0.8,
+                  searchType: 'exact',
+                  adaptationRulesApplied: 1
+                }
+              }
+            }
+          }
+        };
+        vi.mocked(prisma.$transaction).mockResolvedValueOnce([mockPattern]);
+        vi.mocked(prisma.modelState.create).mockReturnValue(mockCreateOperation as any);
 
         const request = new NextRequest('http://localhost/api/learn/search-patterns', {
           method: 'POST',
@@ -292,10 +325,9 @@ describe('Search Patterns API Additional Tests', () => {
 
         await POST(request);
 
-        const calls = mockTransaction.mock.calls;
-        const createCall = calls[0][0][0] as MockCreateCall;
+        const createOperation = vi.mocked(prisma.modelState.create).mock.calls[0][0] as unknown as MockCreateCall;
 
-        expect(createCall.data.metrics.create).toEqual(
+        expect(createOperation.data.metrics.create).toEqual(
           expect.objectContaining({
             accuracy: 0.8, // 8/10
             validationMetrics: expect.objectContaining({
@@ -316,10 +348,22 @@ describe('Search Patterns API Additional Tests', () => {
         };
 
         const mockPattern = createMockPattern('pattern-1');
-        const mockTransaction = vi.fn().mockImplementation((calls: MockCreateCall[]) => {
-          return Promise.resolve([mockPattern]);
-        });
-        vi.mocked(prisma.$transaction).mockImplementation(mockTransaction);
+        const mockCreateOperation: MockCreateCall = {
+          data: {
+            metrics: {
+              create: {
+                accuracy: 0,
+                validationMetrics: {
+                  pattern_confidence: 0.6,
+                  searchType: 'exact',
+                  adaptationRulesApplied: 0
+                }
+              }
+            }
+          }
+        };
+        vi.mocked(prisma.$transaction).mockResolvedValueOnce([mockPattern]);
+        vi.mocked(prisma.modelState.create).mockReturnValue(mockCreateOperation as any);
 
         const request = new NextRequest('http://localhost/api/learn/search-patterns', {
           method: 'POST',
@@ -330,10 +374,9 @@ describe('Search Patterns API Additional Tests', () => {
 
         await POST(request);
 
-        const calls = mockTransaction.mock.calls;
-        const createCall = calls[0][0][0] as MockCreateCall;
+        const createOperation = vi.mocked(prisma.modelState.create).mock.calls[0][0] as unknown as MockCreateCall;
 
-        expect(createCall.data.metrics.create.accuracy).toBe(0);
+        expect(createOperation.data.metrics.create.accuracy).toBe(0);
       });
     });
 

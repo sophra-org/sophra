@@ -1,27 +1,27 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
 import { SignalType } from "@prisma/client";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { GET, POST } from "./route";
 
 // Mock modules before any other code
-vi.mock('@prisma/client', () => ({
+vi.mock("@prisma/client", () => ({
   PrismaClient: vi.fn(),
   SignalType: {
-    SEARCH: 'SEARCH',
-    PERFORMANCE: 'PERFORMANCE',
-    USER_BEHAVIOR_IMPRESSION: 'USER_BEHAVIOR_IMPRESSION',
-    USER_BEHAVIOR_VIEW: 'USER_BEHAVIOR_VIEW',
-    USER_BEHAVIOR_CLICK: 'USER_BEHAVIOR_CLICK',
-    USER_BEHAVIOR_CONVERSION: 'USER_BEHAVIOR_CONVERSION',
-    MODEL_PERFORMANCE: 'MODEL_PERFORMANCE',
-    FEEDBACK: 'FEEDBACK',
-    SYSTEM_HEALTH: 'SYSTEM_HEALTH',
-    SESSION: 'SESSION'
+    SEARCH: "SEARCH",
+    PERFORMANCE: "PERFORMANCE",
+    USER_BEHAVIOR_IMPRESSION: "USER_BEHAVIOR_IMPRESSION",
+    USER_BEHAVIOR_VIEW: "USER_BEHAVIOR_VIEW",
+    USER_BEHAVIOR_CLICK: "USER_BEHAVIOR_CLICK",
+    USER_BEHAVIOR_CONVERSION: "USER_BEHAVIOR_CONVERSION",
+    MODEL_PERFORMANCE: "MODEL_PERFORMANCE",
+    FEEDBACK: "FEEDBACK",
+    SYSTEM_HEALTH: "SYSTEM_HEALTH",
+    SESSION: "SESSION",
   },
   Prisma: {
     JsonValue: undefined,
     JsonObject: undefined,
-  }
+  },
 }));
 
 vi.mock("../../../../lib/shared/database/client", () => {
@@ -29,20 +29,11 @@ vi.mock("../../../../lib/shared/database/client", () => {
     signal: {
       findMany: vi.fn(),
       create: vi.fn(),
-      count: vi.fn()
-    }
+      count: vi.fn(),
+    },
   };
   return { prisma: mockPrisma };
 });
-
-vi.mock("../../../../lib/shared/database/validation/generated", () => ({
-  SignalSchema: {
-    omit: () => ({
-      parse: (value: any) => value,
-      safeParse: (value: any) => ({ success: true, data: value })
-    })
-  }
-}));
 
 vi.mock("../../../../lib/shared/logger", () => ({
   default: {
@@ -57,9 +48,9 @@ vi.mock("next/server", () => {
       json: (data: any, init?: { status?: number }) => ({
         status: init?.status || 200,
         ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: () => Promise.resolve(data)
-      })
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () => Promise.resolve(data),
+      }),
     },
     NextRequest: class MockNextRequest {
       url: string;
@@ -73,9 +64,11 @@ vi.mock("next/server", () => {
       }
 
       async json() {
-        return typeof this.body === 'string' ? JSON.parse(this.body) : this.body;
+        return typeof this.body === "string"
+          ? JSON.parse(this.body)
+          : this.body;
       }
-    }
+    },
   };
 });
 
@@ -94,36 +87,36 @@ describe("Signals Route Handler", () => {
   describe("GET /api/nous/signals", () => {
     it("should fetch signals with default pagination", async () => {
       const mockSignals = [
-        { 
-          id: "1", 
-          type: SignalType.SEARCH, 
+        {
+          id: "1",
+          type: SignalType.SEARCH,
           source: "test",
-          value: { test: "data" },
+          value: 123,
           strength: 1,
           priority: 1,
           timestamp: new Date(),
           processed: false,
           manual: false,
-          metadata: null,
+          metadata: {},
           error: null,
-          retries: null,
+          retries: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
           processedAt: null,
         },
-        { 
-          id: "2", 
-          type: SignalType.SEARCH, 
+        {
+          id: "2",
+          type: SignalType.SEARCH,
           source: "test",
-          value: { test: "data" },
+          value: 123,
           strength: 1,
           priority: 1,
           timestamp: new Date(),
           processed: false,
           manual: false,
-          metadata: null,
+          metadata: {},
           error: null,
-          retries: null,
+          retries: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
           processedAt: null,
@@ -146,23 +139,25 @@ describe("Signals Route Handler", () => {
     });
 
     it("should handle filtering by source and type", async () => {
-      const mockSignals = [{ 
-        id: "1", 
-        type: SignalType.SEARCH, 
-        source: "test",
-        value: { test: "data" },
-        strength: 1,
-        priority: 1,
-        timestamp: new Date(),
-        processed: false,
-        manual: false,
-        metadata: null,
-        error: null,
-        retries: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        processedAt: null,
-      }];
+      const mockSignals = [
+        {
+          id: "1",
+          type: SignalType.SEARCH,
+          source: "test",
+          value: 123,
+          strength: 1,
+          priority: 1,
+          timestamp: new Date(),
+          processed: false,
+          manual: false,
+          metadata: {},
+          error: null,
+          retries: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          processedAt: null,
+        },
+      ];
 
       vi.mocked(prisma.signal.findMany).mockResolvedValue(mockSignals);
       vi.mocked(prisma.signal.count).mockResolvedValue(1);
@@ -186,7 +181,9 @@ describe("Signals Route Handler", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(prisma.signal.findMany).mockRejectedValue(new Error("DB Error"));
+      vi.mocked(prisma.signal.findMany).mockRejectedValue(
+        new Error("DB Error")
+      );
 
       const request = new NextRequest("http://localhost:3000/api/nous/signals");
       const response = await GET(request);
@@ -199,45 +196,46 @@ describe("Signals Route Handler", () => {
 
   describe("POST /api/nous/signals", () => {
     it("should create a new signal with valid data", async () => {
+      const now = new Date();
       const mockSignal = {
         type: SignalType.SEARCH,
         source: "test",
-        value: { test: "data" },
+        value: 123,
         strength: 1,
         priority: 1,
-        timestamp: new Date().toISOString(),
+        timestamp: now.toISOString(),
         processed: false,
         manual: false,
-        metadata: null,
+        metadata: {},
         error: null,
-        retries: null,
+        retries: 0,
       };
 
       const mockResponse = {
         ...mockSignal,
         id: "1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
         processedAt: null,
-        timestamp: new Date(mockSignal.timestamp),
+        timestamp: now,
       };
 
       vi.mocked(prisma.signal.create).mockResolvedValue(mockResponse);
 
-      const request = new NextRequest("http://localhost:3000/api/nous/signals", {
-        method: "POST",
-        body: JSON.stringify(mockSignal),
-      });
+      const request = new NextRequest(
+        "http://localhost:3000/api/nous/signals",
+        {
+          method: "POST",
+          body: JSON.stringify(mockSignal),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       expect(data.success).toBe(true);
-      expect(data.data).toMatchObject(expect.objectContaining({
-        ...mockResponse,
-        value: expect.any(Object),
-      }));
+      expect(data.data).toEqual(mockResponse);
 
       expect(prisma.signal.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -260,23 +258,26 @@ describe("Signals Route Handler", () => {
       const mockSignal = {
         type: SignalType.SEARCH,
         source: "test",
-        value: { test: "data" },
+        value: 123,
         strength: 1,
         priority: 1,
         timestamp: new Date().toISOString(),
         processed: false,
         manual: false,
-        metadata: null,
+        metadata: {},
         error: null,
-        retries: null,
+        retries: 0,
       };
 
       vi.mocked(prisma.signal.create).mockRejectedValue(new Error("DB Error"));
 
-      const request = new NextRequest("http://localhost:3000/api/nous/signals", {
-        method: "POST",
-        body: JSON.stringify(mockSignal),
-      });
+      const request = new NextRequest(
+        "http://localhost:3000/api/nous/signals",
+        {
+          method: "POST",
+          body: JSON.stringify(mockSignal),
+        }
+      );
 
       const response = await POST(request);
       const data = await response.json();
