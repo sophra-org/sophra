@@ -9,11 +9,11 @@ on:
 jobs:
   test:
     runs-on: windows-latest
-    continue-on-error: true
 
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       POSTGRESQL_URL: ${{ secrets.POSTGRESQL_URL }}
+      DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +55,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: always() && !cancelled()
+        continue-on-error: true
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -70,6 +71,14 @@ jobs:
 
       - name: Upload test results to Codecov
         if: always() && !cancelled()
+        continue-on-error: true
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage to DeepSource
+        if: always() && !cancelled()
+        continue-on-error: true
+        run: |
+          curl https://deepsource.io/cli | sh
+          ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/lcov.info
