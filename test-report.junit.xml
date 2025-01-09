@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="4.711">
-    <testsuite name="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" timestamp="2025-01-09T12:31:15.005Z" hostname="sophra" tests="8" failures="0" errors="0" skipped="0" time="0.0499397">
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should require id parameter" time="0.0133719">
+<testsuites name="vitest tests" tests="14" failures="0" errors="0" time="4.578">
+    <testsuite name="src/app/api/cortex/route.additional.test.ts" timestamp="2025-01-09T14:04:16.410Z" hostname="sophra" tests="14" failures="0" errors="0" skipped="0" time="0.0472612">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Configuration &gt; should use Node.js runtime" time="0.0017914">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should require index parameter" time="0.0039018">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Configuration &gt; should force dynamic rendering" time="0.0005467">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Parameter Validation &gt; should validate update data" time="0.0049349">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Configuration &gt; should disable revalidation" time="0.0005189">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should update document successfully" time="0.0052643">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; GET Endpoint &gt; should return successful response" time="0.0249392">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should format UUID-style document IDs" time="0.0062149">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; GET Endpoint &gt; should return correct content" time="0.0017919">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Document Update &gt; should handle partial updates" time="0.0060049">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; GET Endpoint &gt; should return response with correct headers" time="0.0008739">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle Elasticsearch errors" time="0.004149">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; GET Endpoint &gt; should be callable multiple times" time="0.0010161">
         </testcase>
-        <testcase classname="src/app/api/cortex/documents/[id]/id.route.additional.test.ts" name="Document [id] API Additional Tests &gt; PUT Endpoint &gt; Error Handling &gt; should handle vectorization errors" time="0.0041782">
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; GET Endpoint &gt; should create new response instance each time" time="0.0020843">
+        </testcase>
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Response Properties &gt; should have immutable properties" time="0.0016282">
+        </testcase>
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Response Properties &gt; should be one-time readable" time="0.0017407">
+        </testcase>
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Response Properties &gt; should handle cloning" time="0.0016063">
+        </testcase>
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Error Handling &gt; should handle response consumption errors" time="0.001072">
+        </testcase>
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Error Handling &gt; should handle invalid response manipulation" time="0.0008725">
+        </testcase>
+        <testcase classname="src/app/api/cortex/route.additional.test.ts" name="Cortex API Route Additional Tests &gt; Error Handling &gt; should maintain response integrity under stress" time="0.0046917">
         </testcase>
     </testsuite>
 </testsuites>

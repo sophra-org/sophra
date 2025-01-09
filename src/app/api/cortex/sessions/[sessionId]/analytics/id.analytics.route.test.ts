@@ -104,11 +104,59 @@ describe("GET /api/cortex/sessions/[sessionId]/analytics", () => {
   it("should calculate click-through rate correctly", async () => {
     const mockSession = { id: "test-123" };
     const mockEvents = [
-      { filters: { userAction: "clicked" } },
-      { filters: { userAction: "clicked" } },
-      { filters: { userAction: "viewed" } },
-      {},
-    ] as unknown as SearchEvent[];
+      {
+        timestamp: new Date(),
+        query: "test",
+        totalHits: 10,
+        took: 100,
+        searchType: "basic",
+        filters: { userAction: "clicked" },
+        resultIds: [1],
+        page: 1,
+        pageSize: 10,
+        facetsUsed: "",
+        sessionId: "test-123",
+      },
+      {
+        timestamp: new Date(),
+        query: "test",
+        totalHits: 10,
+        took: 100,
+        searchType: "basic",
+        filters: { userAction: "clicked" },
+        resultIds: [2],
+        page: 1,
+        pageSize: 10,
+        facetsUsed: "",
+        sessionId: "test-123",
+      },
+      {
+        timestamp: new Date(),
+        query: "test",
+        totalHits: 10,
+        took: 100,
+        searchType: "basic",
+        filters: { userAction: "viewed" },
+        resultIds: [3],
+        page: 1,
+        pageSize: 10,
+        facetsUsed: "",
+        sessionId: "test-123",
+      },
+      {
+        timestamp: new Date(),
+        query: "test",
+        totalHits: 10,
+        took: 100,
+        searchType: "basic",
+        filters: {},
+        resultIds: [4],
+        page: 1,
+        pageSize: 10,
+        facetsUsed: "",
+        sessionId: "test-123",
+      },
+    ] as SearchEvent[];
 
     mockServices.sessions.getSession.mockResolvedValue(mockSession);
     mockServices.analytics.getSearchEvents.mockResolvedValue(mockEvents);
@@ -118,6 +166,6 @@ describe("GET /api/cortex/sessions/[sessionId]/analytics", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.data.metrics.clickThroughRate).toBe(0.5);
+    expect(json.data.metrics.clickThroughRate).toBe(0.5); // 2 clicks out of 4 total events
   });
 });
