@@ -46,7 +46,7 @@ export async function PUT(
       return NextResponse.json(
         {
           success: false,
-          error: "Validation error",
+          error: "Invalid update data",
           details: validationResult.error.format(),
         },
         { status: 400 }
@@ -124,7 +124,7 @@ export async function PUT(
       return NextResponse.json(
         {
           success: false,
-          error: "Failed to update document",
+          error: "Failed to process document",
           details: error instanceof Error ? error.message : "Unknown error",
         },
         { status: 500 }

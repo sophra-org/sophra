@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock modules must be defined before any imports
+
+// Add explicit type annotation to mockPrisma
 vi.mock("@lib/shared/database/client", () => {
-  const mockPrisma = {
+  const mockPrisma: any = {
     modelState: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn(),
@@ -12,9 +14,9 @@ vi.mock("@lib/shared/database/client", () => {
       count: vi.fn(),
       $queryRaw: vi.fn(),
     },
-    $transaction: vi.fn().mockImplementation((callback) => {
+    $transaction: vi.fn().mockImplementation((callback: any) => {
       if (Array.isArray(callback)) {
-        return Promise.resolve(callback.map(operation => operation));
+        return Promise.resolve(callback.map((operation) => operation));
       }
       return callback(mockPrisma);
     }),
@@ -56,37 +58,41 @@ describe("Search Patterns Route Handler", () => {
   describe("GET /api/nous/learn/search-patterns", () => {
     it("should fetch patterns with default parameters", async () => {
       const now = new Date();
-      const mockPatterns = [{
-        id: "1",
-        modelType: ModelType.PATTERN_DETECTOR,
-        featureNames: ["query1"],
-        versionId: "v1",
-        weights: [0.1, 0.2],
-        bias: 0.5,
-        scaler: { mean: [0], std: [1] },
-        hyperparameters: { learning_rate: 0.01 },
-        isTrained: true,
-        currentEpoch: 10,
-        trainingProgress: 1,
-        lastTrainingError: null,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-        metrics: [{
-          modelVersionId: "metrics-1",
-          accuracy: 0.9,
-          precision: 0.85,
-          recall: 0.88,
-          f1Score: 0.86,
-          latencyMs: 100,
-          loss: 0.1,
-          timestamp: now.toISOString(),
-          validationMetrics: {
-            pattern_confidence: 0.8,
-            searchType: "exact",
-            adaptationRulesApplied: 1
-          }
-        }]
-      }];
+      const mockPatterns = [
+        {
+          id: "1",
+          modelType: ModelType.PATTERN_DETECTOR,
+          featureNames: ["query1"],
+          versionId: "v1",
+          weights: [0.1, 0.2],
+          bias: 0.5,
+          scaler: { mean: [0], std: [1] },
+          hyperparameters: { learning_rate: 0.01 },
+          isTrained: true,
+          currentEpoch: 10,
+          trainingProgress: 1,
+          lastTrainingError: null,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          metrics: [
+            {
+              modelVersionId: "metrics-1",
+              accuracy: 0.9,
+              precision: 0.85,
+              recall: 0.88,
+              f1Score: 0.86,
+              latencyMs: 100,
+              loss: 0.1,
+              timestamp: now.toISOString(),
+              validationMetrics: {
+                pattern_confidence: 0.8,
+                searchType: "exact",
+                adaptationRulesApplied: 1,
+              },
+            },
+          ],
+        },
+      ];
 
       mockModelState.findMany.mockResolvedValue(mockPatterns);
 
@@ -141,21 +147,23 @@ describe("Search Patterns Route Handler", () => {
         hyperparameters: {},
         currentEpoch: 0,
         trainingProgress: 1,
-        metrics: [{
-          modelVersionId: `metrics_${now.getTime()}_abc123`,
-          accuracy: 0.8,
-          precision: 0,
-          recall: 0,
-          f1Score: 0,
-          latencyMs: 50,
-          loss: 0,
-          validationMetrics: {
-            pattern_confidence: 0.8,
-            searchType: "exact",
-            adaptationRulesApplied: 1
+        metrics: [
+          {
+            modelVersionId: `metrics_${now.getTime()}_abc123`,
+            accuracy: 0.8,
+            precision: 0,
+            recall: 0,
+            f1Score: 0,
+            latencyMs: 50,
+            loss: 0,
+            validationMetrics: {
+              pattern_confidence: 0.8,
+              searchType: "exact",
+              adaptationRulesApplied: 1,
+            },
+            timestamp: now.toISOString(),
           },
-          timestamp: now.toISOString()
-        }]
+        ],
       };
 
       mockTransaction.mockResolvedValueOnce([mockResponse]);
@@ -164,19 +172,21 @@ describe("Search Patterns Route Handler", () => {
         "http://localhost:3000/api/nous/learn/search-patterns"
       );
       request.json = vi.fn().mockResolvedValue({
-        patterns: [{
-          query: "test query",
-          timestamp: new Date().toISOString(),
-          metadata: {
-            relevantHits: 8,
-            totalHits: 10,
-            took: 50,
-            adaptationRulesApplied: 1,
-            searchType: "exact",
-            facetsUsed: true,
-            source: "test"
-          }
-        }]
+        patterns: [
+          {
+            query: "test query",
+            timestamp: new Date().toISOString(),
+            metadata: {
+              relevantHits: 8,
+              totalHits: 10,
+              took: 50,
+              adaptationRulesApplied: 1,
+              searchType: "exact",
+              facetsUsed: true,
+              source: "test",
+            },
+          },
+        ],
       });
 
       const response = await POST(request);
@@ -189,8 +199,8 @@ describe("Search Patterns Route Handler", () => {
         metadata: {
           processedCount: 1,
           processingTime: expect.any(Number),
-          timestamp: expect.any(String)
-        }
+          timestamp: expect.any(String),
+        },
       });
     });
 
@@ -215,7 +225,7 @@ describe("Search Patterns Route Handler", () => {
         success: false,
         error: "Invalid request format",
         details: expect.any(Object),
-        received: expect.any(Object)
+        received: expect.any(Object),
       });
     });
   });

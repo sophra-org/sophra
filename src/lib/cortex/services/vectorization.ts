@@ -67,19 +67,19 @@ export class VectorizationService {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const error = await response.json();
         this.log("error", "OpenAI API error", {
           status: response.status,
-          error,
+          error: data,
           textLength: text.length,
         });
         throw new Error(
-          `OpenAI API error: ${error.error?.message || "Unknown error"}`
+          `OpenAI API error: ${data.error?.message || "Unknown error"}`
         );
       }
 
-      const data = await response.json();
       if (!data.data?.[0]?.embedding) {
         throw new Error("No embedding returned from OpenAI API");
       }

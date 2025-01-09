@@ -1,46 +1,55 @@
 import { MetricType } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mockPrisma } from "~/vitest.setup";
 import { GET } from "./route";
 
-vi.mock("next/server", () => {
-  return {
-    NextResponse: {
-      json: (data: any, init?: { status?: number }) => ({
+// Define mock objects
+const mockPrisma = {
+  learningMetric: {
+    findMany: vi.fn(),
+    count: vi.fn(),
+  },
+};
+
+const mockLogger = {
+  error: vi.fn(),
+  info: vi.fn(),
+  debug: vi.fn(),
+};
+
+// Mock modules
+vi.mock("next/server", () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    searchParams: new URL(url).searchParams,
+  })),
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => {
+      const response = {
         status: init?.status || 200,
         ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-        headers: new Headers({ "content-type": "application/json" }),
-        json: () => Promise.resolve(data),
-      }),
-    },
-    NextRequest: class {
-      url: string;
-      nextUrl: URL;
-      searchParams: URLSearchParams;
-
-      constructor(url: string) {
-        this.url = url;
-        this.nextUrl = new URL(url);
-        this.searchParams = new URL(url).searchParams;
-      }
-    },
-  };
-});
-
-vi.mock("@/lib/shared/database/client", () => ({
-  default: {
-    $queryRaw: vi.fn(),
+        headers: new Headers(),
+      };
+      return {
+        ...response,
+        json: async () => data,
+      };
+    }),
   },
 }));
 
-vi.mock("@/lib/shared/logger", () => ({
-  default: {
-    error: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
+vi.mock("@lib/shared/database/client", () => ({
+  prisma: mockPrisma,
 }));
+
+vi.mock("@lib/shared/logger", () => ({
+  default: mockLogger,
+}));
+
+// Import after mocks
+import { prisma } from "@lib/shared/database/client";
 
 describe("Learning Metrics Route Handler", () => {
   const mockMetric = {
@@ -81,10 +90,10 @@ describe("Learning Metrics Route Handler", () => {
         aggregated: false,
       };
 
-      vi.mocked(mockPrisma.learningMetric.findMany).mockResolvedValue([
+      vi.mocked(prisma.learningMetric.findMany).mockResolvedValue([
         mockMetricWithRequired,
       ]);
-      vi.mocked(mockPrisma.learningMetric.count).mockResolvedValue(1);
+      vi.mocked(prisma.learningMetric.count).mockResolvedValue(1);
 
       const request = new NextRequest(
         "http://localhost:3000/api/nous/learn/metrics"

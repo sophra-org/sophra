@@ -1,29 +1,25 @@
-import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const mockPrisma = {
-  learningEvent: {
-    findMany: vi.fn(),
-    create: vi.fn(),
-  },
-  $transaction: vi.fn(),
-  $queryRaw: vi.fn(),
-};
-
-// Mock modules
-vi.mock("@lib/shared/database/client", () => ({
-  prisma: mockPrisma,
-}));
-
-vi.mock("@lib/shared/logger", () => ({
-  default: {
-    error: vi.fn(),
-    info: vi.fn(),
-  },
-}));
-
-// Import after mocks
+import { NextRequest, NextResponse } from "next/server";
+import { mockPrisma } from "~/vitest.setup";
 import { GET } from "./route";
+
+// Mock NextRequest/Response
+vi.mock("next/server", () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    searchParams: new URL(url).searchParams,
+  })),
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data,
+    })),
+  },
+}));
 
 describe("Events Route Tests", () => {
   beforeEach(() => {
@@ -35,13 +31,26 @@ describe("Events Route Tests", () => {
       const mockEvents = [
         {
           id: "mock-suggestion-id",
-          status: "PENDING",
+          type: "SEARCH_PATTERN",
+          priority: "HIGH",
+          timestamp: new Date(),
+          processedAt: new Date(),
           metadata: {
             source: "API",
             timestamp: new Date(),
           },
           createdAt: new Date(),
           updatedAt: new Date(),
+          status: "PENDING",
+          correlationId: "corr-1",
+          sessionId: "session-1",
+          userId: "user-1",
+          clientId: "client-1",
+          environment: "test",
+          version: "1.0.0",
+          tags: ["test"],
+          error: null,
+          retryCount: 0,
         },
       ];
 
@@ -57,15 +66,7 @@ describe("Events Route Tests", () => {
       expect(response.status).toBe(200);
       expect(data).toEqual({
         success: true,
-        data: mockEvents.map(event => ({
-          ...event,
-          metadata: {
-            ...event.metadata,
-            timestamp: event.metadata.timestamp.toISOString(),
-          },
-          createdAt: event.createdAt.toISOString(),
-          updatedAt: event.updatedAt.toISOString(),
-        })),
+        data: mockEvents,
         meta: {
           total: mockEvents.length,
           limit: 100,

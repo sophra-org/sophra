@@ -31,11 +31,11 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.1.0
+ * Prisma Client JS version: 6.2.1
  * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
  */
 Prisma.prismaVersion = {
-  client: "6.1.0",
+  client: "6.2.1",
   engine: "605197351a3c8bdd595af2d2a9bc3025bca48ea2"
 }
 
@@ -300,7 +300,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\sophra\\prisma\\test-analyzer-client",
+      "value": "/workspaces/sophra/prisma/test-analyzer-client",
       "fromEnvVar": null
     },
     "config": {
@@ -309,25 +309,25 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-1.1.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\sophra\\prisma\\test-analyzer.prisma",
+    "sourceFilePath": "/workspaces/sophra/prisma/test-analyzer.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../mcp/test-analyzer/.env"
+    "rootEnvPath": null
   },
   "relativePath": "..",
-  "clientVersion": "6.1.0",
+  "clientVersion": "6.2.1",
   "engineVersion": "605197351a3c8bdd595af2d2a9bc3025bca48ea2",
   "datasourceNames": [
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

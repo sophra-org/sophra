@@ -1,26 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, runtime } from './route';
-import { NextRequest } from 'next/server';
-import { prisma } from '@lib/shared/database/client';
-import logger from '@lib/shared/logger';
 import { LearningEventType } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { mockPrisma } from "~/vitest.setup";
+import { prisma } from "@lib/shared/database/client";
+import logger from "@lib/shared/logger";
+import { GET, runtime } from './route';
 
-// Mock dependencies
-vi.mock('@lib/shared/database/client', () => ({
-  prisma: {
-    learningEvent: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-      $queryRaw: vi.fn(),
-    },
-    $transaction: vi.fn(),
-  },
-}));
-
-vi.mock('@lib/shared/logger', () => ({
+// Mock logger
+vi.mock("@lib/shared/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
+  },
+}));
+
+// Mock NextRequest/Response
+vi.mock("next/server", () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
+    url,
+    nextUrl: new URL(url),
+    headers: new Headers(),
+    searchParams: new URL(url).searchParams,
+  })),
+  NextResponse: {
+    json: vi.fn().mockImplementation((data, init) => ({
+      status: init?.status || 200,
+      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+      headers: new Headers(),
+      json: async () => data,
+    })),
   },
 }));
 
@@ -81,8 +89,8 @@ describe('Events Route Additional Tests', () => {
     it('should check database connection', async () => {
       const mockEvent = createMockEvent();
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]);
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockEvent]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([mockEvent]);
 
       const response = await GET(request);
       const data = await response.json();
@@ -94,7 +102,7 @@ describe('Events Route Additional Tests', () => {
 
     it('should handle database connection failure', async () => {
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('Connection failed'));
+      mockPrisma.$queryRaw.mockRejectedValueOnce(new Error('Connection failed'));
 
       const response = await GET(request);
       const data = await response.json();
@@ -130,8 +138,8 @@ describe('Events Route Additional Tests', () => {
 
     it('should handle empty results', async () => {
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([]); // Query result
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockResolvedValueOnce([]); // Query result
 
       const response = await GET(request);
       const data = await response.json();
@@ -151,11 +159,16 @@ describe('Events Route Additional Tests', () => {
     it('should process valid request with default parameters', async () => {
       const mockEvent = createMockEvent();
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockEvent]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockResolvedValueOnce([mockEvent]);
 
       const response = await GET(request);
       const data = await response.json();
+
+      // Ensure that the mock data and the response are correctly structured and compared
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.data).toEqual([mockEvent]);
 
       expect(response.status).toBe(200);
       expect(data).toEqual({
@@ -172,16 +185,19 @@ describe('Events Route Additional Tests', () => {
     it('should handle custom limit', async () => {
       const mockEvent = createMockEvent();
       const request = new NextRequest('http://localhost/api/learn/events?limit=50');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockEvent]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockResolvedValueOnce([mockEvent]);
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(data.meta.limit).toBe(50);
-      expect(prisma.$queryRaw).toHaveBeenCalledWith(
-        expect.stringContaining('LIMIT 50')
-      );
+      const mockCall = mockPrisma.$queryRaw.mock.calls[1];
+      const queryParts = mockCall[0] as unknown as string[];
+      const params = mockCall.slice(1);
+      // The LIMIT part is in the last query part
+      expect(queryParts[queryParts.length - 2]).toContain('LIMIT');
+      expect(params[params.length - 1]).toBe(50);
     });
 
     it('should handle date range filtering', async () => {
@@ -192,17 +208,15 @@ describe('Events Route Additional Tests', () => {
         `http://localhost/api/learn/events?startDate=${startDate}&endDate=${endDate}`
       );
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockEvent]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockResolvedValueOnce([mockEvent]);
 
       await GET(request);
 
-      expect(prisma.$queryRaw).toHaveBeenCalledWith(
-        expect.stringContaining('timestamp >=')
-      );
-      expect(prisma.$queryRaw).toHaveBeenCalledWith(
-        expect.stringContaining('timestamp <=')
-      );
+      const query = mockPrisma.$queryRaw.mock.calls[1][0] as unknown as string[];
+      const fullQuery = query.join('?');
+      expect(fullQuery).toContain('timestamp >=');
+      expect(fullQuery).toContain('timestamp <=');
     });
 
     it('should handle event type filtering', async () => {
@@ -211,20 +225,20 @@ describe('Events Route Additional Tests', () => {
         `http://localhost/api/learn/events?type=${LearningEventType.SEARCH_PATTERN}`
       );
 
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockEvent]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockResolvedValueOnce([mockEvent]);
 
       await GET(request);
 
-      expect(prisma.$queryRaw).toHaveBeenCalledWith(
-        expect.stringContaining('type::text =')
-      );
+      const query = mockPrisma.$queryRaw.mock.calls[1][0] as unknown as string[];
+      const fullQuery = query.join('?');
+      expect(fullQuery).toContain('type::text =');
     });
 
     it('should handle database query errors', async () => {
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('Query failed'));
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockRejectedValueOnce(new Error('Query failed'));
 
       const response = await GET(request);
       const data = await response.json();
@@ -244,8 +258,8 @@ describe('Events Route Additional Tests', () => {
 
     it('should handle non-Error objects in catch blocks', async () => {
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockImplementationOnce(() => {
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockImplementationOnce(() => {
         throw 'String error'; // Non-Error object
       });
 
@@ -259,8 +273,8 @@ describe('Events Route Additional Tests', () => {
     it('should log event retrieval details', async () => {
       const mockEvent = createMockEvent();
       const request = new NextRequest('http://localhost/api/learn/events');
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([1]); // DB check
-      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([mockEvent]);
+      mockPrisma.$queryRaw.mockResolvedValueOnce([1]); // DB check
+      mockPrisma.$queryRaw.mockResolvedValueOnce([mockEvent]);
 
       await GET(request);
 

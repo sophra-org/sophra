@@ -11,6 +11,7 @@ export const runtime = "nodejs";
 const querySchema = z.object({
   limit: z
     .string()
+    .regex(/^\d+$/, "Limit must be a valid number")
     .transform((val) => parseInt(val, 10))
     .default("100"),
   type: z.nativeEnum(LearningEventType).optional(),

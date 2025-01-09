@@ -18,12 +18,17 @@ vi.mock("next/server", () => ({
     json: vi.fn(),
   })),
   NextResponse: {
-    json: vi.fn().mockImplementation((data, init) => ({
-      status: init?.status || 200,
-      ok: init?.status ? init.status >= 200 && init.status < 300 : true,
-      headers: new Headers(),
-      json: async () => data,
-    })),
+    json: vi.fn().mockImplementation((data, init) => {
+      const response = {
+        status: init?.status || 200,
+        ok: init?.status ? init.status >= 200 && init.status < 300 : true,
+        headers: new Headers(),
+      };
+      return {
+        ...response,
+        json: async () => data,
+      };
+    }),
   },
 }));
 

@@ -2,12 +2,25 @@ import { ModelConfig, ModelType, ModelVersion, Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Define mock objects
+const mockPrisma = {
+  modelConfig: {
+    findMany: vi.fn(),
+    create: vi.fn(),
+  },
+  modelVersion: {
+    create: vi.fn(),
+  },
+};
+
+const mockLogger = {
+  error: vi.fn(),
+  info: vi.fn(),
+};
+
 // Mock modules
 vi.mock("@lib/shared/logger", () => ({
-  default: {
-    error: vi.fn(),
-    info: vi.fn(),
-  },
+  default: mockLogger,
 }));
 
 vi.mock("next/server", () => ({
@@ -27,16 +40,6 @@ vi.mock("next/server", () => ({
   },
 }));
 
-const mockPrisma = {
-  modelConfig: {
-    findMany: vi.fn(),
-    create: vi.fn(),
-  },
-  modelVersion: {
-    create: vi.fn(),
-  },
-};
-
 vi.mock("@lib/shared/database/client", () => ({
   prisma: mockPrisma,
 }));
@@ -45,9 +48,20 @@ vi.mock("@lib/shared/database/client", () => ({
 import { prisma } from "@lib/shared/database/client";
 import { GET, POST } from "./route";
 
+// Extend ModelConfig to include createdAt and updatedAt
+interface ModelConfigWithTimestamps extends ModelConfig {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Extend ModelVersion to include createdAt
+interface ModelVersionWithTimestamps extends ModelVersion {
+  createdAt: Date;
+}
+
 describe("Models Route Handler", () => {
   const now = new Date();
-  const mockVersion: ModelVersion = {
+  const mockVersion: ModelVersionWithTimestamps = {
     id: "v1",
     configId: "test-1",
     metrics: {} as Prisma.JsonValue,
@@ -56,13 +70,15 @@ describe("Models Route Handler", () => {
     createdAt: now,
   };
 
-  const mockModel: ModelConfig & { modelVersions: ModelVersion[] } = {
+  const mockModel: ModelConfigWithTimestamps & { modelVersions: ModelVersionWithTimestamps[] } = {
     id: "test-1",
     type: ModelType.PATTERN_DETECTOR,
     hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
     features: ["feature1", "feature2"],
     trainingParams: { epochs: 100 } as Prisma.JsonValue,
     modelVersions: [mockVersion],
+    createdAt: now,
+    updatedAt: now,
   };
 
   beforeEach(() => {
@@ -81,15 +97,17 @@ describe("Models Route Handler", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual([{
-        ...mockModel,
-        createdAt: mockModel.createdAt.toISOString(),
-        updatedAt: mockModel.updatedAt.toISOString(),
-        modelVersions: mockModel.modelVersions.map(version => ({
-          ...version,
-          createdAt: version.createdAt.toISOString(),
-        })),
-      }]);
+      expect(data.data).toEqual([
+        {
+          ...mockModel,
+          createdAt: mockModel.createdAt.toISOString(),
+          updatedAt: mockModel.updatedAt.toISOString(),
+          modelVersions: mockModel.modelVersions.map((version) => ({
+            ...version,
+            createdAt: version.createdAt.toISOString(),
+          })),
+        },
+      ]);
       expect(data.meta).toEqual({
         total: 1,
         page: 1,
@@ -116,8 +134,6 @@ describe("Models Route Handler", () => {
       expect(data.metadata.took).toBeGreaterThan(0);
     });
   });
-
-  describe("POST /api/nous/learn/models", () => {
 
   describe("POST /api/nous/learn/models", () => {
     it("should create model successfully", async () => {
@@ -175,6 +191,7 @@ describe("Models Route Handler", () => {
         type: ModelType.PATTERN_DETECTOR,
         hyperparameters: { learning_rate: 0.01 } as Prisma.JsonValue,
         features: ["feature1", "feature2"],
+        trainingParams: { epochs: 100 } as Prisma.JsonValue,
       };
 
       vi.mocked(prisma.modelConfig.create).mockRejectedValue(

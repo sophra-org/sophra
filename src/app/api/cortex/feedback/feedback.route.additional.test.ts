@@ -38,7 +38,7 @@ describe('Feedback Route Additional Tests', () => {
     const mockFeedback = [
       {
         id: 'feedback-1',
-        timestamp: new Date(),
+        timestamp: new Date('2025-01-09T02:48:11.218Z'),
         feedback: {
           rating: 0.8,
           metadata: { userAction: SignalType.USER_BEHAVIOR_CLICK },
@@ -60,7 +60,11 @@ describe('Feedback Route Additional Tests', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data).toEqual(mockFeedback);
+      // When data is sent through the API, dates are serialized to strings
+      expect(data.data).toEqual([{
+        ...mockFeedback[0],
+        timestamp: mockFeedback[0].timestamp.toISOString()
+      }]);
       expect(data.metadata).toEqual(
         expect.objectContaining({
           timeframe: '24h',
