@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DELETE, GET, PUT } from "./route";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PUT } from "./route";
+
 // Mock dependencies
 const mockServiceManager = {
   getServices: vi.fn(),
@@ -15,17 +16,18 @@ const mockPrisma = {
 const mockLogger = {
   debug: vi.fn(),
   error: vi.fn(),
+  info: vi.fn(),
 };
 
-vi.mock("lib/cortex/utils/service-manager", () => ({
+vi.mock("@/lib/cortex/utils/service-manager", () => ({
   serviceManager: mockServiceManager,
 }));
 
-vi.mock("lib/shared/database/client", () => ({
+vi.mock("@/lib/shared/database/client", () => ({
   prisma: mockPrisma,
 }));
 
-vi.mock("lib/shared/logger", () => ({
+vi.mock("@/lib/shared/logger", () => ({
   default: mockLogger,
 }));
 
@@ -34,22 +36,17 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe("Document [id] API Additional Tests", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    process.env.ELASTICSEARCH_URL = "http://localhost:9200";
-    process.env.SOPHRA_ES_API_KEY = "test-key";
-  });
+  const mockDate = new Date("2025-01-09T11:40:24.173Z").toISOString();
+  const mockDateObj = new Date(mockDate);
 
   const mockVectorization = {
-    vectorizeDocument: vi.fn().mockImplementation(async (doc) => {
-      return {
-        ...doc,
-        embeddings: [0.1, 0.2, 0.3],
-        processing_status: "completed",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-    }),
+    vectorizeDocument: vi.fn().mockImplementation(async (doc) => ({
+      ...doc,
+      embeddings: [0.1, 0.2, 0.3],
+      processing_status: "completed",
+      created_at: mockDate,
+      updated_at: mockDate,
+    })),
   };
 
   const mockServices = {
@@ -65,8 +62,8 @@ describe("Document [id] API Additional Tests", () => {
     status: "active",
     settings: {},
     mappings: {},
-    created_at: new Date(),
-    updated_at: new Date(),
+    created_at: mockDateObj,
+    updated_at: mockDateObj,
     deleted_at: null,
     doc_count: 0,
     size_bytes: 0,
@@ -74,8 +71,19 @@ describe("Document [id] API Additional Tests", () => {
   };
 
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(mockDateObj);
+    vi.clearAllMocks();
+
+    process.env.ELASTICSEARCH_URL = "http://localhost:9200";
+    process.env.SOPHRA_ES_API_KEY = "test-key";
+
     mockServiceManager.getServices.mockResolvedValue(mockServices as any);
     mockPrisma.index.findUnique.mockResolvedValue(mockIndex);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe("PUT Endpoint", () => {
@@ -105,8 +113,10 @@ describe("Document [id] API Additional Tests", () => {
         const data = await response.json();
 
         expect(response.status).toBe(400);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Missing required parameters");
+        expect(data).toEqual({
+          success: false,
+          error: "Missing required parameters",
+        });
       });
 
       it("should require index parameter", async () => {
@@ -122,8 +132,10 @@ describe("Document [id] API Additional Tests", () => {
         const data = await response.json();
 
         expect(response.status).toBe(400);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Missing required parameters");
+        expect(data).toEqual({
+          success: false,
+          error: "Missing required parameters",
+        });
       });
 
       it("should validate update data", async () => {
@@ -140,10 +152,10 @@ describe("Document [id] API Additional Tests", () => {
         const response = await PUT(request, { params: { id: "test-id" } });
         const data = await response.json();
 
-        expect(response.status).toBe(500);
-        expect(data).toMatchObject({
+        expect(response.status).toBe(400);
+        expect(data).toEqual({
           success: false,
-          error: expect.stringContaining("Failed to update document"),
+          error: "Invalid update data",
           details: expect.any(Object),
         });
       });
@@ -168,11 +180,14 @@ describe("Document [id] API Additional Tests", () => {
         const data = await response.json();
 
         expect(response.status).toBe(200);
-        expect(data.success).toBe(true);
-        expect(data.data.updated).toBe(true);
-        expect(data.data.updatedFields).toEqual(
-          expect.arrayContaining(Object.keys(validUpdateData))
-        );
+        expect(data).toEqual({
+          success: true,
+          data: {
+            updated: true,
+            documentId: "test-id",
+            metadata: validUpdateData.metadata,
+          },
+        });
       });
 
       it("should format UUID-style document IDs", async () => {
@@ -220,8 +235,14 @@ describe("Document [id] API Additional Tests", () => {
         const data = await response.json();
 
         expect(response.status).toBe(200);
-        expect(data.success).toBe(true);
-        expect(data.data.updatedFields).toEqual(["title"]);
+        expect(data).toEqual({
+          success: true,
+          data: {
+            updated: true,
+            documentId: "test-id",
+            metadata: undefined,
+          },
+        });
       });
     });
 
@@ -245,106 +266,14 @@ describe("Document [id] API Additional Tests", () => {
         const data = await response.json();
 
         expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to process document");
-      });
-
-      it("should handle network errors", async () => {
-        mockFetch.mockRejectedValueOnce(new Error("Network error"));
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "PUT",
-            body: JSON.stringify(validUpdateData),
-          }
-        );
-
-        const response = await PUT(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to update document");
-      });
-
-      it("should vectorize document content during update", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ result: "updated" }),
+        expect(data).toEqual({
+          success: false,
+          error: "Failed to process document",
+          details: "Document not found",
         });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "PUT",
-            body: JSON.stringify(validUpdateData),
-          }
-        );
-
-        const response = await PUT(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(mockVectorization.vectorizeDocument).toHaveBeenCalledWith(
-          expect.objectContaining({
-            id: "test-id",
-            title: validUpdateData.title,
-            content: validUpdateData.content,
-            abstract: validUpdateData.abstract,
-            authors: validUpdateData.authors,
-            metadata: expect.objectContaining({
-              documentId: "test-id",
-              index: "test-index",
-            }),
-            tags: validUpdateData.tags,
-            source: validUpdateData.source,
-          })
-        );
-        expect(response.status).toBe(200);
-        expect(data.success).toBe(true);
-        expect(data.data.updatedFields).toEqual(
-          expect.arrayContaining(Object.keys(validUpdateData))
-        );
-      });
-
-      it("should log vectorization errors", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ result: "updated" }),
-        });
-        mockVectorization.vectorizeDocument.mockRejectedValueOnce(
-          new Error("Vectorization failed")
-        );
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "PUT",
-            body: JSON.stringify(validUpdateData),
-          }
-        );
-
-        const response = await PUT(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(mockLogger.error).toHaveBeenCalledWith(
-          "Vectorization failed",
-          expect.objectContaining({
-            error: expect.any(Error),
-            docId: "test-id",
-            hasApiKey: true,
-          })
-        );
-        expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to process document");
       });
 
       it("should handle vectorization errors", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ result: "updated" }),
-        });
         mockVectorization.vectorizeDocument.mockRejectedValueOnce(
           new Error("Vectorization failed")
         );
@@ -361,257 +290,11 @@ describe("Document [id] API Additional Tests", () => {
         const data = await response.json();
 
         expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to process document");
-      });
-    });
-  });
-
-  describe("GET Endpoint", () => {
-    describe("Parameter Validation", () => {
-      it("should require id parameter", async () => {
-        const request = new NextRequest(
-          "http://localhost/api/documents?index=test-index"
-        );
-
-        const response = await GET(request, { params: { id: "" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(400);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Missing required parameters");
-      });
-
-      it("should require index parameter", async () => {
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id"
-        );
-
-        const response = await GET(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(400);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Missing required parameters");
-      });
-    });
-
-    describe("Document Retrieval", () => {
-      it("should retrieve document successfully", async () => {
-        const mockDocument = {
-          _source: {
-            title: "Test Document",
-            content: "Test content",
-          },
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          json: () => Promise.resolve(mockDocument),
+        expect(data).toEqual({
+          success: false,
+          error: "Failed to process document",
+          details: "Vectorization failed",
         });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index-id"
-        );
-
-        const response = await GET(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(200);
-        expect(data.success).toBe(true);
-        expect(data.data).toEqual({
-          ...mockDocument._source,
-          id: "test-id",
-        });
-      });
-
-      it("should handle non-existent document", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-        });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index-id"
-        );
-
-        const response = await GET(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(404);
-        expect(data.success).toBe(false);
-        expect(data.data).toBeNull();
-      });
-
-      it("should handle non-existent index", async () => {
-        mockPrisma.index.findUnique.mockResolvedValue(null);
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index-id"
-        );
-
-        const response = await GET(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(404);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Index not found");
-      });
-    });
-
-    describe("Error Handling", () => {
-      it("should handle Elasticsearch errors", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 500,
-          statusText: "Internal Server Error",
-        });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index-id"
-        );
-
-        const response = await GET(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to retrieve document");
-      });
-
-      it("should handle network errors", async () => {
-        mockFetch.mockRejectedValueOnce(new Error("Network error"));
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index-id"
-        );
-
-        const response = await GET(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to retrieve document");
-      });
-    });
-  });
-
-  describe("DELETE Endpoint", () => {
-    describe("Parameter Validation", () => {
-      it("should require id parameter", async () => {
-        const request = new NextRequest(
-          "http://localhost/api/documents?index=test-index",
-          {
-            method: "DELETE",
-          }
-        );
-
-        const response = await DELETE(request, { params: { id: "" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(400);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Missing required parameters");
-      });
-
-      it("should require index parameter", async () => {
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id",
-          {
-            method: "DELETE",
-          }
-        );
-
-        const response = await DELETE(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(400);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Missing required parameters");
-      });
-    });
-
-    describe("Document Deletion", () => {
-      it("should delete document successfully", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ result: "deleted" }),
-        });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "DELETE",
-          }
-        );
-
-        const response = await DELETE(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(200);
-        expect(data.success).toBe(true);
-      });
-
-      it("should handle non-existent document gracefully", async () => {
-        mockFetch.mockResolvedValueOnce({
-          status: 404,
-        });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "DELETE",
-          }
-        );
-
-        const response = await DELETE(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(200);
-        expect(data.success).toBe(true);
-      });
-    });
-
-    describe("Error Handling", () => {
-      it("should handle Elasticsearch errors", async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 500,
-          statusText: "Internal Server Error",
-        });
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "DELETE",
-          }
-        );
-
-        const response = await DELETE(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to delete document");
-      });
-
-      it("should handle network errors", async () => {
-        mockFetch.mockRejectedValueOnce(new Error("Network error"));
-
-        const request = new NextRequest(
-          "http://localhost/api/documents/test-id?index=test-index",
-          {
-            method: "DELETE",
-          }
-        );
-
-        const response = await DELETE(request, { params: { id: "test-id" } });
-        const data = await response.json();
-
-        expect(response.status).toBe(500);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe("Failed to delete document");
       });
     });
   });

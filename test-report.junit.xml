@@ -1,29 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="12" failures="0" errors="0" time="4.521">
-    <testsuite name="src/app/api/nous/signals/signals.route.additional.test.ts" timestamp="2025-01-09T12:00:31.027Z" hostname="sophra" tests="12" failures="0" errors="0" skipped="0" time="0.0407374">
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle default pagination parameters" time="0.0131994">
+<testsuites name="vitest tests" tests="3" failures="0" errors="0" time="4.223">
+    <testsuite name="src/app/api/cortex/documents/[id]/id.route.test.ts" timestamp="2025-01-09T12:25:18.065Z" hostname="sophra" tests="3" failures="0" errors="0" skipped="0" time="0.0319692">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.test.ts" name="Document API Routes &gt; DELETE /api/cortex/documents/[id] &gt; should delete a document successfully" time="0.0243042">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle custom pagination parameters" time="0.0026167">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.test.ts" name="Document API Routes &gt; DELETE /api/cortex/documents/[id] &gt; should handle already deleted document gracefully" time="0.0024472">
         </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Pagination &gt; should handle invalid pagination parameters" time="0.0014407">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should filter by source" time="0.0015983">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should filter by type" time="0.0025032">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Filtering &gt; should combine source and type filters" time="0.0015641">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; GET Endpoint &gt; Error Handling &gt; should handle database errors" time="0.0020115">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should validate required fields" time="0.0036592">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should handle invalid signal type" time="0.0021625">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Request Validation &gt; should validate timestamp is not in future" time="0.0028294">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should create signal with required fields" time="0.0026033">
-        </testcase>
-        <testcase classname="src/app/api/nous/signals/signals.route.additional.test.ts" name="Signals API Additional Tests &gt; POST Endpoint &gt; Signal Creation &gt; should handle database errors during creation" time="0.0016905">
+        <testcase classname="src/app/api/cortex/documents/[id]/id.route.test.ts" name="Document API Routes &gt; DELETE /api/cortex/documents/[id] &gt; should handle missing parameters" time="0.0038384">
         </testcase>
     </testsuite>
 </testsuites>
