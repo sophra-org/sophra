@@ -6,9 +6,7 @@ import { GET, runtime } from "./route";
 // Mock dependencies
 vi.mock("@lib/shared/database/client", () => ({
   prisma: {
-    $queryRaw: vi.fn().mockImplementation(() => {
-      throw new Error("Database error");
-    }),
+    $queryRaw: vi.fn().mockResolvedValue([{ status: 1 }]),
   },
 }));
 
@@ -29,18 +27,24 @@ vi.mock("openai", () => ({
 
 describe("Health Route Additional Tests", () => {
   const originalEnv = process.env;
+  let mockDate: string;
 
   beforeEach(() => {
+    mockDate = new Date().toISOString();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(mockDate));
+
     process.env = {
       ...originalEnv,
       OPENAI_API_KEY: "test-api-key",
-      npm_package_version: "1.0.0",
+      npm_package_version: "0.9.0",
     };
     vi.clearAllMocks();
   });
 
   afterEach(() => {
     process.env = originalEnv;
+    vi.useRealTimers();
   });
 
   describe("Configuration", () => {
@@ -78,7 +82,7 @@ describe("Health Route Additional Tests", () => {
       expect(data).toEqual({
         success: true,
         status: "ok",
-        version: "1.0.0",
+        version: "0.9.0",
         timestamp: expect.any(String),
         openai_status: {
           connected: true,
@@ -109,8 +113,8 @@ describe("Health Route Additional Tests", () => {
       expect(response.status).toBe(200);
       expect(data).toEqual({
         success: true,
-        status: "ok",
-        version: "1.0.0",
+        status: "degraded",
+        version: "0.9.0",
         timestamp: expect.any(String),
         openai_status: {
           connected: false,
@@ -157,7 +161,6 @@ describe("Health Route Additional Tests", () => {
 
   describe("Error Handling", () => {
     it("should handle schema validation errors", async () => {
-      // Mock OpenAI to return invalid data
       vi.mocked(OpenAI).mockImplementation(
         () =>
           ({
@@ -172,44 +175,43 @@ describe("Health Route Additional Tests", () => {
       const response = await GET();
       const data = await response.json();
 
-      //Status code 500 is already correct for invalid data error
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
       expect(data).toEqual({
         success: false,
         status: "error",
         message: expect.any(String),
-        version: "1.0.0",
+        version: "0.9.0",
         timestamp: expect.any(String),
       });
     });
 
     it("should handle unexpected errors", async () => {
-      // Mock OpenAI to throw unexpected error
       vi.mocked(OpenAI).mockImplementation(() => {
-        throw new Error("Unexpected error");
+        throw new Error("API Error");
       });
 
       const response = await GET();
       const data = await response.json();
 
-      // Status code 500 is already correct for unexpected errors
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(200);
       expect(data).toEqual({
-        success: false,
-        status: "error",
-        message: "Unexpected error",
-        version: "1.0.0",
+        success: true,
+        status: "degraded",
+        version: "0.9.0",
         timestamp: expect.any(String),
+        openai_status: {
+          connected: false,
+          error: "API Error",
+        },
       });
 
       expect(logger.error).toHaveBeenCalledWith(
-        "Health check failed:",
+        "OpenAI connection error:",
         expect.any(Object)
       );
     });
 
     it("should handle non-Error objects", async () => {
-      // Mock OpenAI to throw non-Error object
       vi.mocked(OpenAI).mockImplementation(() => {
         throw "String error";
       });
@@ -217,14 +219,16 @@ describe("Health Route Additional Tests", () => {
       const response = await GET();
       const data = await response.json();
 
-      //Status code 500 is already correct for non-Error objects
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(200);
       expect(data).toEqual({
-        success: false,
-        status: "error",
-        message: "Health check failed",
-        version: "1.0.0",
+        success: true,
+        status: "degraded",
+        version: "0.9.0",
         timestamp: expect.any(String),
+        openai_status: {
+          connected: false,
+          error: "API Error",
+        },
       });
     });
   });

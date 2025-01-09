@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="13" failures="0" errors="0" time="4.365">
-    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" timestamp="2025-01-09T11:47:50.936Z" hostname="sophra" tests="3" failures="0" errors="0" skipped="0" time="0.0290755">
-        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" name="Metrics Route Additional Tests &gt; Configuration &gt; should use Node.js runtime" time="0.0019546">
+<testsuites name="vitest tests" tests="13" failures="0" errors="0" time="4.515">
+    <testsuite name="src/app/api/nous/health/health.route.additional.test.ts" timestamp="2025-01-09T11:55:29.441Z" hostname="sophra" tests="13" failures="0" errors="0" skipped="0" time="0.043634">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Configuration &gt; should use Node.js runtime" time="0.0053751">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" name="Metrics Route Additional Tests &gt; GET Endpoint &gt; should validate metric types" time="0.0242866">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; GET Endpoint &gt; should return successful health check response" time="0.0081174">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.additional.test.ts" name="Metrics Route Additional Tests &gt; GET Endpoint &gt; should handle multiple metrics" time="0.001663">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; GET Endpoint &gt; should handle OpenAI connection failure" time="0.0041632">
         </testcase>
-    </testsuite>
-    <testsuite name="src/app/api/nous/learn/metrics/metrics.route.test.ts" timestamp="2025-01-09T11:47:50.940Z" hostname="sophra" tests="2" failures="0" errors="0" skipped="0" time="0.0265151">
-        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; Configuration &gt; should use Node.js runtime" time="0.0019359">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; GET Endpoint &gt; should handle missing OpenAI API key" time="0.0019102">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/metrics/metrics.route.test.ts" name="Learning Metrics Route Handler &gt; GET /api/nous/learn/metrics &gt; should fetch metrics with default parameters" time="0.0233865">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; GET Endpoint &gt; should handle missing package version" time="0.0022944">
         </testcase>
-    </testsuite>
-    <testsuite name="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" timestamp="2025-01-09T11:47:50.942Z" hostname="sophra" tests="8" failures="0" errors="0" skipped="0" time="0.0381359">
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should fetch patterns with default parameters" time="0.0262244">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; GET Endpoint &gt; should include ISO timestamp" time="0.0022811">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle database errors gracefully" time="0.0013133">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Error Handling &gt; should handle schema validation errors" time="0.0023731">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle custom timeframe and limit" time="0.0011976">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Error Handling &gt; should handle unexpected errors" time="0.0022996">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle invalid timeframe parameter" time="0.0018855">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Error Handling &gt; should handle non-Error objects" time="0.0018669">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle invalid limit parameter" time="0.0016793">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Response Format &gt; should set correct content type" time="0.0020242">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle limit out of range" time="0.0016001">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Response Format &gt; should be JSON parseable" time="0.0029462">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should calculate confidence and metrics correctly" time="0.001098">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Response Format &gt; should limit available models to 5" time="0.0030893">
         </testcase>
-        <testcase classname="src/app/api/nous/learn/feedback/patterns/patterns.route.test.ts" name="Feedback Patterns Route Handler &gt; GET /api/nous/learn/feedback/patterns &gt; should handle empty results" time="0.0013508">
+        <testcase classname="src/app/api/nous/health/health.route.additional.test.ts" name="Health Route Additional Tests &gt; Response Format &gt; should handle empty models list" time="0.0028386">
         </testcase>
     </testsuite>
 </testsuites>
