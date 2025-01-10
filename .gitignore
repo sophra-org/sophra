@@ -2,6 +2,7 @@
 
 # Dependencies
 /node_modules
+/prisma2/node_modules
 /mcp/test-analyzer/node_modules
 /.pnp
 .pnp.*

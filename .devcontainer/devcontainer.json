@@ -66,12 +66,10 @@
 
   "forwardPorts": [3000],
 
-  "postCreateCommand": "npm install -g pnpm && pnpm install && cd mcp/test-analyzer && npm install -g pnpm && pnpm install",
+  "postCreateCommand": "bash -c 'npm install -g pnpm & pnpm install & (cd prisma2 && pnpm install) & wait'",
 
   "postStartCommand": {
-    "install-deps": "pnpm install",
-    "build-mcp": "pnpm mcp:build",
-    "setup-analyzer": "pnpm test-analyzer:prisma:setup"
+    "install-deps": "bash -c 'pnpm install & (cd prisma2 && pnpm install) & wait'"
   },
 
   "remoteUser": "node",
