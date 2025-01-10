@@ -62,6 +62,7 @@ async function readFileContent(filePath: string): Promise<{ content: string; isB
   }
 }
 
+
 export class CodebaseSync {
   private watcher?: chokidar.FSWatcher;
   private rootDir: string;
