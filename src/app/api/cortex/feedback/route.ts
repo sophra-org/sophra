@@ -4,28 +4,10 @@ import logger from "@/lib/shared/logger";
 import JSON5 from "json5";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { SignalType, EngagementType } from "./types";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
-
-export enum SignalType {
-  SEARCH = "SEARCH",
-  PERFORMANCE = "PERFORMANCE",
-  USER_BEHAVIOR_IMPRESSION = "USER_BEHAVIOR_IMPRESSION",
-  USER_BEHAVIOR_VIEW = "USER_BEHAVIOR_VIEW",
-  USER_BEHAVIOR_CLICK = "USER_BEHAVIOR_CLICK",
-  USER_BEHAVIOR_CONVERSION = "USER_BEHAVIOR_CONVERSION",
-  MODEL_PERFORMANCE = "MODEL_PERFORMANCE",
-  FEEDBACK = "FEEDBACK",
-  SYSTEM_HEALTH = "SYSTEM_HEALTH",
-}
-
-export enum EngagementType {
-  IMPRESSION = "IMPRESSION",
-  VIEW = "VIEW",
-  CLICK = "CLICK",
-  CONVERSION = "CONVERSION",
-}
 
 const FeedbackSchema = z.object({
   sessionId: z.string(),

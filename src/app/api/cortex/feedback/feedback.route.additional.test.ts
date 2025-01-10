@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, POST, SignalType, EngagementType } from './route';
+import { GET, POST } from './route';
+import { SignalType, EngagementType } from './types';
 import { serviceManager } from '@lib/cortex/utils/service-manager';
 import { prisma } from '@lib/shared/database/client';
 import logger from '@lib/shared/logger';

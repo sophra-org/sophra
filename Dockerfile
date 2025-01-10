@@ -10,23 +10,32 @@ RUN apk add --no-cache libc6-compat python3 make g++ gcc
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json ./
-RUN npm install
+COPY package.json yarn.lock* package-lock.json* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  else npm install; \
+  fi
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Build arguments for environment configuration
+ARG NODE_ENV=production
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_TELEMETRY_DISABLED=1
+
+ENV NODE_ENV=${NODE_ENV}
+ENV NEXT_TELEMETRY_DISABLED=${NEXT_TELEMETRY_DISABLED}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma Client and zod-prisma-types
 RUN npx prisma generate
 RUN mkdir -p src/lib/shared/database/validation/generated
-
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN yarn build
 
@@ -35,8 +44,7 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -61,7 +69,6 @@ RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
 # Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -70,7 +77,24 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT 3000
-# set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD node -e "const http = require('http'); \
+    const options = { \
+      hostname: 'localhost', \
+      port: 3000, \
+      path: '/api/health', \
+      timeout: 2000 \
+    }; \
+    const req = http.get(options, (res) => { \
+      console.log('STATUS:', res.statusCode); \
+      process.exit(res.statusCode === 200 ? 0 : 1); \
+    }); \
+    req.on('error', (error) => { \
+      console.error('ERROR:', error); \
+      process.exit(1); \
+    });"
 
 CMD ["node", "server.js"]
