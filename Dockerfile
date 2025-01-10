@@ -1,5 +1,5 @@
 # Syntax version
-FROM alpine:latest as permissions
+FROM alpine:latest AS permissions
 WORKDIR /temp_context
 COPY . .
 RUN find . -type d -exec chmod 0755 {} \; && \
@@ -33,25 +33,39 @@ RUN addgroup --system --gid 1001 nodejs && \
 FROM base AS builder
 
 # Copy normalized files from permissions stage
-COPY --from=permissions /temp_context /app
-RUN chown -R nextjs:nodejs /app
+COPY --from=permissions --chown=nextjs:nodejs /temp_context /app
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile && \
-    cd prisma2 && pnpm install --frozen-lockfile && cd ..
-
-# Install Prisma and generate artifacts
-RUN pnpm add -D prisma@6.1.0 @prisma/client@6.1.0 ts-node typescript @types/node glob && \
-    mkdir -p src/lib/shared/database/validation/generated/outputTypeSchemas && \
-    chown -R nextjs:nodejs src/lib/shared/database
-
-# Switch to non-root user for build
+# Install and setup pnpm
 USER nextjs
+WORKDIR /app
+
+# Initialize pnpm and install dependencies with proper permissions
+RUN set -ex && \
+    pnpm config set store-dir /app/.pnpm-store && \
+    # Install root dependencies
+    pnpm install && \
+    # Make prisma CLI executable
+    chmod +x ./node_modules/.bin/prisma && \
+    # Install prisma2 dependencies
+    cd prisma2 && \
+    pnpm install && \
+    chmod +x ./node_modules/.bin/prisma && \
+    cd ..
+
+# Install Prisma and ensure correct permissions
+RUN set -ex && \
+    pnpm add -D prisma@6.1.0 @prisma/client@6.1.0 ts-node typescript @types/node glob && \
+    chmod -R 755 node_modules/.bin
 
 # Generate Prisma artifacts and build
-RUN NODE_ENV=development pnpm exec prisma generate --schema=./prisma/schema.prisma && \
-    cd prisma2 && NODE_ENV=development pnpm exec prisma generate --schema=./schema.prisma && cd .. && \
-    NODE_ENV=development pnpm exec ts-node --project tsconfig.json scripts/clean-zod-schemas.ts && \
+RUN set -ex && \
+    # Generate main prisma schema
+    NODE_ENV=development ./node_modules/.bin/prisma generate --schema=./prisma/schema.prisma && \
+    # Generate prisma2 schema
+    cd prisma2 && \
+    NODE_ENV=development ../node_modules/.bin/prisma generate --schema=./schema.prisma && \
+    cd .. && \
+    # Complete the build
     HUSKY=0 pnpm build
 
 # Runner stage
@@ -69,13 +83,15 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma2 ./prisma2
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Copy package files for production install
+# Copy package files and lockfiles for production install
 COPY --from=permissions /temp_context/package.json ./
+COPY --from=permissions /temp_context/pnpm-lock.yaml ./
 COPY --from=permissions /temp_context/prisma2/package.json ./prisma2/
+COPY --from=permissions /temp_context/prisma2/pnpm-lock.yaml ./prisma2/
 
 # Install production dependencies
-RUN pnpm install --prod --frozen-lockfile && \
-    cd prisma2 && pnpm install --prod --frozen-lockfile && cd .. && \
+RUN pnpm install --prod && \
+    cd prisma2 && pnpm install --prod && cd .. && \
     chown -R nextjs:nodejs /app
 
 # Switch to non-root user
