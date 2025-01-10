@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prepare": "husky install",
     "sync-codebase": "ts-node --project tsconfig.codebase-sync.json codebase-sync.ts",
     "sync-codebase:watch": "ts-node --project tsconfig.codebase-sync.json codebase-sync.ts watch",
     "sync-codebase:db:generate": "cd prisma2 && prisma generate",
@@ -131,7 +130,6 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-typescript": "^3.7.0",
     "glob": "^11.0.0",
-    "husky": "^9.1.7",
     "install": "^0.13.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-fetch-mock": "^3.0.3",
