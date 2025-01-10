@@ -39,14 +39,37 @@ services:
         echo "Setting permissions..." &&
         chown -R 1000:0 /certs &&
         chmod -R 755 /certs &&
-        echo "Certificate setup completed successfully"
+        
+        echo "Waiting for Elasticsearch..." &&
+        while ! curl -s --cacert /certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" https://es01:9200 >/dev/null; do
+          sleep 5
+        done &&
+        
+        echo "Waiting for Elasticsearch cluster..." &&
+        while ! curl -s --cacert /certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" https://es01:9200/_cluster/health | grep -q '"status":"green"'; do
+          sleep 5
+          echo "Waiting for cluster to be ready..."
+        done &&
+
+        echo "Setting up kibana_system user..." &&
+        curl -s -X POST --cacert /certs/ca/ca.crt \
+          -u "elastic:${ELASTIC_PASSWORD}" \
+          -H "Content-Type: application/json" \
+          https://es01:9200/_security/user/kibana_system \
+          -d "{\"password\":\"${ELASTIC_PASSWORD}\",\"roles\":[\"kibana_system\"]}" &&
+        
+        echo "Setup completed successfully"
       '
     user: "0"
     working_dir: /usr/share/elasticsearch
     volumes:
       - certs:/certs
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /certs/ca/ca.crt ] && [ -f /certs/http/es01/es01.crt ] && [ -f /certs/http/es02/es02.crt ] && [ -f /certs/http/es03/es03.crt ]"]
+      test:
+        [
+          "CMD-SHELL",
+          "[ -f /certs/ca/ca.crt ] && [ -f /certs/http/es01/es01.crt ] && [ -f /certs/http/es02/es02.crt ] && [ -f /certs/http/es03/es03.crt ]",
+        ]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -65,7 +88,7 @@ services:
 
       # Databases
       - POSTGRESQL_URL=postgresql://sophra:sophra@postgres:5432/sophra
-      
+
       # Redis
       - REDIS_URL=redis://redis:6379
 
@@ -226,9 +249,16 @@ services:
     ports:
       - "5601:5601"
     environment:
-      - ELASTICSEARCH_HOSTS=["https://es01:9200","https://es02:9200","https://es03:9200"]
-      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_HOSTS=https://es01:9200,https://es02:9200,https://es03:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/certs/ca/ca.crt
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
+      - ELASTICSEARCH_SSL_CERTIFICATE=/usr/share/kibana/config/certs/kibana/kibana.crt
+      - ELASTICSEARCH_SSL_KEY=/usr/share/kibana/config/certs/kibana/kibana.key
+      - SERVER_SSL_ENABLED=true
+      - SERVER_SSL_CERTIFICATE=/usr/share/kibana/config/certs/kibana/kibana.crt
+      - SERVER_SSL_KEY=/usr/share/kibana/config/certs/kibana/kibana.key
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
       - certs:/usr/share/kibana/config/certs:ro
@@ -243,11 +273,29 @@ services:
         condition: service_healthy
     networks:
       - elastic
+    command: >
+      bash -c '
+        echo "Waiting for certificates..." &&
+        while [ ! -f /usr/share/kibana/config/certs/ca/ca.crt ] || [ ! -f /usr/share/kibana/config/certs/kibana/kibana.key ]; do
+          sleep 2
+        done &&
+        
+        echo "Waiting for Elasticsearch..." &&
+        while ! curl -s --cacert /usr/share/kibana/config/certs/ca/ca.crt \
+          -u "kibana_system:${ELASTIC_PASSWORD}" \
+          https://es01:9200/_cluster/health > /dev/null; do
+          sleep 5
+          echo "Waiting for Elasticsearch to be ready..."
+        done &&
+
+        echo "Starting Kibana..." &&
+        /usr/local/bin/kibana-docker
+      '
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+          "curl -s -I --cacert /usr/share/kibana/config/certs/ca/ca.crt https://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
         ]
       interval: 10s
       timeout: 10s
