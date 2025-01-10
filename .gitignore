@@ -25,7 +25,6 @@ pnpm-lock.yaml
 *.whl
 
 # Environment
-.env*
 .env
 .venv
 env/
@@ -35,6 +34,9 @@ ENV/
 .env.local
 .env.development.local
 .env.production.local
+/compose/elastic/certs
+/compose/kibana/certs
+
 
 # IDE
 .idea/

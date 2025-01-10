@@ -1,0 +1,69 @@
+# Cluster Configuration
+cluster.name: sophra-es-cluster
+node.name: ${HOSTNAME}
+
+# Network Configuration
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+
+# Discovery Configuration
+discovery.seed_hosts: ["es01", "es02", "es03"]
+cluster.initial_master_nodes: ["es01", "es02", "es03"]
+
+# Security Configuration
+xpack.security.enabled: true
+xpack.security.enrollment.enabled: true
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certs/http/${HOSTNAME}/${HOSTNAME}.key
+xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certs/http/${HOSTNAME}/${HOSTNAME}.crt
+xpack.security.http.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+xpack.security.http.ssl.verification_mode: certificate
+
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/transport/${HOSTNAME}/${HOSTNAME}.key
+xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/transport/${HOSTNAME}/${HOSTNAME}.crt
+xpack.security.transport.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+xpack.security.transport.ssl.verification_mode: certificate
+
+# Memory Configuration
+bootstrap.memory_lock: false
+node.store.allow_mmap: false
+indices.memory.index_buffer_size: 5%
+indices.fielddata.cache.size: 10%
+indices.queries.cache.size: 2%
+
+# Path Configuration
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# Node Configuration
+node.roles: [ master, data, ingest ]
+
+# Performance Settings
+search.max_buckets: 5000
+
+# Thread Pools
+thread_pool:
+  write:
+    size: 2
+    queue_size: 500
+  search:
+    size: 3
+    queue_size: 500
+
+# Shard Request Cache
+indices.requests.cache.size: 1%
+
+# Recovery Settings
+cluster.routing.allocation.node_concurrent_recoveries: 2
+cluster.routing.allocation.node_initial_primaries_recoveries: 4
+
+# Circuit Breaker Settings
+indices.breaker.total.use_real_memory: true
+indices.breaker.total.limit: 70%
+indices.breaker.fielddata.limit: 60%
+indices.breaker.request.limit: 60%
+
+# Monitoring
+xpack.monitoring.collection.enabled: true
