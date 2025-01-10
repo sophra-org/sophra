@@ -76,8 +76,8 @@
   "remoteUser": "node",
 
   "mounts": [
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/node/.ssh,type=bind,readonly",
-    "source=${localWorkspaceFolder}/../sophra-dev-provider,target=/workspaces/sophra-dev-provider,type=bind,consistency=cached"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/node/.ssh,type=bind,readonly"
+    // Remove the sophra-dev-provider mount
   ],
 
   "containerEnv": {
