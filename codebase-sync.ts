@@ -33,11 +33,12 @@ const BINARY_EXTENSIONS = new Set([
 ]);
 
 function isBinaryPath(filePath: string): boolean {
-  const ext = path.extname(filePath).toLowerCase();
+  const ext = path.extname(normalizePath(filePath)).toLowerCase();
   return BINARY_EXTENSIONS.has(ext);
 }
 
 async function readFileContent(filePath: string): Promise<{ content: string; isBinary: boolean }> {
+  filePath = normalizePath(filePath);
   const isBinary = isBinaryPath(filePath);
 
   if (isBinary) {
@@ -75,7 +76,7 @@ export class CodebaseSync {
   ];
 
   constructor(rootDir: string = process.cwd()) {
-    this.rootDir = rootDir;
+    this.rootDir = normalizePath(rootDir);
   }
 
   private async getFileInfo(filePath: string): Promise<FileInfo> {
@@ -160,13 +161,13 @@ export class CodebaseSync {
       },
     });
 
-    const files = await glob('**/*', {
+    const files = (await glob('**/*', {
       cwd: this.rootDir,
       ignore: this.excludePatterns,
       nodir: true,
       follow: false,
       absolute: true,
-    });
+    })).map(normalizePath);
 
     let syncedCount = 0;
     const totalFiles = files.length;
@@ -213,6 +214,7 @@ export class CodebaseSync {
 
     this.watcher
       .on('add', async (filePath: string) => {
+        filePath = normalizePath(filePath);
         const version = await prisma.codebaseVersion.create({
           data: { description: `File added: ${filePath}` },
         });
@@ -225,6 +227,7 @@ export class CodebaseSync {
         console.log(`Synced new file: ${filePath}`);
       })
       .on('change', async (filePath: string) => {
+        filePath = normalizePath(filePath);
         const version = await prisma.codebaseVersion.create({
           data: { description: `File changed: ${filePath}` },
         });
@@ -238,7 +241,7 @@ export class CodebaseSync {
       })
       .on('unlink', async (filePath: string) => {
         await prisma.codebaseFile.delete({
-          where: { path: filePath },
+          where: { path: normalizePath(filePath) },
         });
         console.log(`Removed deleted file: ${filePath}`);
       });
