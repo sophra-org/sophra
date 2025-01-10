@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "Running pre-commit codebase sync..."
-pnpm sync-codebase sync "Pre-commit sync"
+# Run codebase sync
+if ! ts-node --project tsconfig.codebase-sync.json codebase-sync.ts sync 'auto-sync'; then
+  echo "❌ Codebase sync failed"
+  exit 1
+fi
+
+exit 0

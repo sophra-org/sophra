@@ -26,6 +26,7 @@ pnpm-lock.yaml
 
 # Environment
 .env*
+.env
 .venv
 env/
 venv/
