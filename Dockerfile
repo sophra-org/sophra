@@ -17,40 +17,54 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 # Builder stage
 FROM base AS builder
-WORKDIR /app
 
-# Safe copy of package files
-COPY ["package.json", "pnpm-lock.yaml", "./"]
-COPY ["prisma2/package.json", "prisma2/pnpm-lock.yaml", "./prisma2/"]
+# Copy normalized files from permissions stage
+COPY --from=permissions /temp_context /app
+RUN chown -R nextjs:nodejs /app
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile && \
     cd prisma2 && pnpm install --frozen-lockfile && cd ..
 
-# Copy source with explicit paths
-COPY prisma ./prisma/
-COPY prisma2 ./prisma2/
-COPY src ./src/
-COPY tsconfig.json .
+# Install Prisma and generate artifacts
+RUN pnpm add -D prisma@6.1.0 @prisma/client@6.1.0 ts-node typescript @types/node glob && \
+    mkdir -p src/lib/shared/database/validation/generated/outputTypeSchemas && \
+    chown -R nextjs:nodejs src/lib/shared/database
 
-# Generate Prisma
-RUN pnpm exec prisma generate --schema=./prisma/schema.prisma && \
-    cd prisma2 && pnpm exec prisma generate --schema=./schema.prisma
+# Switch to non-root user for build
+USER nextjs
 
-# Production stage
-FROM base AS production
-WORKDIR /app
+# Generate Prisma artifacts and build
+RUN NODE_ENV=development pnpm exec prisma generate --schema=./prisma/schema.prisma && \
+    cd prisma2 && NODE_ENV=development pnpm exec prisma generate --schema=./schema.prisma && cd .. && \
+    NODE_ENV=development pnpm exec ts-node --project tsconfig.json scripts/clean-zod-schemas.ts && \
+    HUSKY=0 pnpm build
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# Runner stage
+FROM base AS runner
 
-# Copy built files
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/prisma2/node_modules ./prisma2/node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/prisma2 ./prisma2
-COPY --chown=nextjs:nodejs . .
+# Create necessary directories
+RUN mkdir -p /app/logs && \
+    chown -R nextjs:nodejs /app
 
+# Copy production files from builder
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma2 ./prisma2
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Copy package files for production install
+COPY --from=permissions /temp_context/package.json ./
+COPY --from=permissions /temp_context/prisma2/package.json ./prisma2/
+
+# Install production dependencies
+RUN pnpm install --prod --frozen-lockfile && \
+    cd prisma2 && pnpm install --prod --frozen-lockfile && cd .. && \
+    chown -R nextjs:nodejs /app
+
+# Switch to non-root user
 USER nextjs
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
