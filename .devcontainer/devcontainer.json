@@ -66,12 +66,9 @@
 
   "forwardPorts": [3000],
 
-  "postCreateCommand": "bash -c 'npm install -g pnpm & pnpm install & (cd prisma2 && pnpm install) & git clone https://github.com/sophra-org/sophra-dev-provider.git /workspaces/sophra-dev-provider & (cd /workspaces/sophra-dev-provider && pnpm install && npx prisma generate && npm run build) & wait'",
+  "postCreateCommand": "bash -c 'set -e && npm install -g pnpm && pnpm install && cd prisma2 && pnpm install && git clone https://${PERSONAL_ACCESS_TOKEN}@github.com/sophra-org/sophra-dev-provider.git /workspaces/sophra-dev-provider && cd /workspaces/sophra-dev-provider && pnpm install && npx prisma generate && pnpm build'",
 
-  "postStartCommand": {
-    "install-deps": "bash -c 'pnpm install & (cd prisma2 && pnpm install) & wait'",
-    "start-mcp": "bash -c 'cd /workspaces/sophra-dev-provider && npm start'"
-  },
+  "postStartCommand": "bash -c 'cd /workspaces/sophra-dev-provider && npm start'",
 
   "remoteUser": "node",
 
@@ -84,6 +81,10 @@
     "SHELL": "/usr/bin/pwsh",
     "PROVIDER_DATABASE_URL": "${SECRET_PROVIDER_DATABASE_URL}",
     "DATABASE_URL": "${SECRET_DATABASE_URL}"
+  },
+
+  "remoteEnv": {
+    "PERSONAL_ACCESS_TOKEN": "${localEnv:PERSONAL_ACCESS_TOKEN}"
   },
 
   "waitFor": "postCreateCommand",
