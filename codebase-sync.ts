@@ -5,6 +5,12 @@ import fs from 'fs/promises';
 import path from 'path';
 import { glob } from 'glob';
 
+// Helper function to normalize paths to forward slashes
+function normalizePath(pathStr: string): string {
+  return pathStr.split(path.sep).join('/');
+}
+
+
 const prisma = new PrismaClient();
 
 interface FileInfo {
@@ -76,7 +82,7 @@ export class CodebaseSync {
     const { content, isBinary } = await readFileContent(filePath);
     const stats = await fs.stat(filePath);
     const hash = createHash('sha256').update(content).digest('hex');
-    const relativePath = path.relative(this.rootDir, filePath);
+    const relativePath = normalizePath(path.relative(this.rootDir, filePath));
 
     return {
       path: relativePath,
@@ -89,8 +95,8 @@ export class CodebaseSync {
   }
 
   private async createOrUpdateDirectory(dirPath: string): Promise<string> {
-    const relativePath = path.relative(this.rootDir, dirPath);
-    const parentPath = path.dirname(relativePath);
+    const relativePath = normalizePath(path.relative(this.rootDir, dirPath));
+    const parentPath = normalizePath(path.dirname(relativePath));
 
     let parentId: string | null = null;
     if (parentPath !== '.') {
@@ -166,8 +172,8 @@ export class CodebaseSync {
     const totalFiles = files.length;
 
     for (const file of files) {
-      const fullPath = file;
-      const dirPath = path.dirname(fullPath);
+      const fullPath = normalizePath(file);
+      const dirPath = normalizePath(path.dirname(fullPath));
 
       try {
         const directoryId = await this.createOrUpdateDirectory(dirPath);
@@ -211,8 +217,8 @@ export class CodebaseSync {
           data: { description: `File added: ${filePath}` },
         });
 
-        const fullPath = path.join(this.rootDir, filePath);
-        const dirPath = path.dirname(fullPath);
+        const fullPath = normalizePath(path.join(this.rootDir, filePath));
+        const dirPath = normalizePath(path.dirname(fullPath));
         const directoryId = await this.createOrUpdateDirectory(dirPath);
         const fileInfo = await this.getFileInfo(fullPath);
         await this.syncFile(fileInfo, version.id, directoryId);
@@ -223,8 +229,8 @@ export class CodebaseSync {
           data: { description: `File changed: ${filePath}` },
         });
 
-        const fullPath = path.join(this.rootDir, filePath);
-        const dirPath = path.dirname(fullPath);
+        const fullPath = normalizePath(path.join(this.rootDir, filePath));
+        const dirPath = normalizePath(path.dirname(fullPath));
         const directoryId = await this.createOrUpdateDirectory(dirPath);
         const fileInfo = await this.getFileInfo(fullPath);
         await this.syncFile(fileInfo, version.id, directoryId);
