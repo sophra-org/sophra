@@ -1,31 +1,23 @@
-# Dependencies and build outputs
+# Ignore everything by default
+*
+
+# Only include necessary files
+!package.json
+!package-lock.json
+!next.config.js
+!server.js
+!tsconfig*.json
+!src/**
+!public/**
+!prisma/**
+!scripts/**
+
+# Always ignore these
+.git
+.env*
 node_modules
-.pnpm-store
 .next
 out
 dist
 build
-
-# Environment and config
-.env*
-.git
-.vscode
-.idea
-
-# Test files
 coverage
-**/*.test.ts
-**/*.test.tsx
-**/__tests__
-**/*.spec.*
-
-# Include necessary files
-!package.json
-!pnpm-lock.yaml
-!next.config.js
-!tsconfig*.json
-!src
-!public
-!prisma
-!prisma2
-!scripts

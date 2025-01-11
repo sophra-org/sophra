@@ -1,5 +1,7 @@
-// Initialize New Relic before anything else
-require("newrelic");
+// Initialize New Relic if enabled
+if (process.env.NEW_RELIC_ENABLED !== 'false') {
+  require("newrelic");
+}
 
-// Import the standalone server
-const server = require("./.next/standalone/server.js");
+// Import and start the standalone server
+const server = require('./server');
