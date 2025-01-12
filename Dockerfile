@@ -24,7 +24,6 @@ RUN pnpm run build
 # Set environment variables
 ENV PORT=3000 \
     NODE_ENV=production \
-    NEW_RELIC_ENABLED=false \
     NEXT_TELEMETRY_DISABLED=1 \
     HOSTNAME=0.0.0.0 \
     NEXT_SHARP_PATH=/app/node_modules/sharp
