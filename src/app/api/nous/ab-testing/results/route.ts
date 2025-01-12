@@ -3,6 +3,7 @@ import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { serviceManager } from "@/lib/cortex/utils/service-manager";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
@@ -58,6 +59,93 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Verify variant exists in experiment configuration
+    const config = experiment.configuration as { variants: Array<{ id: string }> };
+    const variantExists = config.variants.some(v => v.id === variantId);
+
+    if (!variantExists) {
+      logger.error("Invalid variant for experiment", {
+        testId,
+        variantId,
+        availableVariants: config.variants.map(v => v.id)
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid variant",
+          details: `Variant ${variantId} not found in experiment configuration`,
+          availableVariants: config.variants.map(v => v.id)
+        },
+        { status: 400 }
+      );
+    }
+
+    // Get services for Redis access
+    const services = await serviceManager.getServices();
+    
+    if (!services.sessions || !services.redis) {
+      logger.error("Required services not available", {
+        sessionsAvailable: !!services.sessions,
+        redisAvailable: !!services.redis
+      });
+      throw new Error("Required services not available");
+    }
+
+    // First check database for session
+    let session = await prisma.session.findUnique({
+      where: { id: sessionId }
+    });
+
+    // If not in database, try Redis
+    if (!session) {
+      const redisSession = await services.sessions.getSession(sessionId);
+      
+      if (!redisSession) {
+        logger.error("Session not found in Redis or database", {
+          sessionId,
+          testId,
+          variantId
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Invalid session",
+            details: "Session not found",
+            sessionId
+          },
+          { status: 404 }
+        );
+      }
+
+      // Create session in database from Redis data
+      try {
+        // Set expiration to 30 days from now by default
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+
+        session = await prisma.session.create({
+          data: {
+            id: sessionId,
+            startedAt: new Date(redisSession.startedAt || new Date()),
+            lastActiveAt: new Date(redisSession.lastActiveAt || new Date()),
+            metadata: redisSession.metadata || {},
+            userId: redisSession.userId || null,
+            expiresAt: expiresAt,
+            data: redisSession.data || {}
+          }
+        });
+        logger.debug("Created session in database from Redis data", {
+          sessionId
+        });
+      } catch (createError) {
+        logger.error("Failed to create session in database", {
+          error: createError,
+          sessionId
+        });
+        throw new Error("Failed to create session in database");
+      }
+    }
+
     // Record metrics
     const metricsData = Object.entries(metrics).map(([key, value]) => ({
       testId,
@@ -65,29 +153,39 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       sessionId,
       eventType: key,
       value,
-      metadata: metadata ? metadata : null,
-      timestamp: new Date(),
+      timestamp: new Date()
     }));
-    const results = await prisma.aBTestMetric.createMany({
-      data: metricsData.map((metric) => ({
-        testId: metric.testId,
-        variantId: metric.variantId,
-        sessionId: metric.sessionId,
-        eventType: metric.eventType,
-        value: metric.value,
-        timestamp: metric.timestamp,
-        metadata:
-          metric.metadata === null
-            ? Prisma.JsonNull
-            : (metric.metadata as Prisma.InputJsonValue),
-      })),
+
+    // Log the metrics being created
+    logger.debug("Creating metrics", {
+      testId,
+      variantId,
+      sessionId,
+      metrics: metricsData
     });
+
+    // Create metrics one by one to better handle errors
+    const results = await Promise.all(
+      metricsData.map(async (metric) => {
+        try {
+          return await prisma.aBTestMetric.create({
+            data: metric
+          });
+        } catch (error) {
+          logger.error("Failed to create metric", {
+            error,
+            metric
+          });
+          throw error;
+        }
+      })
+    );
 
     const latency = Date.now() - startTime;
     logger.info("Recorded experiment metrics", {
       testId,
       variantId,
-      metricCount: results.count,
+      metricCount: results.length,
       latency,
     });
 
@@ -96,7 +194,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       data: {
         testId,
         variantId,
-        metricsRecorded: results.count,
+        metricsRecorded: results.length,
       },
       meta: {
         took: latency,

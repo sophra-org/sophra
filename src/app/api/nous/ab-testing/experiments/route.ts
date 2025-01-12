@@ -4,12 +4,22 @@ import { ExperimentStatus } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/shared/database/client";
 
+const VariantSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  weight: z.number().min(0).max(1),
+  config: z.record(z.unknown())
+});
+
 const ExperimentSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
   configuration: z.object({
-    variants: z.array(z.string()),
-    distribution: z.array(z.number())
+    variants: z.array(VariantSchema),
+    trafficAllocation: z.number().min(0).max(1),
+    targetMetrics: z.array(z.string())
   })
 });
 
@@ -61,20 +71,34 @@ export async function POST(request: NextRequest) {
     const validation = ExperimentSchema.safeParse(body);
 
     if (!validation.success) {
+      logger.warn('Invalid experiment data', {
+        errors: validation.error.format(),
+        received: body
+      });
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid experiment data'
+          error: 'Invalid experiment data',
+          details: validation.error.format()
         },
         { status: 400 }
       );
     }
+
+    const { startDate, endDate, ...rest } = validation.data;
     const experiment = await prisma.aBTest.create({
       data: {
-        ...validation.data,
+        ...rest,
         status: ExperimentStatus.PENDING,
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        configuration: {
+          ...rest.configuration,
+          variants: rest.configuration.variants.map(v => ({
+            ...v,
+            weight: Number(v.weight) // Ensure weights are numbers
+          }))
+        }
       }
     });
 

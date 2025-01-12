@@ -29,14 +29,22 @@ const FeedbackSchema = z.object({
 
 function mapToCortexUserAction(
   action: SignalType
-): "clicked" | "ignored" | "converted" {
+): "clicked" | "viewed" | "impressed" | "converted" {
   switch (action) {
     case SignalType.USER_BEHAVIOR_CLICK:
       return "clicked";
+    case SignalType.USER_BEHAVIOR_VIEW:
+      return "viewed";
+    case SignalType.USER_BEHAVIOR_IMPRESSION:
+      return "impressed";
     case SignalType.USER_BEHAVIOR_CONVERSION:
       return "converted";
     default:
-      return "ignored";
+      logger.warn("Unknown user action type, defaulting to impressed", {
+        action,
+        timestamp: new Date().toISOString()
+      });
+      return "impressed";
   }
 }
 
@@ -132,27 +140,62 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Create search event with error handling
     let searchEvent;
     try {
-      // First, verify the session exists
-      const session = await prisma.session.findUnique({
+      // First, ensure session exists in database since we need it for relations
+      const dbSession = await prisma.session.findUnique({
         where: {
           id: validation.data.sessionId,
         },
       });
 
-      if (!session) {
-        logger.error("Session not found", {
-          sessionId: validation.data.sessionId,
-          timestamp: new Date().toISOString(),
-        });
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Invalid session",
-            details: "Session not found",
+      if (!dbSession) {
+        // If not in database, try to get from Redis and create in database
+        const redisSession = await services.sessions.getSession(validation.data.sessionId);
+        
+        if (!redisSession) {
+          logger.error("Session not found in Redis or database", {
             sessionId: validation.data.sessionId,
-          },
-          { status: 404 }
-        );
+            timestamp: new Date().toISOString(),
+            redisAvailable: !!services.redis,
+            sessionsAvailable: !!services.sessions
+          });
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Invalid session",
+              details: "Session not found",
+              sessionId: validation.data.sessionId,
+            },
+            { status: 404 }
+          );
+        }
+
+        // Create session in database from Redis data
+        try {
+          // Set expiration to 30 days from now by default
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + 30);
+
+          await prisma.session.create({
+            data: {
+              id: validation.data.sessionId,
+              startedAt: new Date(redisSession.startedAt || new Date()),
+              lastActiveAt: new Date(redisSession.lastActiveAt || new Date()),
+              metadata: redisSession.metadata || {},
+              userId: redisSession.userId || null,
+              expiresAt: expiresAt,
+              data: redisSession.data || {}
+            }
+          });
+          logger.debug("Created session in database from Redis data", {
+            sessionId: validation.data.sessionId
+          });
+        } catch (createError) {
+          logger.error("Failed to create session in database", {
+            error: createError,
+            sessionId: validation.data.sessionId
+          });
+          throw new Error("Failed to create session in database");
+        }
       }
 
       searchEvent = await prisma.searchEvent.create({
@@ -192,21 +235,49 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Process feedback with error handling
     try {
-      await services.feedback.recordFeedbackWithOptimization(
-        feedback.map((item) => ({
+      // Process all feedback items
+      for (const item of feedback) {
+        const feedbackData = {
           searchId: item.queryId,
           queryHash: item.metadata.queryHash,
           resultId: item.metadata.resultId,
-          relevanceScore: Math.round(item.rating * 5),
+          relevanceScore: item.rating, // Rating is already between 0 and 1
           userAction: mapToCortexUserAction(item.metadata.userAction),
           metadata: {
-            ...item.metadata.customMetadata,
-            originalRating: item.rating,
-            engagementType: item.metadata.engagementType,
+            testId: item.metadata.customMetadata?.testId,
+            variantId: item.metadata.customMetadata?.variantId,
             timestamp: item.metadata.timestamp,
+            engagementType: item.metadata.engagementType,
+            originalRating: item.rating,
+            customData: item.metadata.customMetadata
           },
-        }))[0]
-      );
+        };
+
+        logger.debug("Processing feedback item", {
+          feedbackData,
+          userAction: item.metadata.userAction,
+          mappedAction: mapToCortexUserAction(item.metadata.userAction),
+          searchEventId: searchEvent.id
+        });
+
+        try {
+          await services.feedback.recordFeedbackWithOptimization(feedbackData);
+        } catch (itemError) {
+          logger.error("Failed to process individual feedback item", {
+            error: itemError,
+            feedbackData,
+            searchEventId: searchEvent.id
+          });
+          throw itemError;
+        }
+      }
+
+      logger.info("Successfully processed all feedback items", {
+        feedbackCount: feedback.length,
+        searchEventId: searchEvent.id,
+        firstItemAction: feedback[0]?.metadata.userAction,
+        firstItemMappedAction: feedback[0] ? mapToCortexUserAction(feedback[0].metadata.userAction) : null
+      });
     } catch (feedbackError) {
       logger.error("Failed to process feedback", {
         error: feedbackError,

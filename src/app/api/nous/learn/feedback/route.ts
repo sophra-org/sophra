@@ -31,9 +31,12 @@ export async function GET(): Promise<NextResponse> {
       take: 100,
     });
 
-    const formattedFeedback = feedback.map((f) => ({
-      id: f.id,
-      feedback: (f.feedback as any[]).map((item) => ({
+    const formattedFeedback = feedback.map((f) => {
+      // Parse the stringified feedback JSON
+      const parsedFeedback = JSON.parse(f.feedback as string);
+      return {
+        id: f.id,
+        feedback: parsedFeedback.map((item: any) => ({
         queryId: item.queryId,
         rating: item.rating,
         metadata: {
@@ -44,17 +47,18 @@ export async function GET(): Promise<NextResponse> {
           engagementType: item.metadata.engagementType,
         },
       })),
-      timestamp: f.timestamp,
-      meta: {
-        feedbackCount: (f.feedback as any[]).length,
-        averageRating:
-          (f.feedback as any[]).reduce((acc, item) => acc + item.rating, 0) /
-          (f.feedback as any[]).length,
-        uniqueQueries: new Set(
-          (f.feedback as any[]).map((item) => item.queryId)
-        ).size,
-      },
-    }));
+        timestamp: f.timestamp,
+        meta: {
+          feedbackCount: parsedFeedback.length,
+          averageRating:
+            parsedFeedback.reduce((acc: number, item: any) => acc + item.rating, 0) /
+            parsedFeedback.length,
+          uniqueQueries: new Set(
+            parsedFeedback.map((item: any) => item.queryId)
+          ).size,
+        },
+      };
+    });
 
     return NextResponse.json({
       success: true,

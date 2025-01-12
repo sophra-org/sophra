@@ -60,27 +60,43 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       take: params.limit,
     });
 
-    const patterns = feedbackPatterns.map((pattern) => {
-      const feedback = pattern.feedback as any[];
-      const confidence = calculateConfidence(feedback);
-      const averageRating = calculateAverageRating(feedback);
-      
-      return {
-        query_id: pattern.id,
-        pattern_type: "FEEDBACK",
-        confidence,
-        metadata: {
-          averageRating,
-          uniqueQueries: new Set(feedback.map((f) => f.queryId)).size,
-          totalFeedback: feedback.length,
-          actions: feedback.map((f) => f.metadata.userAction),
-          engagementTypes: feedback
-            .map((f) => f.metadata.engagementType)
-            .filter(Boolean),
-        },
-        timestamp: pattern.timestamp.toISOString(),
-      };
-    });
+    const patterns = await Promise.all(feedbackPatterns.map(async (pattern) => {
+      try {
+        // Parse the stringified feedback JSON
+        const feedback = JSON.parse(pattern.feedback as string);
+        
+        logger.debug("Processing feedback pattern", {
+          id: pattern.id,
+          feedbackCount: feedback.length,
+          timestamp: pattern.timestamp
+        });
+
+        const confidence = calculateConfidence(feedback);
+        const averageRating = calculateAverageRating(feedback);
+        
+        return {
+          query_id: pattern.id,
+          pattern_type: "FEEDBACK",
+          confidence,
+          metadata: {
+            averageRating,
+            uniqueQueries: new Set(feedback.map((f) => f.queryId)).size,
+            totalFeedback: feedback.length,
+            actions: feedback.map((f) => f.metadata.userAction),
+            engagementTypes: feedback
+              .map((f) => f.metadata.engagementType)
+              .filter(Boolean),
+          },
+          timestamp: pattern.timestamp.toISOString(),
+        };
+      } catch (error) {
+        logger.error("Failed to process feedback pattern", {
+          id: pattern.id,
+          error: error instanceof Error ? error.message : String(error)
+        });
+        throw error;
+      }
+    }));
 
     const latency = Date.now() - startTime;
     return NextResponse.json({
