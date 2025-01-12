@@ -1,4 +1,4 @@
-import { serviceManager } from "@/lib/cortex/utils/service-manager";
+  import { serviceManager } from "@/lib/cortex/utils/service-manager";
 import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
@@ -62,45 +62,47 @@ const formatBytes = (bytes: number): string => {
 export async function GET(): Promise<NextResponse> {
   try {
     const services = await serviceManager.getServices();
-    let rawIndices;
-
-    try {
-      rawIndices = await services.elasticsearch.listIndices();
-    } catch (esError: any) {
-      // The error actually contains our data in this case
-      logger.info("Got indices from error response");
-      rawIndices = esError;
+    logger.info("Attempting to list indices...");
+    const indices = await services.elasticsearch.listIndices();
+    
+    logger.info("Raw indices response:", { indices });
+    
+    if (!indices || indices.length === 0) {
+      logger.info("No indices found in response");
+      return NextResponse.json({
+        success: true,
+        data: {
+          indices: [],
+          stats: {
+            totalIndices: 0,
+            totalDocuments: 0,
+            size: "0.00B",
+            health: "green"
+          },
+          details: []
+        }
+      });
     }
 
-    // Extract indices from the response structure
-    const indices = Array.isArray(rawIndices)
-      ? rawIndices
-      : rawIndices?.response?.response || rawIndices?.response || [];
-
-    logger.info(`Processing ${indices.length} indices`);
+    logger.info(`Found ${indices.length} indices`);
 
     const response = {
       success: true,
       data: {
-        indices: indices.map((idx: { index: any }) => idx.index),
+        indices: indices.map(idx => idx.name),
         stats: {
           totalIndices: indices.length,
           totalDocuments: indices.reduce(
-            (sum: number, idx: { [x: string]: string }) => {
-              const count = idx["docs.count"] || "0";
-              return sum + parseInt(count);
-            },
+            (sum, idx) => sum + idx.docsCount,
             0
           ),
           size: formatBytes(
-            indices.reduce((sum: number, idx: { [x: string]: string }) => {
-              const size = idx["store.size"] || "0b";
-              return sum + parseInt(size.replace(/[a-z]/gi, "") || "0");
+            indices.reduce((sum, idx) => {
+              const sizeInBytes = parseInt(idx.storeSize);
+              return sum + (isNaN(sizeInBytes) ? 0 : sizeInBytes);
             }, 0)
           ),
-          health: indices.every(
-            (idx: { health: string }) => idx.health === "green"
-          )
+          health: indices.every(idx => idx.health === "green")
             ? "green"
             : "yellow",
         },
