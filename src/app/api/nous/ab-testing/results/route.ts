@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import type { Services } from "@/lib/cortex/types/services";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       // Map the configuration to our expected structure
       config = {
-        variants: parsedConfig.variants.map((v) => ({
+        variants: parsedConfig.variants.map((v: { id: string }) => ({
           id: v.id,
           // Other fields are not needed for validation
         })),
@@ -147,7 +148,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     // Get services for Redis access
-    const services = await serviceManager.getServices();
+    const services: Services = await serviceManager.getServices();
 
     if (!services.sessions || !services.redis) {
       logger.error("Required services not available", {

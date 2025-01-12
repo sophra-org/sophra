@@ -1,10 +1,12 @@
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import type { Services } from "@/lib/cortex/types/services";
 import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import JSON5 from "json5";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { SignalType, EngagementType } from "./types";
+import { Prisma } from "@prisma/client";
 
 // Declare Node.js runtime
 export const runtime = "nodejs";
@@ -100,13 +102,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
-  let rawBody = null;
-  let services = null;
+  let rawBody: string | null = null;
+  let services: Services | null = null;
 
   try {
     services = await serviceManager.getServices();
 
-    if (!services.feedback) {
+    if (!services || !services.feedback) {
       logger.error("Feedback service not available");
       throw new Error("Feedback service not initialized");
     }
@@ -149,7 +151,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         if (!dbSession) {
           // If not in database, try to get from Redis and create in database
-          const redisSession = await services.sessions.getSession(
+          if (!services?.sessions) {
+            logger.error("Sessions service not available", {
+              sessionId: validation.data.sessionId,
+              timestamp: new Date().toISOString(),
+            });
+            throw new Error("Sessions service not available");
+          }
+
+          const redisSession = await services?.sessions.getSession(
             validation.data.sessionId
           );
 
@@ -157,8 +167,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             logger.error("Session not found in Redis or database", {
               sessionId: validation.data.sessionId,
               timestamp: new Date().toISOString(),
-              redisAvailable: !!services.redis,
-              sessionsAvailable: !!services.sessions,
+              redisAvailable: !!services?.redis,
+              sessionsAvailable: true,
             });
             throw new Error("Session not found in Redis or database");
           }
@@ -176,10 +186,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
               lastActiveAt: now,
               createdAt: now,
               updatedAt: now,
-              metadata: redisSession?.metadata || {},
+              metadata: redisSession?.metadata || {} as Prisma.InputJsonValue,
               userId: redisSession?.userId || null,
               expiresAt: expiresAt,
-              data: redisSession?.data || {}
+              data: (redisSession as { data?: Prisma.InputJsonValue })?.data || {} as Prisma.InputJsonValue
             },
           });
         }
@@ -188,7 +198,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const event = await tx.searchEvent.create({
           data: {
             timestamp: new Date(),
-            filters: {} as JsonValue,
+            filters: {} as Prisma.InputJsonValue,
             query: feedback[0].metadata.queryHash,
             searchType: "FEEDBACK",
             totalHits: 0,
@@ -269,6 +279,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         });
 
         try {
+          if (!services?.feedback) {
+            throw new Error("Feedback service not available");
+          }
           const result = await services.feedback.recordFeedbackWithOptimization(feedbackData);
           feedbackResults.push({
             success: true,
