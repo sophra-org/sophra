@@ -126,12 +126,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         session = await prisma.session.create({
           data: {
             id: sessionId,
-            startedAt: new Date(redisSession.startedAt || new Date()),
-            lastActiveAt: new Date(redisSession.lastActiveAt || new Date()),
-            metadata: redisSession.metadata || {},
-            userId: redisSession.userId || null,
-            expiresAt: expiresAt,
-            data: redisSession.data || {}
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            metadata: redisSession?.metadata || {},
+            userId: redisSession?.userId || null,
+            expiresAt: expiresAt
           }
         });
         logger.debug("Created session in database from Redis data", {

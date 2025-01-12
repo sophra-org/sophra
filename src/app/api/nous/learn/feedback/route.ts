@@ -178,13 +178,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           timeframe: "24h",
           count: total,
           aggregated: false,
-          metadata: {
+          metadata: JSON.stringify({
             feedbackCount: total,
             uniqueQueries,
             feedbackIds: feedback.feedback.map(f => f.queryId),
             userActions: feedback.feedback.map(f => f.metadata.userAction),
             engagementTypes: feedback.feedback.map(f => f.metadata.engagementType).filter(Boolean)
-          }
+          })
         }
       }),
       // Engagement rate metric
@@ -197,13 +197,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           timeframe: "24h",
           count: total,
           aggregated: false,
-          metadata: {
+          metadata: JSON.stringify({
             clicks,
             conversions,
             total,
             userActions: feedback.feedback.map(f => f.metadata.userAction),
             engagementTypes: feedback.feedback.map(f => f.metadata.engagementType).filter(Boolean)
-          }
+          })
         }
       }),
       // Click-through rate metric
@@ -216,14 +216,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           timeframe: "24h",
           count: total,
           aggregated: false,
-          metadata: {
+          metadata: JSON.stringify({
             clicks,
             impressions,
             total,
             clickThroughRate: impressions > 0 ? clicks / impressions : 0,
             userActions: feedback.feedback.map(f => f.metadata.userAction),
             engagementTypes: feedback.feedback.map(f => f.metadata.engagementType).filter(Boolean)
-          }
+          })
         }
       }),
       // Conversion rate metric
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           timeframe: "24h",
           count: total,
           aggregated: false,
-          metadata: {
+          metadata: JSON.stringify({
             clicks,
             conversions,
             total,
@@ -244,7 +244,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             conversionPerImpression: impressions > 0 ? conversions / impressions : 0,
             userActions: feedback.feedback.map(f => f.metadata.userAction),
             engagementTypes: feedback.feedback.map(f => f.metadata.engagementType).filter(Boolean)
-          }
+          })
         }
       })
     ]);

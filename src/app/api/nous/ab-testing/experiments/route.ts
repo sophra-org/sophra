@@ -86,25 +86,30 @@ export async function POST(request: NextRequest) {
     }
 
     const { startDate, endDate, ...rest } = validation.data;
+    
+    // Convert configuration to JSON string for Prisma
+    const configuration = JSON.stringify({
+      ...rest.configuration,
+      variants: rest.configuration.variants.map(v => ({
+        ...v,
+        weight: Number(v.weight) // Ensure weights are numbers
+      }))
+    });
+
     const experiment = await prisma.aBTest.create({
       data: {
         ...rest,
         status: ExperimentStatus.PENDING,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        configuration: {
-          ...rest.configuration,
-          variants: rest.configuration.variants.map(v => ({
-            ...v,
-            weight: Number(v.weight) // Ensure weights are numbers
-          }))
-        }
+        configuration
       }
     });
 
     logger.info('Created new experiment', {
       experimentId: experiment.id,
-      name: experiment.name
+      name: experiment.name,
+      configuration: JSON.parse(configuration)
     });
 
     return NextResponse.json(

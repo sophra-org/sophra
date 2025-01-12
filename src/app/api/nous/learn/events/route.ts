@@ -83,7 +83,13 @@ export async function GET(req: NextRequest) {
     const { limit, type, startDate, endDate } = validation.data;
 
     // Build query conditions
-    const where = {
+    const where: {
+      timestamp: {
+        gte: Date;
+        lte: Date;
+      };
+      type?: LearningEventType;
+    } = {
       timestamp: {
         gte: startDate ? new Date(startDate) : new Date(0),
         lte: endDate ? new Date(endDate) : new Date()
@@ -224,10 +230,26 @@ export async function POST(req: NextRequest) {
 
     const event = await prisma.learningEvent.create({
       data: {
-        ...eventData,
+        type: eventData.type,
+        priority: eventData.priority,
         status: LearningEventStatus.PENDING,
         timestamp: new Date(),
-        retryCount: 0
+        retryCount: 0,
+        metadata: eventData.metadata ? {
+          ...Object.fromEntries(
+            Object.entries(eventData.metadata).map(([key, value]) => [
+              key,
+              typeof value === 'object' ? JSON.parse(JSON.stringify(value)) : value
+            ])
+          )
+        } : undefined,
+        correlationId: eventData.correlationId,
+        sessionId: eventData.sessionId,
+        userId: eventData.userId,
+        clientId: eventData.clientId,
+        environment: eventData.environment,
+        version: eventData.version,
+        tags: eventData.tags
       },
       include: {
         patterns: true

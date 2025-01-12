@@ -3,9 +3,22 @@ import logger from "@lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { calculateConfidence, calculateAverageRating } from "./utils";
+import { SignalType, EngagementType } from "@prisma/client";
 
 // Declare Node.js runtime
 export const runtime = "nodejs";
+
+interface FeedbackItem {
+  queryId: string;
+  rating: number;
+  metadata: {
+    userAction: SignalType;
+    resultId: string;
+    queryHash: string;
+    engagementType?: EngagementType;
+    customMetadata?: Record<string, unknown>;
+  };
+}
 
 const queryParamsSchema = z.object({
   timeframe: z.enum(["1h", "24h", "7d", "30d"]).default("24h"),
@@ -63,7 +76,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const patterns = await Promise.all(feedbackPatterns.map(async (pattern) => {
       try {
         // Parse the stringified feedback JSON
-        const feedback = JSON.parse(pattern.feedback as string);
+        const feedback = JSON.parse(pattern.feedback as string) as FeedbackItem[];
         
         logger.debug("Processing feedback pattern", {
           id: pattern.id,
@@ -78,15 +91,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           query_id: pattern.id,
           pattern_type: "FEEDBACK",
           confidence,
-          metadata: {
+          metadata: JSON.stringify({
             averageRating,
-            uniqueQueries: new Set(feedback.map((f) => f.queryId)).size,
+            uniqueQueries: new Set(feedback.map((f: FeedbackItem) => f.queryId)).size,
             totalFeedback: feedback.length,
-            actions: feedback.map((f) => f.metadata.userAction),
+            actions: feedback.map((f: FeedbackItem) => f.metadata.userAction),
             engagementTypes: feedback
-              .map((f) => f.metadata.engagementType)
+              .map((f: FeedbackItem) => f.metadata.engagementType)
               .filter(Boolean),
-          },
+          }),
           timestamp: pattern.timestamp.toISOString(),
         };
       } catch (error) {

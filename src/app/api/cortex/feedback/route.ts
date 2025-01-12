@@ -29,22 +29,20 @@ const FeedbackSchema = z.object({
 
 function mapToCortexUserAction(
   action: SignalType
-): "clicked" | "viewed" | "impressed" | "converted" {
+): "clicked" | "converted" | "ignored" {
   switch (action) {
     case SignalType.USER_BEHAVIOR_CLICK:
       return "clicked";
-    case SignalType.USER_BEHAVIOR_VIEW:
-      return "viewed";
-    case SignalType.USER_BEHAVIOR_IMPRESSION:
-      return "impressed";
     case SignalType.USER_BEHAVIOR_CONVERSION:
       return "converted";
+    case SignalType.USER_BEHAVIOR_VIEW:
+    case SignalType.USER_BEHAVIOR_IMPRESSION:
     default:
-      logger.warn("Unknown user action type, defaulting to impressed", {
+      logger.warn("Unsupported user action type, defaulting to ignored", {
         action,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      return "impressed";
+      return "ignored";
   }
 }
 
@@ -149,14 +147,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       if (!dbSession) {
         // If not in database, try to get from Redis and create in database
-        const redisSession = await services.sessions.getSession(validation.data.sessionId);
-        
+        const redisSession = await services.sessions.getSession(
+          validation.data.sessionId
+        );
+
         if (!redisSession) {
           logger.error("Session not found in Redis or database", {
             sessionId: validation.data.sessionId,
             timestamp: new Date().toISOString(),
             redisAvailable: !!services.redis,
-            sessionsAvailable: !!services.sessions
+            sessionsAvailable: !!services.sessions,
           });
           return NextResponse.json(
             {
@@ -178,21 +178,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           await prisma.session.create({
             data: {
               id: validation.data.sessionId,
-              startedAt: new Date(redisSession.startedAt || new Date()),
-              lastActiveAt: new Date(redisSession.lastActiveAt || new Date()),
-              metadata: redisSession.metadata || {},
-              userId: redisSession.userId || null,
+              startedAt: new Date(),
+              lastActiveAt: new Date(),
+              metadata: redisSession?.metadata || {},
+              userId: redisSession?.userId || null,
               expiresAt: expiresAt,
-              data: redisSession.data || {}
-            }
+            },
           });
           logger.debug("Created session in database from Redis data", {
-            sessionId: validation.data.sessionId
+            sessionId: validation.data.sessionId,
           });
         } catch (createError) {
           logger.error("Failed to create session in database", {
             error: createError,
-            sessionId: validation.data.sessionId
+            sessionId: validation.data.sessionId,
           });
           throw new Error("Failed to create session in database");
         }
@@ -244,20 +243,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           relevanceScore: item.rating, // Rating is already between 0 and 1
           userAction: mapToCortexUserAction(item.metadata.userAction),
           metadata: {
-            testId: item.metadata.customMetadata?.testId,
-            variantId: item.metadata.customMetadata?.variantId,
             timestamp: item.metadata.timestamp,
             engagementType: item.metadata.engagementType,
             originalRating: item.rating,
             customData: item.metadata.customMetadata
           },
+          testData: item.metadata.customMetadata?.testId && item.metadata.customMetadata?.variantId ? {
+            variantId: String(item.metadata.customMetadata.variantId)
+          } : undefined
         };
 
         logger.debug("Processing feedback item", {
           feedbackData,
           userAction: item.metadata.userAction,
           mappedAction: mapToCortexUserAction(item.metadata.userAction),
-          searchEventId: searchEvent.id
+          searchEventId: searchEvent.id,
         });
 
         try {
@@ -266,7 +266,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           logger.error("Failed to process individual feedback item", {
             error: itemError,
             feedbackData,
-            searchEventId: searchEvent.id
+            searchEventId: searchEvent.id,
           });
           throw itemError;
         }
@@ -276,7 +276,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         feedbackCount: feedback.length,
         searchEventId: searchEvent.id,
         firstItemAction: feedback[0]?.metadata.userAction,
-        firstItemMappedAction: feedback[0] ? mapToCortexUserAction(feedback[0].metadata.userAction) : null
+        firstItemMappedAction: feedback[0]
+          ? mapToCortexUserAction(feedback[0].metadata.userAction)
+          : null,
       });
     } catch (feedbackError) {
       logger.error("Failed to process feedback", {
