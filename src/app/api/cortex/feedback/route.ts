@@ -135,82 +135,81 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { feedback } = validation.data;
     const timestamp = new Date().toISOString();
 
-    // Create search event with error handling
+    // Create search event with error handling in a transaction
     let searchEvent;
     try {
-      // First, ensure session exists in database since we need it for relations
-      const dbSession = await prisma.session.findUnique({
-        where: {
-          id: validation.data.sessionId,
-        },
-      });
+      // Use a transaction to ensure session and search event creation are atomic
+      const result = await prisma.$transaction(async (tx) => {
+        // First, ensure session exists in database since we need it for relations
+        const dbSession = await tx.session.findUnique({
+          where: {
+            id: validation.data.sessionId,
+          },
+        });
 
-      if (!dbSession) {
-        // If not in database, try to get from Redis and create in database
-        const redisSession = await services.sessions.getSession(
-          validation.data.sessionId
-        );
-
-        if (!redisSession) {
-          logger.error("Session not found in Redis or database", {
-            sessionId: validation.data.sessionId,
-            timestamp: new Date().toISOString(),
-            redisAvailable: !!services.redis,
-            sessionsAvailable: !!services.sessions,
-          });
-          return NextResponse.json(
-            {
-              success: false,
-              error: "Invalid session",
-              details: "Session not found",
-              sessionId: validation.data.sessionId,
-            },
-            { status: 404 }
+        if (!dbSession) {
+          // If not in database, try to get from Redis and create in database
+          const redisSession = await services.sessions.getSession(
+            validation.data.sessionId
           );
-        }
 
-        // Create session in database from Redis data
-        try {
+          if (!redisSession) {
+            logger.error("Session not found in Redis or database", {
+              sessionId: validation.data.sessionId,
+              timestamp: new Date().toISOString(),
+              redisAvailable: !!services.redis,
+              sessionsAvailable: !!services.sessions,
+            });
+            throw new Error("Session not found in Redis or database");
+          }
+
           // Set expiration to 30 days from now by default
           const expiresAt = new Date();
           expiresAt.setDate(expiresAt.getDate() + 30);
+          const now = new Date();
 
-          await prisma.session.create({
+          // Create session
+          await tx.session.create({
             data: {
               id: validation.data.sessionId,
-              startedAt: new Date(),
-              lastActiveAt: new Date(),
+              startedAt: now,
+              lastActiveAt: now,
+              createdAt: now,
+              updatedAt: now,
               metadata: redisSession?.metadata || {},
               userId: redisSession?.userId || null,
               expiresAt: expiresAt,
+              data: redisSession?.data || {}
             },
           });
-          logger.debug("Created session in database from Redis data", {
-            sessionId: validation.data.sessionId,
-          });
-        } catch (createError) {
-          logger.error("Failed to create session in database", {
-            error: createError,
-            sessionId: validation.data.sessionId,
-          });
-          throw new Error("Failed to create session in database");
         }
-      }
 
-      searchEvent = await prisma.searchEvent.create({
-        data: {
-          timestamp: new Date(),
-          filters: {},
-          query: feedback[0].metadata.queryHash,
-          searchType: "FEEDBACK",
-          totalHits: 0,
-          took: 0,
-          session: {
-            connect: {
-              id: validation.data.sessionId,
+        // Create search event
+        const event = await tx.searchEvent.create({
+          data: {
+            timestamp: new Date(),
+            filters: {} as JsonValue,
+            query: feedback[0].metadata.queryHash,
+            searchType: "FEEDBACK",
+            totalHits: 0,
+            took: 0,
+            session: {
+              connect: {
+                id: validation.data.sessionId,
+              },
             },
           },
-        },
+        });
+
+        return event;
+      });
+
+      searchEvent = result;
+      logger.debug("Created search event", {
+        searchEventId: searchEvent.id,
+        sessionId: validation.data.sessionId,
+        queryHash: feedback[0].metadata.queryHash,
+        filters: searchEvent.filters
       });
     } catch (dbError) {
       logger.error("Failed to create search event", {
@@ -234,13 +233,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Process feedback with error handling
     try {
-      // Process all feedback items
+      // Process all feedback items with error tracking
+      const feedbackResults = [];
       for (const item of feedback) {
+        logger.debug("Preparing feedback data", {
+          searchEventId: searchEvent.id,
+          itemQueryId: item.queryId,
+          itemQueryHash: item.metadata.queryHash,
+          itemAction: item.metadata.userAction,
+          mappedAction: mapToCortexUserAction(item.metadata.userAction)
+        });
+
         const feedbackData = {
-          searchId: item.queryId,
+          searchId: searchEvent.id,
           queryHash: item.metadata.queryHash,
           resultId: item.metadata.resultId,
-          relevanceScore: item.rating, // Rating is already between 0 and 1
+          relevanceScore: item.rating,
           userAction: mapToCortexUserAction(item.metadata.userAction),
           metadata: {
             timestamp: item.metadata.timestamp,
@@ -261,15 +269,44 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         });
 
         try {
-          await services.feedback.recordFeedbackWithOptimization(feedbackData);
+          const result = await services.feedback.recordFeedbackWithOptimization(feedbackData);
+          feedbackResults.push({
+            success: true,
+            data: result,
+            feedbackData
+          });
         } catch (itemError) {
           logger.error("Failed to process individual feedback item", {
             error: itemError,
             feedbackData,
             searchEventId: searchEvent.id,
+            errorDetails: itemError instanceof Error ? {
+              message: itemError.message,
+              name: itemError.name,
+              stack: itemError.stack
+            } : 'Unknown error type'
           });
-          throw itemError;
+          feedbackResults.push({
+            success: false,
+            error: itemError,
+            feedbackData
+          });
+          // Don't throw here, continue processing other items
         }
+      }
+
+      // Check if any feedback items failed
+      const failedItems = feedbackResults.filter(r => !r.success);
+      if (failedItems.length > 0) {
+        logger.error("Some feedback items failed to process", {
+          totalItems: feedback.length,
+          failedCount: failedItems.length,
+          failedItems: failedItems.map(f => ({
+            queryId: f.feedbackData.searchId,
+            error: f.error instanceof Error ? f.error.message : String(f.error)
+          }))
+        });
+        throw new Error(`Failed to process ${failedItems.length} feedback items`);
       }
 
       logger.info("Successfully processed all feedback items", {
@@ -279,13 +316,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         firstItemMappedAction: feedback[0]
           ? mapToCortexUserAction(feedback[0].metadata.userAction)
           : null,
+        results: feedbackResults.map(r => ({
+          queryId: r.feedbackData.searchId,
+          success: r.success
+        }))
       });
     } catch (feedbackError) {
       logger.error("Failed to process feedback", {
         error: feedbackError,
         searchEventId: searchEvent.id,
+        errorDetails: feedbackError instanceof Error ? {
+          message: feedbackError.message,
+          name: feedbackError.name,
+          stack: feedbackError.stack
+        } : 'Unknown error type'
       });
-      throw new Error("Feedback processing failed");
+      throw new Error(feedbackError instanceof Error ? feedbackError.message : "Feedback processing failed");
     }
 
     return NextResponse.json({
