@@ -26,17 +26,23 @@ ENV PORT=3000 \
     NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     HOSTNAME=0.0.0.0 \
-    NEXT_SHARP_PATH=/app/node_modules/sharp
+    NEXT_SHARP_PATH=/app/node_modules/sharp \
+    SOPHRA_REDIS_URL=redis://redis:6379 \
+    ELASTICSEARCH_URL=http://elasticsearch:9200 \
+    POSTGRESQL_URL=postgresql://postgres:postgres@postgres:5432/sophra
 
 # Setup standalone directory and copy files
-WORKDIR /app/.next/standalone
-RUN mkdir -p .next/static && \
-    cp -r /app/.next/static/* .next/static/ && \
-    cp -r /app/public .
-WORKDIR /app/.next/standalone
+RUN mkdir -p /app/standalone && \
+    cp -r .next/standalone/* /app/standalone/ && \
+    mkdir -p /app/standalone/.next && \
+    cp -r .next/* /app/standalone/.next/ && \
+    cp -r public /app/standalone/ && \
+    cp package.json /app/standalone/
+
+WORKDIR /app/standalone
 
 # Expose port
 EXPOSE 3000
 
-# Start the Next.js standalone server directly
-CMD ["node", "./server.js"]
+# Start the Next.js server
+CMD ["node", "server.js"]

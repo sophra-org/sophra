@@ -1034,16 +1034,17 @@ export class ElasticsearchService extends BaseService {
     }>
   > {
     try {
-      const response = (await this.client.cat.indices({
+      this.logger.info("Attempting to list indices with cat API");
+
+      const indices = await this.client.cat.indices({
         format: "json",
-      })) as unknown as CatIndicesApiResponse;
+        v: true, // Include column headers
+        h: "index,health,status,docs.count,docs.deleted,store.size,pri,rep", // Specify columns
+      });
 
-      if (!response?.body) {
-        this.logger.error("Invalid response from cat indices", { response });
-        return [];
-      }
+      this.logger.info("Raw cat.indices response:", { indices });
+      this.logger.info("Parsed indices from response:", { indices });
 
-      const indices = response.body;
       if (!Array.isArray(indices)) {
         this.logger.error("Invalid indices response format", { indices });
         return [];

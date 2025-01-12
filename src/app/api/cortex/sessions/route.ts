@@ -172,19 +172,23 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const session = await services.sessions.getSession(sessionId);
-    if (!session) {
+    const rawSession = await services.sessions.getSession(sessionId) as RawSession;
+    if (!rawSession) {
       return NextResponse.json({ success: true, data: null });
     }
 
-    // Return only the fields expected by the test
-    const responseData = {
-      id: session.id,
-      userId: session.userId,
-      metadata: session.metadata || {}
+    const now = new Date();
+    const session: Session = {
+      id: rawSession.id,
+      userId: rawSession.userId || null,
+      startedAt: rawSession.startedAt ? new Date(rawSession.startedAt) : now,
+      lastActiveAt: rawSession.lastActiveAt ? new Date(rawSession.lastActiveAt) : now,
+      createdAt: rawSession.createdAt ? new Date(rawSession.createdAt) : now,
+      updatedAt: rawSession.updatedAt ? new Date(rawSession.updatedAt) : now,
+      metadata: (rawSession.metadata || {}) as Record<string, unknown>
     };
 
-    return NextResponse.json({ success: true, data: responseData });
+    return NextResponse.json({ success: true, data: session });
   } catch (error) {
     logger.error("Failed to retrieve session", { error });
     return NextResponse.json(
