@@ -300,6 +300,7 @@ describe("Sessions API Additional Tests", () => {
         expect(data.data).toEqual({
           id: mockSession.id,
           userId: mockSession.userId,
+          username: null,
           metadata: mockSession.metadata,
         });
       });

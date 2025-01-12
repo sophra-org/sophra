@@ -26,10 +26,8 @@ ENV PORT=3000 \
     NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     HOSTNAME=0.0.0.0 \
-    NEXT_SHARP_PATH=/app/node_modules/sharp \
-    SOPHRA_REDIS_URL=redis://redis:6379 \
-    ELASTICSEARCH_URL=http://elasticsearch:9200 \
-    POSTGRESQL_URL=postgresql://postgres:postgres@postgres:5432/sophra
+    NEXT_SHARP_PATH=/app/node_modules/sharp 
+
 
 # Setup standalone directory and copy files
 RUN mkdir -p /app/standalone && \

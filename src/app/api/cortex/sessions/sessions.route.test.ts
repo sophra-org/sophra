@@ -165,6 +165,7 @@ describe("Sessions API", () => {
       expect(data.data).toEqual({
         id: mockSession.id,
         userId: mockSession.userId,
+        username: null,
         metadata: mockSession.metadata,
       });
       expect(mockServices.sessions.getSession).toHaveBeenCalledWith("test-id");

@@ -1050,7 +1050,8 @@ export class ElasticsearchService extends BaseService {
         return [];
       }
 
-      return indices.map((index: CatIndicesResponse) => ({
+      //@ts-expect-error We know this is a valid type
+      return indices.map((index: CatIndicesIndicesRecord) => ({
         name: index.index,
         health: index.health || "unknown",
         status: index.status || "unknown",
