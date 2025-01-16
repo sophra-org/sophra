@@ -125,6 +125,10 @@ export class ServiceManager {
         auth: {
           apiKey: process.env.SOPHRA_ES_API_KEY || "",
         },
+        tls: {
+          ca: process.env.ELASTICSEARCH_CA_CERT,
+          rejectUnauthorized: true,
+        },
       });
       await client.ping();
       return true;
@@ -201,7 +205,8 @@ export class ServiceManager {
           apiKey: process.env.SOPHRA_ES_API_KEY ?? "",
         },
         ssl: {
-          rejectUnauthorized: false,
+          ca: process.env.ELASTICSEARCH_CA_CERT,
+          rejectUnauthorized: true,
         },
         maxRetries: 3,
         requestTimeout: 10000,

@@ -112,7 +112,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-export function calculateConfidence(feedback: any[]): number {
+ function calculateConfidence(feedback: any[]): number {
   if (!feedback || feedback.length === 0) return 0;
 
   const sampleSize = feedback.length;
@@ -121,7 +121,7 @@ export function calculateConfidence(feedback: any[]): number {
   return Math.round(baseConfidence * consistencyScore * 100) / 100;
 }
 
-export function calculateConsistencyScore(feedback: any[]): number {
+function calculateConsistencyScore(feedback: any[]): number {
   if (!feedback || feedback.length < 2) return 0.5;
 
   const ratings = feedback.map((f) => f.rating);
@@ -134,7 +134,7 @@ export function calculateConsistencyScore(feedback: any[]): number {
   return Math.max(0, 1 - standardDeviation);
 }
 
-export function calculateAverageRating(feedback: any[]): number {
+function calculateAverageRating(feedback: any[]): number {
   if (!feedback || feedback.length === 0) return 0;
   return (
     Math.round(

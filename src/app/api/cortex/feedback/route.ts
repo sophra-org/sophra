@@ -8,7 +8,7 @@ import { z } from "zod";
 export const runtime = "nodejs";
 
 
-export enum SignalType {
+enum SignalType {
   SEARCH = "SEARCH",
   PERFORMANCE = "PERFORMANCE",
   USER_BEHAVIOR_IMPRESSION = "USER_BEHAVIOR_IMPRESSION",
@@ -20,7 +20,7 @@ export enum SignalType {
   SYSTEM_HEALTH = "SYSTEM_HEALTH",
 }
 
-export enum EngagementType {
+enum EngagementType {
   IMPRESSION = "IMPRESSION",
   VIEW = "VIEW",
   CLICK = "CLICK",

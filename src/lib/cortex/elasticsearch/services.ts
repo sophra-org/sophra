@@ -63,6 +63,13 @@ export interface ElasticsearchConfig {
   auth?: {
     apiKey: string;
   };
+  ssl?: {
+    rejectUnauthorized: boolean;
+    ca?: string | Buffer | Array<string | Buffer>;
+  };
+  maxRetries?: number;
+  requestTimeout?: number;
+  sniffOnStart?: boolean;
 }
 
 /**
@@ -246,6 +253,7 @@ export interface ElasticsearchServiceConfig extends BaseServiceConfig {
     };
     ssl?: {
       rejectUnauthorized: boolean;
+      ca?: string | Buffer | Array<string | Buffer>;
     };
     maxRetries?: number;
     requestTimeout?: number;

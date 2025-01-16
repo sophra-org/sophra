@@ -30,6 +30,7 @@ const eslintConfig = [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
+      "import/no-unused-exports": "off"
     },
     settings: {
       "import/resolver": {
