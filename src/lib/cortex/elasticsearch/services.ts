@@ -251,7 +251,7 @@ export interface ElasticsearchServiceConfig extends BaseServiceConfig {
     auth?: {
       apiKey: string;
     };
-    ssl?: {
+    tls?: {
       rejectUnauthorized: boolean;
       ca?: string | Buffer | Array<string | Buffer>;
     };
@@ -313,22 +313,11 @@ export class ElasticsearchService extends BaseService {
     this.logger = config.logger;
     this.metrics = config.metrics;
 
-    const elasticConfig = {
-      node: process.env.ELASTICSEARCH_URL,
-      auth: process.env.SOPHRA_ES_API_KEY
-        ? {
-            apiKey: process.env.SOPHRA_ES_API_KEY as string,
-          }
-        : undefined,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-      maxRetries: 3,
-      requestTimeout: 30000,
-      sniffOnStart: false,
-    } as const;
-
-    this.client = new Client(elasticConfig);
+    this.client = new Client({
+      ...config.config,
+      requestTimeout: config.config.requestTimeout || 30000,
+      maxRetries: config.config.maxRetries || 3,
+    });
   }
 
   /**
