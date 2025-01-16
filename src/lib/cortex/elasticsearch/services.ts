@@ -314,9 +314,22 @@ export class ElasticsearchService extends BaseService {
     this.metrics = config.metrics;
 
     this.client = new Client({
-      ...config.config,
+      node: config.config.node,
+      auth: config.config.auth,
+      tls: config.config.tls,
       requestTimeout: config.config.requestTimeout || 30000,
+      pingTimeout: 30000,
       maxRetries: config.config.maxRetries || 3,
+      compression: true,
+      name: 'sophra-app'
+    });
+
+    this.logger.debug("Elasticsearch client initialized with config:", {
+      node: config.config.node,
+      hasAuth: !!config.config.auth,
+      hasTLS: !!config.config.tls,
+      requestTimeout: config.config.requestTimeout || 30000,
+      maxRetries: config.config.maxRetries || 3
     });
   }
 
