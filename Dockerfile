@@ -1,76 +1,46 @@
-# syntax=docker.io/docker/dockerfile:1
-
-FROM node:18-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat python3 make g++ gcc
+# Node.js Dockerfile with Windows compatibility
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json ./
-RUN npm install
+# Install pnpm
+RUN npm install -g pnpm
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files first to leverage Docker caching
+COPY package*.json ./
+
+# Install dependencies
+RUN pnpm install
+
+# Copy application files
 COPY . .
 
-# Generate Prisma Client and zod-prisma-types
+# Generate Prisma client
 RUN npx prisma generate
-RUN mkdir -p src/lib/shared/database/validation/generated
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# Build the application
+RUN pnpm run build
 
-RUN yarn build
+# Set environment variables
+ENV PORT=3000 \
+    NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    HOSTNAME=0.0.0.0 \
+    NEXT_SHARP_PATH=/app/node_modules/sharp 
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
 
-ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# Setup standalone directory and copy files
+RUN mkdir -p /app/standalone && \
+    cp -r .next/standalone/* /app/standalone/ && \
+    mkdir -p /app/standalone/.next && \
+    cp -r .next/* /app/standalone/.next/ && \
+    cp -r public /app/standalone/ && \
+    cp package.json /app/standalone/
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+WORKDIR /app/standalone
 
-# Install native module dependencies
-RUN apk add --no-cache python3 make g++ gcc
-
-# Create logs directory with correct permissions
-RUN mkdir -p /app/logs && chown -R nextjs:nodejs /app/logs
-
-# Install New Relic in the final stage
-COPY --from=builder /app/package.json ./
-RUN npm install newrelic --save
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/src/lib/shared/database/validation/generated ./src/lib/shared/database/validation/generated
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
+# Expose port
 EXPOSE 3000
 
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
+# Start the Next.js server
 CMD ["node", "server.js"]

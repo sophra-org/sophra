@@ -125,16 +125,16 @@ model ABTestMetric {
   id        String   @id @default(cuid())
   testId    String
   variantId String
+  sessionId String
   eventType String
   value     Float
   timestamp DateTime @default(now())
-  sessionId String
-  session   Session  @relation(fields: [sessionId], references: [id])
   test      ABTest   @relation(fields: [testId], references: [id])
+  session   Session @relation(fields: [sessionId], references: [id])
 
-  @@index([testId, variantId])
+  @@index([testId])
+  @@index([variantId])
   @@index([sessionId])
-  @@index([timestamp])
 }
 
 model SearchFeedback {

@@ -43,13 +43,12 @@ vi.mock('@/lib/shared/database/client', () => ({
 }));
 
 // Regular imports after mocks
-import { describe, it, expect, beforeEach } from "vitest";
-import { EngineService } from "./service";
-import type { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";
-import { EngineOperationType, EngineOperationStatus, EngineStatus, EngineOptimizationType, EngineRiskLevel, EngineState } from "./types";
-import { LearningEventType, LearningEventStatus, LearningEventPriority } from "../types/learning";
-import type { Logger } from '../../../lib/shared/types';
+import { beforeEach, describe, expect, it } from "vitest";
+import type { Logger } from '../../shared/types';
+import { LearningEventPriority, LearningEventStatus, LearningEventType } from "../types/learning";
+import { EngineService } from "./service";
+import { EngineOperationStatus, EngineOperationType, EngineOptimizationType, EngineRiskLevel, EngineState, EngineStatus } from "./types";
 
 // Create a mock logger that satisfies the Winston Logger interface
 const createMockLogger = () => {

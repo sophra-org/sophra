@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock modules before any other imports
 vi.mock("@prisma/client", () => {
@@ -97,13 +97,12 @@ vi.mock("../../../lib/shared/database/client", () => ({
 }));
 
 // Now import everything else
-import { RealTimeLearner } from "./real-time-learner";
-import { ElasticsearchService } from "../../../lib/cortex/elasticsearch/services";
-import { MetricsService } from "../../../lib/cortex/monitoring/metrics";
+import { LearningEvent, LearningEventPriority, LearningEventStatus, LearningEventType } from "@prisma/client";
 import { Redis } from "ioredis";
-import { Logger } from "../../../lib/shared/types";
-import { prisma } from "../../../lib/shared/database/client";
-import { LearningEvent, LearningEventStatus, LearningEventType, LearningEventPriority } from "@prisma/client";
+import { ElasticsearchService } from "../../cortex/elasticsearch/services";
+import { MetricsService } from "../../cortex/monitoring/metrics";
+import { Logger } from "../../shared/types";
+import { RealTimeLearner } from "./real-time-learner";
 
 const mockEvent: LearningEvent = {
   id: "event1",

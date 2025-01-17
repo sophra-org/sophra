@@ -1,27 +1,27 @@
 import {
-  EngineOptimizationStrategy,
-  EngineOptimizationType,
-  EngineRiskLevel,
-  LearningEvent,
-  LearningEventPriority,
-  LearningEventStatus,
-  LearningEventType,
-  LearningPattern,
+    EngineOptimizationStrategy,
+    EngineOptimizationType,
+    EngineRiskLevel,
+    LearningEvent,
+    LearningEventPriority,
+    LearningEventStatus,
+    LearningEventType,
+    LearningPattern,
 } from "@prisma/client";
 import { Redis } from "ioredis";
-import { ElasticsearchService } from "../../../lib/cortex/elasticsearch/services";
-import { MetricsService } from "../../../lib/cortex/monitoring/metrics";
-import { prisma } from "../../../lib/shared/database/client";
-import { LearningEngine, ProcessorMap } from "../../../lib/shared/engine";
-import { MetricsAdapter } from "../../../lib/shared/engine/adapters/metrics-adapter";
+import { ElasticsearchService } from "../../cortex/elasticsearch/services";
+import { MetricsService } from "../../cortex/monitoring/metrics";
+import { prisma } from "../../shared/database/client";
+import { LearningEngine, ProcessorMap } from "../../shared/engine";
+import { MetricsAdapter } from "../../shared/engine/adapters/metrics-adapter";
 import {
-  FeedbackProcessor,
-  PerformanceProcessor,
-  StrategyProcessor,
-  TimeBasedProcessor,
-} from "../../../lib/shared/engine/processors";
-import { ITimeBasedProcessor } from "../../../lib/shared/engine/processors/time-based-processor";
-import { Logger } from "../../../lib/shared/types";
+    FeedbackProcessor,
+    PerformanceProcessor,
+    StrategyProcessor,
+    TimeBasedProcessor,
+} from "../../shared/engine/processors";
+import { ITimeBasedProcessor } from "../../shared/engine/processors/time-based-processor";
+import { Logger } from "../../shared/types";
 
 interface PerformanceMetrics {
   latency: number;

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MetricsAdapter } from './metrics-adapter';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MetricsService } from '../../../cortex/monitoring/metrics';
-import type { Logger } from '../../../shared/types';
+import type { Logger } from '../../types';
+import { MetricsAdapter } from './metrics-adapter';
 
 // Create mock functions
 const mockFns = {

@@ -14,9 +14,7 @@ import type { Services } from "@/lib/cortex/types/services";
 import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import { Client } from "@elastic/elasticsearch";
-import fs from 'fs';
 import Redis from "ioredis";
-import path from 'path';
 
 export class ServiceManager {
   private static instance: ServiceManager;
@@ -122,52 +120,15 @@ export class ServiceManager {
 
   private async checkElasticsearchConnection(): Promise<boolean> {
     try {
-      // Read the CA certificate from file
-      const caCert = process.env.ELASTICSEARCH_CA_CERT?.startsWith('certs/') 
-        ? fs.readFileSync(path.join(process.cwd(), process.env.ELASTICSEARCH_CA_CERT), 'utf8')
-        : process.env.ELASTICSEARCH_CA_CERT;
-
-      logger.info("Attempting Elasticsearch connection", {
-        url: process.env.ELASTICSEARCH_URL,
-        hasCA: !!caCert,
-      });
-
       const client = new Client({
         node: process.env.ELASTICSEARCH_URL,
         auth: {
           apiKey: process.env.SOPHRA_ES_API_KEY || "",
         },
-        tls: {
-          ca: caCert,
-          rejectUnauthorized: true,
-        },
-        requestTimeout: 30000,
-        pingTimeout: 30000,
-        maxRetries: 3,
-        compression: true,
-        name: 'sophra-app'
       });
-
-      // Add debug logging for certificate
-      logger.debug("Elasticsearch TLS config:", {
-        caLength: caCert?.length,
-        caPreview: caCert?.substring(0, 50) + '...',
-      });
-
-      // Try a basic health check instead of ping
-      const response = await client.cluster.health({ timeout: '30s' });
-      logger.info("Elasticsearch health check successful:", response);
+      await client.ping();
       return true;
-    } catch (error: unknown) {
-      logger.error("Elasticsearch connection check failed:", { 
-        error: error instanceof Error ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        } : String(error),
-        url: process.env.ELASTICSEARCH_URL,
-        hasCA: !!process.env.ELASTICSEARCH_CA_CERT,
-      });
+    } catch {
       return false;
     }
   }
@@ -219,11 +180,6 @@ export class ServiceManager {
     return redis;
   }
   private async createBaseServices() {
-    // Read the CA certificate from file
-    const caCert = process.env.ELASTICSEARCH_CA_CERT?.startsWith('certs/') 
-      ? fs.readFileSync(path.join(process.cwd(), process.env.ELASTICSEARCH_CA_CERT), 'utf8')
-      : process.env.ELASTICSEARCH_CA_CERT;
-
     const metricsService = new MetricsService({
       logger,
       environment: process.env.NODE_ENV as
@@ -244,9 +200,8 @@ export class ServiceManager {
         auth: {
           apiKey: process.env.SOPHRA_ES_API_KEY ?? "",
         },
-        tls: {
-          ca: caCert,
-          rejectUnauthorized: true,
+        ssl: {
+          rejectUnauthorized: false,
         },
         maxRetries: 3,
         requestTimeout: 10000,

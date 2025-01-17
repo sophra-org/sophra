@@ -1,5 +1,7 @@
 # The Sophra System
 
+[![DeepSource](https://app.deepsource.com/gh/sophra-org/sophra.svg/?label=code+coverage&show_trend=true&token=7lF4hvTUUhUyMPJ5bVh8ZMWP)](https://app.deepsource.com/gh/sophra-org/sophra/) [![DeepSource](https://app.deepsource.com/gh/sophra-org/sophra.svg/?label=active+issues&show_trend=true&token=7lF4hvTUUhUyMPJ5bVh8ZMWP)](https://app.deepsource.com/gh/sophra-org/sophra/) [![DeepSource](https://app.deepsource.com/gh/sophra-org/sophra.svg/?label=resolved+issues&show_trend=true&token=7lF4hvTUUhUyMPJ5bVh8ZMWP)](https://app.deepsource.com/gh/sophra-org/sophra/)
+
 ## Overview
 
 Sophra is an open-source and enterprise-grade data synchronization and management layer created by The Sophra Organization. It leverages modern cloud architecture to provide sophisticated search capabilities and intelligent data processing. Built on Next.js 14 with TypeScript, it combines powerful search operations with machine learning capabilities to deliver adaptive, self-improving data interactions.

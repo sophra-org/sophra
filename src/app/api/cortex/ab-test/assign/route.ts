@@ -11,7 +11,7 @@ const assignSchema = z
     sessionId: z
       .string()
       .min(1, "Session ID is required")
-      .regex(/^[a-z0-9]+$/, "Invalid session ID format"),
+      .regex(/^[a-zA-Z0-9]+$/, "Invalid session ID format"),
     testId: z.string().optional(),
     testName: z.string().optional(),
   })

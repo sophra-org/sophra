@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/shared/database/client";
-import { LearningEventType } from "@/lib/nous/types/learning";
+import { LearningEventType, LearningEventStatus, LearningEventPriority } from "@prisma/client";
 import logger from "@/lib/shared/logger";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
 
 const querySchema = z.object({
   limit: z
@@ -19,20 +19,32 @@ const querySchema = z.object({
   endDate: z.string().optional(),
 });
 
+const createEventSchema = z.object({
+  type: z.nativeEnum(LearningEventType),
+  priority: z.nativeEnum(LearningEventPriority).default("MEDIUM"),
+  metadata: z.record(z.unknown()),
+  correlationId: z.string().optional(),
+  sessionId: z.string().optional(),
+  userId: z.string().optional(),
+  clientId: z.string().optional(),
+  environment: z.string().optional(),
+  version: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+});
+
 export async function GET(req: NextRequest) {
   try {
-    logger.info("Prisma client state:", {
-      isPrismaAvailable: !!prisma,
-      hasLearningEvent: !!(prisma && prisma.learningEvent),
+    logger.debug("Starting learning events query", {
+      url: req.url,
+      timestamp: new Date().toISOString()
     });
 
+    // Validate database connection
     try {
-      logger.info("Testing DB connection...");
-      const result = await prisma.$queryRaw`SELECT 1`;
-      if (!result) throw new Error("DB connection failed");
-      logger.info("DB connection successful");
+      await prisma.$connect();
+      logger.debug("Database connection successful");
     } catch (e) {
-      logger.error("DB connection failed:", e);
+      logger.error("Database connection failed:", e);
       return NextResponse.json(
         {
           success: false,
@@ -46,6 +58,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Parse and validate query parameters
     const { searchParams } = new URL(req.url);
     const validation = querySchema.safeParse(Object.fromEntries(searchParams));
 
@@ -69,61 +82,95 @@ export async function GET(req: NextRequest) {
 
     const { limit, type, startDate, endDate } = validation.data;
 
-    const events = await prisma.$queryRaw`
-      SELECT * FROM "LearningEvent" 
-      WHERE type::text = ${type || "SEARCH_PATTERN"}
-      AND timestamp >= ${startDate ? new Date(startDate) : new Date(0)}
-      AND timestamp <= ${endDate ? new Date(endDate) : new Date()}
-      ORDER BY timestamp DESC
-      LIMIT ${limit}
-    `;
+    // Build query conditions
+    const where: {
+      timestamp: {
+        gte: Date;
+        lte: Date;
+      };
+      type?: LearningEventType;
+    } = {
+      timestamp: {
+        gte: startDate ? new Date(startDate) : new Date(0),
+        lte: endDate ? new Date(endDate) : new Date()
+      }
+    };
 
-    if (!events || !Array.isArray(events) || events.length === 0) {
-      return NextResponse.json({
-        success: true,
-        data: [],
-        meta: {
-          total: 0,
-          timestamp: new Date().toISOString(),
-          limit,
-        },
-      });
+    // Only add type filter if specified
+    if (type) {
+      logger.debug("Adding type filter", { type });
+      where.type = type;
     }
+
+    // Log available types
+    logger.debug("Available event types", {
+      types: Object.values(LearningEventType)
+    });
+
+    logger.debug("Querying learning events with params", {
+      where,
+      limit,
+      timestamp: new Date().toISOString()
+    });
+
+    // Get total count for pagination
+    const totalCount = await prisma.learningEvent.count({ where });
+
+    // Query events with conditions
+    const events = await prisma.learningEvent.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+      include: {
+        patterns: true // Include related patterns if needed
+      }
+    });
 
     logger.info("Retrieved learning events", {
       count: events.length,
+      total: totalCount,
       type,
       limit,
       startDate,
       endDate,
     });
 
+    // Format response
+    const formattedEvents = events.map((event) => ({
+      id: event.id,
+      type: event.type,
+      priority: event.priority,
+      timestamp: event.timestamp,
+      processedAt: event.processedAt,
+      metadata: event.metadata,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+      status: event.status,
+      correlationId: event.correlationId,
+      sessionId: event.sessionId,
+      userId: event.userId,
+      clientId: event.clientId,
+      environment: event.environment,
+      version: event.version,
+      tags: event.tags,
+      error: event.error,
+      retryCount: event.retryCount,
+      patterns: event.patterns
+    }));
+
     return NextResponse.json({
       success: true,
-      data: events.map((event) => ({
-        id: event.id,
-        type: event.type,
-        priority: event.priority,
-        timestamp: event.timestamp,
-        processedAt: event.processedAt,
-        metadata: event.metadata,
-        createdAt: event.createdAt,
-        updatedAt: event.updatedAt,
-        status: event.status,
-        correlationId: event.correlationId,
-        sessionId: event.sessionId,
-        userId: event.userId,
-        clientId: event.clientId,
-        environment: event.environment,
-        version: event.version,
-        tags: event.tags,
-        error: event.error,
-        retryCount: event.retryCount
-      })),
+      data: formattedEvents,
       meta: {
-        total: events.length,
+        total: totalCount,
+        returned: events.length,
         timestamp: new Date().toISOString(),
         limit,
+        query: {
+          type,
+          startDate: startDate ? new Date(startDate).toISOString() : undefined,
+          endDate: endDate ? new Date(endDate).toISOString() : undefined
+        }
       },
     });
   } catch (error) {
@@ -131,6 +178,7 @@ export async function GET(req: NextRequest) {
       error,
       errorType: error instanceof Error ? error.name : typeof error,
       message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
     });
 
     return NextResponse.json(
@@ -140,11 +188,104 @@ export async function GET(req: NextRequest) {
         meta: {
           timestamp: new Date().toISOString(),
           errorType: error instanceof Error ? error.name : typeof error,
+          errorMessage: error instanceof Error ? error.message : String(error),
           total: 0,
           limit: parseInt(
             new URL(req.url).searchParams.get("limit") || "100",
             10
           ),
+        }
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const validation = createEventSchema.safeParse(body);
+
+    if (!validation.success) {
+      logger.error("Invalid event data", {
+        errors: validation.error.format(),
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid event data",
+          details: validation.error.format(),
+        },
+        { status: 400 }
+      );
+    }
+
+    const eventData = validation.data;
+
+    logger.debug("Creating learning event", {
+      type: eventData.type,
+      priority: eventData.priority,
+      timestamp: new Date().toISOString()
+    });
+
+    const event = await prisma.learningEvent.create({
+      data: {
+        type: eventData.type,
+        priority: eventData.priority,
+        status: LearningEventStatus.PENDING,
+        timestamp: new Date(),
+        retryCount: 0,
+        metadata: eventData.metadata ? {
+          ...Object.fromEntries(
+            Object.entries(eventData.metadata).map(([key, value]) => [
+              key,
+              typeof value === 'object' ? JSON.parse(JSON.stringify(value)) : value
+            ])
+          )
+        } : undefined,
+        correlationId: eventData.correlationId,
+        sessionId: eventData.sessionId,
+        userId: eventData.userId,
+        clientId: eventData.clientId,
+        environment: eventData.environment,
+        version: eventData.version,
+        tags: eventData.tags
+      },
+      include: {
+        patterns: true
+      }
+    });
+
+    logger.info("Created learning event", {
+      id: event.id,
+      type: event.type,
+      timestamp: event.timestamp
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: event,
+      meta: {
+        timestamp: new Date().toISOString()
+      }
+    }, { status: 201 });
+
+  } catch (error) {
+    logger.error("Failed to create learning event", {
+      error,
+      errorType: error instanceof Error ? error.name : typeof error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to create learning event",
+        meta: {
+          timestamp: new Date().toISOString(),
+          errorType: error instanceof Error ? error.name : typeof error,
+          errorMessage: error instanceof Error ? error.message : String(error)
         }
       },
       { status: 500 }

@@ -1,61 +1,23 @@
-# Dependencies
-node_modules
-.pnpm-store
-.npm
-.yarn
-.pnp.*
+# Ignore everything by default
+*
 
-# Build outputs
+# Only include necessary files
+!package.json
+!package-lock.json
+!next.config.js
+!server.js
+!tsconfig*.json
+!src/**
+!public/**
+!prisma/**
+!scripts/**
+
+# Always ignore these
+.git
+.env*
+node_modules
 .next
 out
 dist
 build
-*.tsbuildinfo
-
-# Version control
-.git
-.gitignore
-.gitattributes
-.github
-
-# Development files
-.env*
-.editorconfig
-.eslintrc*
-.prettierrc*
-.vscode
-.idea
-*.log
-*.lock
-*.md
-*.test.*
-__tests__
-test
-tests
 coverage
-
-# Cache and temp files
-.cache
-.temp
-*.swp
-.DS_Store
-Thumbs.db
-
-# Documentation
-docs
-*.md
-CHANGELOG*
-LICENSE*
-
-# Postman collections
-postman
-
-# Debug files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Docker files (except Dockerfile)
-.dockerignore
-docker-compose*

@@ -63,13 +63,6 @@ export interface ElasticsearchConfig {
   auth?: {
     apiKey: string;
   };
-  ssl?: {
-    rejectUnauthorized: boolean;
-    ca?: string | Buffer | Array<string | Buffer>;
-  };
-  maxRetries?: number;
-  requestTimeout?: number;
-  sniffOnStart?: boolean;
 }
 
 /**
@@ -251,9 +244,8 @@ export interface ElasticsearchServiceConfig extends BaseServiceConfig {
     auth?: {
       apiKey: string;
     };
-    tls?: {
+    ssl?: {
       rejectUnauthorized: boolean;
-      ca?: string | Buffer | Array<string | Buffer>;
     };
     maxRetries?: number;
     requestTimeout?: number;
@@ -313,24 +305,22 @@ export class ElasticsearchService extends BaseService {
     this.logger = config.logger;
     this.metrics = config.metrics;
 
-    this.client = new Client({
-      node: config.config.node,
-      auth: config.config.auth,
-      tls: config.config.tls,
-      requestTimeout: config.config.requestTimeout || 30000,
-      pingTimeout: 30000,
-      maxRetries: config.config.maxRetries || 3,
-      compression: true,
-      name: 'sophra-app'
-    });
+    const elasticConfig = {
+      node: process.env.ELASTICSEARCH_URL,
+      auth: process.env.SOPHRA_ES_API_KEY
+        ? {
+            apiKey: process.env.SOPHRA_ES_API_KEY as string,
+          }
+        : undefined,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      maxRetries: 3,
+      requestTimeout: 30000,
+      sniffOnStart: false,
+    } as const;
 
-    this.logger.debug("Elasticsearch client initialized with config:", {
-      node: config.config.node,
-      hasAuth: !!config.config.auth,
-      hasTLS: !!config.config.tls,
-      requestTimeout: config.config.requestTimeout || 30000,
-      maxRetries: config.config.maxRetries || 3
-    });
+    this.client = new Client(elasticConfig);
   }
 
   /**
@@ -1044,22 +1034,24 @@ export class ElasticsearchService extends BaseService {
     }>
   > {
     try {
-      const response = (await this.client.cat.indices({
+      this.logger.info("Attempting to list indices with cat API");
+
+      const indices = await this.client.cat.indices({
         format: "json",
-      })) as unknown as CatIndicesApiResponse;
+        v: true, // Include column headers
+        h: "index,health,status,docs.count,docs.deleted,store.size,pri,rep", // Specify columns
+      });
 
-      if (!response?.body) {
-        this.logger.error("Invalid response from cat indices", { response });
-        return [];
-      }
+      this.logger.info("Raw cat.indices response:", { indices });
+      this.logger.info("Parsed indices from response:", { indices });
 
-      const indices = response.body;
       if (!Array.isArray(indices)) {
         this.logger.error("Invalid indices response format", { indices });
         return [];
       }
 
-      return indices.map((index: CatIndicesResponse) => ({
+      //@ts-expect-error We know this is a valid type
+      return indices.map((index: CatIndicesIndicesRecord) => ({
         name: index.index,
         health: index.health || "unknown",
         status: index.status || "unknown",

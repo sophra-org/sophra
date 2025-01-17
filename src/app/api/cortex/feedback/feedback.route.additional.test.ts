@@ -1,11 +1,11 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { GET, POST } from './route';
+import { SignalType, EngagementType } from './types';
 import { serviceManager } from '@lib/cortex/utils/service-manager';
 import { prisma } from '@lib/shared/database/client';
 import logger from '@lib/shared/logger';
-import { EngagementType, SignalType } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 import { JsonValue } from '@prisma/client/runtime/library';
-import { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GET, POST } from './route';
 
 // Mock dependencies
 vi.mock('@lib/cortex/utils/service-manager', () => ({

@@ -1,31 +1,15 @@
 import { serviceManager } from "@/lib/cortex/utils/service-manager";
+import type { Services } from "@/lib/cortex/types/services";
 import { prisma } from "@/lib/shared/database/client";
 import logger from "@/lib/shared/logger";
 import JSON5 from "json5";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { SignalType, EngagementType } from "./types";
+import { Prisma } from "@prisma/client";
+
 // Declare Node.js runtime
 export const runtime = "nodejs";
-
-
-enum SignalType {
-  SEARCH = "SEARCH",
-  PERFORMANCE = "PERFORMANCE",
-  USER_BEHAVIOR_IMPRESSION = "USER_BEHAVIOR_IMPRESSION",
-  USER_BEHAVIOR_VIEW = "USER_BEHAVIOR_VIEW",
-  USER_BEHAVIOR_CLICK = "USER_BEHAVIOR_CLICK",
-  USER_BEHAVIOR_CONVERSION = "USER_BEHAVIOR_CONVERSION",
-  MODEL_PERFORMANCE = "MODEL_PERFORMANCE",
-  FEEDBACK = "FEEDBACK",
-  SYSTEM_HEALTH = "SYSTEM_HEALTH",
-}
-
-enum EngagementType {
-  IMPRESSION = "IMPRESSION",
-  VIEW = "VIEW",
-  CLICK = "CLICK",
-  CONVERSION = "CONVERSION",
-}
 
 const FeedbackSchema = z.object({
   sessionId: z.string(),
@@ -47,13 +31,19 @@ const FeedbackSchema = z.object({
 
 function mapToCortexUserAction(
   action: SignalType
-): "clicked" | "ignored" | "converted" {
+): "clicked" | "converted" | "ignored" {
   switch (action) {
     case SignalType.USER_BEHAVIOR_CLICK:
       return "clicked";
     case SignalType.USER_BEHAVIOR_CONVERSION:
       return "converted";
+    case SignalType.USER_BEHAVIOR_VIEW:
+    case SignalType.USER_BEHAVIOR_IMPRESSION:
     default:
+      logger.warn("Unsupported user action type, defaulting to ignored", {
+        action,
+        timestamp: new Date().toISOString(),
+      });
       return "ignored";
   }
 }
@@ -112,13 +102,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
-  let rawBody = null;
-  let services = null;
+  let rawBody: string | null = null;
+  let services: Services | null = null;
 
   try {
     services = await serviceManager.getServices();
 
-    if (!services.feedback) {
+    if (!services || !services.feedback) {
       logger.error("Feedback service not available");
       throw new Error("Feedback service not initialized");
     }
@@ -147,46 +137,89 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { feedback } = validation.data;
     const timestamp = new Date().toISOString();
 
-    // Create search event with error handling
+    // Create search event with error handling in a transaction
     let searchEvent;
     try {
-      // First, verify the session exists
-      const session = await prisma.session.findUnique({
-        where: {
-          id: validation.data.sessionId,
-        },
-      });
-
-      if (!session) {
-        logger.error("Session not found", {
-          sessionId: validation.data.sessionId,
-          timestamp: new Date().toISOString(),
-        });
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Invalid session",
-            details: "Session not found",
-            sessionId: validation.data.sessionId,
+      // Use a transaction to ensure session and search event creation are atomic
+      const result = await prisma.$transaction(async (tx) => {
+        // First, ensure session exists in database since we need it for relations
+        const dbSession = await tx.session.findUnique({
+          where: {
+            id: validation.data.sessionId,
           },
-          { status: 404 }
-        );
-      }
+        });
 
-      searchEvent = await prisma.searchEvent.create({
-        data: {
-          timestamp: new Date(),
-          filters: {},
-          query: feedback[0].metadata.queryHash,
-          searchType: "FEEDBACK",
-          totalHits: 0,
-          took: 0,
-          session: {
-            connect: {
+        if (!dbSession) {
+          // If not in database, try to get from Redis and create in database
+          if (!services?.sessions) {
+            logger.error("Sessions service not available", {
+              sessionId: validation.data.sessionId,
+              timestamp: new Date().toISOString(),
+            });
+            throw new Error("Sessions service not available");
+          }
+
+          const redisSession = await services?.sessions.getSession(
+            validation.data.sessionId
+          );
+
+          if (!redisSession) {
+            logger.error("Session not found in Redis or database", {
+              sessionId: validation.data.sessionId,
+              timestamp: new Date().toISOString(),
+              redisAvailable: !!services?.redis,
+              sessionsAvailable: true,
+            });
+            throw new Error("Session not found in Redis or database");
+          }
+
+          // Set expiration to 30 days from now by default
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + 30);
+          const now = new Date();
+
+          // Create session
+          await tx.session.create({
+            data: {
               id: validation.data.sessionId,
+              startedAt: now,
+              lastActiveAt: now,
+              createdAt: now,
+              updatedAt: now,
+              metadata: redisSession?.metadata || {} as Prisma.InputJsonValue,
+              userId: redisSession?.userId || null,
+              expiresAt: expiresAt,
+              data: (redisSession as { data?: Prisma.InputJsonValue })?.data || {} as Prisma.InputJsonValue
+            },
+          });
+        }
+
+        // Create search event
+        const event = await tx.searchEvent.create({
+          data: {
+            timestamp: new Date(),
+            filters: {} as Prisma.InputJsonValue,
+            query: feedback[0].metadata.queryHash,
+            searchType: "FEEDBACK",
+            totalHits: 0,
+            took: 0,
+            session: {
+              connect: {
+                id: validation.data.sessionId,
+              },
             },
           },
-        },
+        });
+
+        return event;
+      });
+
+      searchEvent = result;
+      logger.debug("Created search event", {
+        searchEventId: searchEvent.id,
+        sessionId: validation.data.sessionId,
+        queryHash: feedback[0].metadata.queryHash,
+        filters: searchEvent.filters
       });
     } catch (dbError) {
       logger.error("Failed to create search event", {
@@ -210,27 +243,108 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Process feedback with error handling
     try {
-      await services.feedback.recordFeedbackWithOptimization(
-        feedback.map((item) => ({
-          searchId: item.queryId,
+      // Process all feedback items with error tracking
+      const feedbackResults = [];
+      for (const item of feedback) {
+        logger.debug("Preparing feedback data", {
+          searchEventId: searchEvent.id,
+          itemQueryId: item.queryId,
+          itemQueryHash: item.metadata.queryHash,
+          itemAction: item.metadata.userAction,
+          mappedAction: mapToCortexUserAction(item.metadata.userAction)
+        });
+
+        const feedbackData = {
+          searchId: searchEvent.id,
           queryHash: item.metadata.queryHash,
           resultId: item.metadata.resultId,
-          relevanceScore: Math.round(item.rating * 5),
+          relevanceScore: item.rating,
           userAction: mapToCortexUserAction(item.metadata.userAction),
           metadata: {
-            ...item.metadata.customMetadata,
-            originalRating: item.rating,
-            engagementType: item.metadata.engagementType,
             timestamp: item.metadata.timestamp,
+            engagementType: item.metadata.engagementType,
+            originalRating: item.rating,
+            customData: item.metadata.customMetadata
           },
-        }))[0]
-      );
+          testData: item.metadata.customMetadata?.testId && item.metadata.customMetadata?.variantId ? {
+            variantId: String(item.metadata.customMetadata.variantId)
+          } : undefined
+        };
+
+        logger.debug("Processing feedback item", {
+          feedbackData,
+          userAction: item.metadata.userAction,
+          mappedAction: mapToCortexUserAction(item.metadata.userAction),
+          searchEventId: searchEvent.id,
+        });
+
+        try {
+          if (!services?.feedback) {
+            throw new Error("Feedback service not available");
+          }
+          const result = await services.feedback.recordFeedbackWithOptimization(feedbackData);
+          feedbackResults.push({
+            success: true,
+            data: result,
+            feedbackData
+          });
+        } catch (itemError) {
+          logger.error("Failed to process individual feedback item", {
+            error: itemError,
+            feedbackData,
+            searchEventId: searchEvent.id,
+            errorDetails: itemError instanceof Error ? {
+              message: itemError.message,
+              name: itemError.name,
+              stack: itemError.stack
+            } : 'Unknown error type'
+          });
+          feedbackResults.push({
+            success: false,
+            error: itemError,
+            feedbackData
+          });
+          // Don't throw here, continue processing other items
+        }
+      }
+
+      // Check if any feedback items failed
+      const failedItems = feedbackResults.filter(r => !r.success);
+      if (failedItems.length > 0) {
+        logger.error("Some feedback items failed to process", {
+          totalItems: feedback.length,
+          failedCount: failedItems.length,
+          failedItems: failedItems.map(f => ({
+            queryId: f.feedbackData.searchId,
+            error: f.error instanceof Error ? f.error.message : String(f.error)
+          }))
+        });
+        throw new Error(`Failed to process ${failedItems.length} feedback items`);
+      }
+
+      logger.info("Successfully processed all feedback items", {
+        feedbackCount: feedback.length,
+        searchEventId: searchEvent.id,
+        firstItemAction: feedback[0]?.metadata.userAction,
+        firstItemMappedAction: feedback[0]
+          ? mapToCortexUserAction(feedback[0].metadata.userAction)
+          : null,
+        results: feedbackResults.map(r => ({
+          queryId: r.feedbackData.searchId,
+          success: r.success
+        }))
+      });
     } catch (feedbackError) {
       logger.error("Failed to process feedback", {
         error: feedbackError,
         searchEventId: searchEvent.id,
+        errorDetails: feedbackError instanceof Error ? {
+          message: feedbackError.message,
+          name: feedbackError.name,
+          stack: feedbackError.stack
+        } : 'Unknown error type'
       });
-      throw new Error("Feedback processing failed");
+      throw new Error(feedbackError instanceof Error ? feedbackError.message : "Feedback processing failed");
     }
 
     return NextResponse.json({

@@ -2,9 +2,23 @@ import { prisma } from "@lib/shared/database/client";
 import logger from "@lib/shared/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { calculateConfidence, calculateAverageRating } from "./utils";
+import { SignalType, EngagementType } from "@prisma/client";
 
 // Declare Node.js runtime
 export const runtime = "nodejs";
+
+interface FeedbackItem {
+  queryId: string;
+  rating: number;
+  metadata: {
+    userAction: SignalType;
+    resultId: string;
+    queryHash: string;
+    engagementType?: EngagementType;
+    customMetadata?: Record<string, unknown>;
+  };
+}
 
 const queryParamsSchema = z.object({
   timeframe: z.enum(["1h", "24h", "7d", "30d"]).default("24h"),
@@ -59,27 +73,43 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       take: params.limit,
     });
 
-    const patterns = feedbackPatterns.map((pattern) => {
-      const feedback = pattern.feedback as any[];
-      const confidence = calculateConfidence(feedback);
-      const averageRating = calculateAverageRating(feedback);
-      
-      return {
-        query_id: pattern.id,
-        pattern_type: "FEEDBACK",
-        confidence,
-        metadata: {
-          averageRating,
-          uniqueQueries: new Set(feedback.map((f) => f.queryId)).size,
-          totalFeedback: feedback.length,
-          actions: feedback.map((f) => f.metadata.userAction),
-          engagementTypes: feedback
-            .map((f) => f.metadata.engagementType)
-            .filter(Boolean),
-        },
-        timestamp: pattern.timestamp.toISOString(),
-      };
-    });
+    const patterns = await Promise.all(feedbackPatterns.map(async (pattern) => {
+      try {
+        // Parse the stringified feedback JSON
+        const feedback = JSON.parse(pattern.feedback as string) as FeedbackItem[];
+        
+        logger.debug("Processing feedback pattern", {
+          id: pattern.id,
+          feedbackCount: feedback.length,
+          timestamp: pattern.timestamp
+        });
+
+        const confidence = calculateConfidence(feedback);
+        const averageRating = calculateAverageRating(feedback);
+        
+        return {
+          query_id: pattern.id,
+          pattern_type: "FEEDBACK",
+          confidence,
+          metadata: JSON.stringify({
+            averageRating,
+            uniqueQueries: new Set(feedback.map((f: FeedbackItem) => f.queryId)).size,
+            totalFeedback: feedback.length,
+            actions: feedback.map((f: FeedbackItem) => f.metadata.userAction),
+            engagementTypes: feedback
+              .map((f: FeedbackItem) => f.metadata.engagementType)
+              .filter(Boolean),
+          }),
+          timestamp: pattern.timestamp.toISOString(),
+        };
+      } catch (error) {
+        logger.error("Failed to process feedback pattern", {
+          id: pattern.id,
+          error: error instanceof Error ? error.message : String(error)
+        });
+        throw error;
+      }
+    }));
 
     const latency = Date.now() - startTime;
     return NextResponse.json({
@@ -110,35 +140,4 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       { status: 500 }
     );
   }
-}
-
- function calculateConfidence(feedback: any[]): number {
-  if (!feedback || feedback.length === 0) return 0;
-
-  const sampleSize = feedback.length;
-  const baseConfidence = Math.min(sampleSize / 100, 1); // Scale with sample size up to 100
-  const consistencyScore = calculateConsistencyScore(feedback);
-  return Math.round(baseConfidence * consistencyScore * 100) / 100;
-}
-
-function calculateConsistencyScore(feedback: any[]): number {
-  if (!feedback || feedback.length < 2) return 0.5;
-
-  const ratings = feedback.map((f) => f.rating);
-  const mean = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-  const variance =
-    ratings.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / ratings.length;
-  const standardDeviation = Math.sqrt(variance);
-
-  // Lower standard deviation means more consistent ratings
-  return Math.max(0, 1 - standardDeviation);
-}
-
-function calculateAverageRating(feedback: any[]): number {
-  if (!feedback || feedback.length === 0) return 0;
-  return (
-    Math.round(
-      (feedback.reduce((acc, f) => acc + f.rating, 0) / feedback.length) * 100
-    ) / 100
-  );
 }
