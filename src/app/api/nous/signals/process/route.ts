@@ -1,8 +1,8 @@
-import { prisma } from "../../../../../lib/shared/database/client";
-import logger from "../../../../../lib/shared/logger";
 import { Prisma, SignalType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { prisma } from "../../../../../lib/shared/database/client";
+import logger from "../../../../../lib/shared/logger";
 // Declare Node.js runtime
 export const runtime = "nodejs";
 
@@ -62,28 +62,47 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           success: false,
           error: "Invalid request format",
           details: validation.error.format(),
-          metadata: {
-            processingDuration: 0,
-            apiVersion: process.env.NEXT_PUBLIC_API_VERSION,
-            timestamp: new Date().toISOString(),
-          },
         },
         { status: 400 }
       );
     }
 
-    const startTime = Date.now();
     const { signalId, status, type, result, error, metadata } = validation.data;
 
+    // First fetch the existing signal to preserve required fields
+    const existingSignal = await prisma.signal.findUnique({
+      where: { id: signalId },
+    });
+
+    if (!existingSignal) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Signal not found",
+          details: `No signal found with ID: ${signalId}`,
+        },
+        { status: 404 }
+      );
+    }
+
+    // Merge metadata properly
+    const updatedMetadata = {
+      ...(existingSignal.metadata as Record<string, unknown>),
+      ...(metadata || {}),
+      status,
+    };
+
+    // Update the signal while preserving required fields
     const processing = await prisma.signal.update({
       where: { id: signalId },
       data: {
-        type,
-        value: result as unknown as Prisma.InputJsonValue,
         processed: true,
         processedAt: new Date(),
-        metadata: metadata as unknown as Prisma.InputJsonValue,
-        error: error || null,
+        metadata: updatedMetadata as Prisma.InputJsonValue,
+        error: error || undefined,
+        updatedAt: new Date(),
+        strength: existingSignal.strength,
+        value: result ? (result as Prisma.InputJsonValue) : (existingSignal.value as Prisma.InputJsonValue),
       },
     });
 
@@ -91,30 +110,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       signalId,
       status,
       processed: processing.processed,
-      duration: Date.now() - startTime,
     });
 
     return NextResponse.json({
       success: true,
       data: processing,
-      metadata: {
-        processingDuration: Date.now() - startTime,
-        apiVersion: process.env.NEXT_PUBLIC_API_VERSION,
-        timestamp: new Date().toISOString(),
-      },
     });
   } catch (error) {
     logger.error("Failed to update signal processing", {
-      error:
-        error instanceof Error
-          ? {
-              message: error.message,
-              stack: error.stack,
-            }
-          : error,
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
     });
     return NextResponse.json(
-      { success: false, error: "Failed to update signal processing" },
+      { 
+        success: false, 
+        error: "Failed to update signal processing",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }
